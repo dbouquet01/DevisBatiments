@@ -4,6 +4,8 @@
  */
 package com.mycompany.devisbatiments.elements;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author eglan
@@ -12,11 +14,10 @@ public class Piece {
     
       
     String IdPiece;
-    private ArrayList<Coin> coins;
-    private ArrayList<Mur> murs;
+    private final ArrayList<Mur> murs;
 
     public Piece() {
-        this.coins = new ArrayList<>();
+        new ArrayList<>();
         this.murs = new ArrayList<>();
     }
     
