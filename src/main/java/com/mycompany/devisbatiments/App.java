@@ -1,11 +1,15 @@
 package com.mycompany.devisbatiments;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import com.mycompany.devisbatiments.Fenetre.FenetreAccueil;
+
 
 
 /**
@@ -13,25 +17,34 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
+    public static String currentUserRole = "";  // "Administrateur" ou "Opérateur"
+
     @Override
-    public void start(Stage stage) {
-        var javaVersion = SystemInfo.javaVersion();
-        var javafxVersion = SystemInfo.javafxVersion();
-        Button bouton = new Button("Clique!");
-        bouton.setOnAction(e -> {
-        System.out.println("Bouton cliqué !");
-        });
-        StackPane root = new StackPane();
-        root.getChildren().add(bouton);
-        Scene scene = new Scene(root, 300, 200);
+    public void start(Stage primaryStage) {
+    Stage loginStage = new Stage();
+    VBox loginLayout = new VBox(10);
+    loginLayout.setPadding(new Insets(20));
+    loginLayout.setAlignment(Pos.CENTER);
+    
+    Label titre = new Label("DEVIS BATIMENT");
+    titre.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;");
 
-        stage.setScene(scene);
-        stage.show();
-        
+    Button btnCo = new Button("Connexion");
+    
+    btnCo.setStyle("-fx-font-size: 14px;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;-fx-cursor: hand;");
+    
+
+    btnCo.setOnAction(e -> {
+    FenetreAccueil accueil = new FenetreAccueil();
+    accueil.afficher(primaryStage);
+    });
+    
+        // Bouton historique
+    loginLayout.getChildren().addAll(titre, btnCo );
+    Scene loginScene = new Scene(loginLayout, 300, 250);
+    loginStage.setScene(loginScene);
+    loginStage.setTitle("Connexion");
+    loginStage.show();
     }
-
-    public static void main(String[] args) {
-        launch();
-    }
-
 }
+
