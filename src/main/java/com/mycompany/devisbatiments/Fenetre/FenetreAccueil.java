@@ -19,6 +19,10 @@ import javafx.scene.layout.HBox;
  *
  * @author delph
  */
+
+//modification ligne 59 
+
+
 public class FenetreAccueil {
     
    
@@ -52,10 +56,16 @@ public class FenetreAccueil {
             accueil.afficher(stage);
         });
 
+        //c'est ce que j'ai du modifié         
         historique.setOnAction(e -> {
-            System.out.println("Historique des projets");
-        });
+         FenetreProjet recherche = new FenetreProjet();
+    
+         recherche.afficher(stage);
+         
+});
 
+        
+        
         // Conteneur des boutons
         HBox centre = new HBox(20, btnnewproject, historique);
         centre.setPadding(new Insets(30));
@@ -77,5 +87,6 @@ public class FenetreAccueil {
         
         stage.show();
     }
-        
+
+ 
 }
