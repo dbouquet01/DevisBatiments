@@ -41,13 +41,19 @@ public class FenetreNouveauProjet {
         btnimmeuble.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         btnimmeuble.setStyle("-fx-font-size: 24px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-alignment: center;-fx-cursor: hand;");
-        
+        btnimmeuble.setOnAction(e -> {
+        new FenetreAttributsImmeuble().afficher(stage);
+});
         // Bouton historique
         Button btnmaison = new Button("MAISON");
 
         btnmaison.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         btnmaison.setStyle("-fx-font-size: 24px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-alignment: center;-fx-cursor: hand;");
+        btnmaison.setOnAction(e -> { 
+    // Plus tard tu mettras : new FenetreAttributsMaison().afficher(stage);
+});        
+        
         Button retour = new Button("Retour");
 
         retour.setStyle(
@@ -82,7 +88,7 @@ public class FenetreNouveauProjet {
 
         Scene scene = new Scene(root, 1000, 600);
 
-        stage.setTitle("Accueil");
+        stage.setTitle("Nouveau projet");
         stage.setScene(scene);
         
         stage.show();

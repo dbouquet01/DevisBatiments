@@ -17,7 +17,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
  
 
-
 public class FenetreProjet {
 
     public void afficher(Stage stage) {
