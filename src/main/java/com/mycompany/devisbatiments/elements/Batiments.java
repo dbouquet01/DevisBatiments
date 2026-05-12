@@ -49,25 +49,10 @@ public class Batiments {
     }
     return total;
 }
-    
-    public double surfaceRevetement(int idRevetement) {
-    double surface = 0;
-    for (Niveau n : niveaux) {
-        for (Appartement a : n.getApparts()) {
-            for (Piece p : a.getPieces()) {
-                surface += p.surface();
-            }
-        }
-    }
-    return surface;
-}
+   
     
     
- public double devisRevetement(int idRevetement) {
-        double surface = surfaceRevetement(idRevetement);
-        // multiplier par le prix du revêtement
-        return surface;
-    }
+
 
     
     //il manque la methode dessiner mais je sais pas comment l'ecrire 

@@ -9,33 +9,20 @@ package com.mycompany.devisbatiments.elements;
  * @author eglan
  */
 public class Coin {
-    
-     private int IdCoin;
-    private double cx; 
-    private double cy; 
 
-    public int getIdCoin() {
-        return IdCoin;
+    private double x;
+    private double y;
+
+    public Coin(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public void setIdCoin(int IdCoin) {
-        this.IdCoin = IdCoin;
+    public double obtenirX() {
+        return x;
     }
 
-    public double getCx() {
-        return cx;
+    public double obtenirY() {
+        return y;
     }
-
-    public void setCx(double cx) {
-        this.cx = cx;
-    }
-
-    public double getCy() {
-        return cy;
-    }
-
-    public void setCy(double cy) {
-        this.cy = cy;
-    }
-    
 }

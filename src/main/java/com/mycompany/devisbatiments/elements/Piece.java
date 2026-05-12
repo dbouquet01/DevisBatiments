@@ -6,36 +6,50 @@ package com.mycompany.devisbatiments.elements;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author eglan
- */
 public class Piece {
-    
-      
-    String IdPiece;
-    private final ArrayList<Mur> murs;
 
-    public Piece() {
-        new ArrayList<>();
-        this.murs = new ArrayList<>();
-    }
-    
-    
-    //il faut appeler les classes murs et sols et invoquer le catalogue 
+    private String nom;
 
-    public String getIdPiece() {
-        return IdPiece;
+    private ArrayList<Coin> coins;
+    private ArrayList<Mur> murs;
+
+    public Piece(String nom) {
+
+        this.nom = nom;
+
+        coins = new ArrayList<>();
+        murs = new ArrayList<>();
     }
 
-    public void setIdPiece(String IdPiece) {
-        this.IdPiece = IdPiece;
+    public void ajouterCoin(Coin coin) {
+        coins.add(coin);
     }
 
-   public double surface() {
-    // calcul de la surface de la pièce
-    // à compléter selon comment on calcule
-    return 0;
-}
-    
+    public void construireMurs() {
+
+        murs.clear();
+
+        for (int i = 0; i < coins.size(); i++) {
+
+            Coin debut = coins.get(i);
+
+            Coin fin;
+
+            if (i == coins.size() - 1) {
+                fin = coins.get(0);
+            } else {
+                fin = coins.get(i + 1);
+            }
+
+            murs.add(new Mur(debut, fin));
+        }
+    }
+
+    public ArrayList<Coin> obtenirCoins() {
+        return coins;
+    }
+
+    public String obtenirNom() {
+        return nom;
+    }
 }
