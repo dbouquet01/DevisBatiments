@@ -1,19 +1,20 @@
-idRevetement;designation;pourMur(0/1);pourSol(0/1);pourPlafond(0/1) ;prixUnitaire
-1;Peinture;1;0;1;10.95
-2;Carrelage;1;1;0;49.75
-3;Lambris;1;1;1;50.60
-4;Marbre;1;1;0;97.85
-5;Crepi;1;0;0;67.80
-6;Papier peint;1;0;0;32.90
-7;Plaquettes de parement;1;0;0;15.20
-8;Peinture;1;0;1;77.30
-9;Peinture;1;0;1;29.90
-10;Carrelage;1;1;0;89.45
-11;Lambris;1;1;0;42.50
-12;Liege;1;0;0;25.40
-13;Parquet;0;1;0;46.36
-14;Vinyle Lino;0;1;0;23.55
-15;Moquette;0;1;0;48.10
-16;Stratifie;0;1;0;31.99
-17;Gazon;0;1;0;17.95
-18;Liege;0;1;0;33.90
+idRevetement;designation;pourMur(0/1);pourSol(0/1);pourPlafond(0/1) ;prixUnitaire;couleur
+
+1;Peinture;1;0;1;10.95;BEIGE
+2;Carrelage;1;1;0;49.75;LIGHTGRAY
+3;Lambris;1;1;1;50.60;BURLYWOOD
+4;Marbre;1;1;0;97.85;WHITE
+5;Crepi;1;0;0;67.80;BISQUE
+6;Papier peint;1;0;0;32.90;LIGHTPINK
+7;Plaquettes de parement;1;0;0;15.20;SANDYBROWN
+8;Peinture;1;0;1;77.30;ANTIQUEWHITE
+9;Peinture;1;0;1;29.90;FLORALWHITE
+10;Carrelage;1;1;0;89.45;SILVER
+11;Lambris;1;1;0;42.50;PERU
+12;Liege;1;0;0;25.40;TAN
+13;Parquet;0;1;0;46.36;SADDLEBROWN
+14;Vinyle Lino;0;1;0;23.55;DARKGRAY
+15;Moquette;0;1;0;48.10;DIMGRAY
+16;Stratifie;0;1;0;31.99;LIGHTSLATEGRAY
+17;Gazon;0;1;0;17.95;GREEN
+18;Liege;0;1;0;33.90;PERU
