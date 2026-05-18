@@ -4,84 +4,143 @@
  */
 package com.mycompany.devisbatiments.elements;
 
-import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-/**
- *
- * @author eglan
- */
+import java.util.ArrayList;
+
 public class Revetement {
-    
-    protected int idRevetement;
 
-    public Revetement(int idRevetement) {
+    private int idRevetement;
+    private String designation;
+    private boolean pourMur;
+    private boolean pourSol;
+    private boolean pourPlafond;
+    private double prixUnitaire;
+    private String couleur;
+
+    public Revetement(int idRevetement, String designation,
+                      boolean pourMur, boolean pourSol, boolean pourPlafond,
+                      double prixUnitaire, String couleur) {
         this.idRevetement = idRevetement;
+        this.designation = designation;
+        this.pourMur = pourMur;
+        this.pourSol = pourSol;
+        this.pourPlafond = pourPlafond;
+        this.prixUnitaire = prixUnitaire;
+        this.couleur = couleur;
     }
 
-    public int getIdRevetment() {
-        return idRevetement;
+    public static ArrayList<Revetement> chargerDepuisFichier() {
+        ArrayList<Revetement> liste = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("CatalogueRevetements.txt"))) {
+
+            reader.readLine();
+
+            String ligne;
+
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length < 7) {
+                    continue;
+                }
+
+                int id = Integer.parseInt(parts[0].trim());
+                String designation = parts[1].trim();
+                boolean pourMur = parts[2].trim().equals("1");
+                boolean pourSol = parts[3].trim().equals("1");
+                boolean pourPlafond = parts[4].trim().equals("1");
+                double prixUnitaire = Double.parseDouble(parts[5].trim());
+                String couleur = parts[6].trim();
+
+                liste.add(new Revetement(id, designation, pourMur, pourSol,
+                        pourPlafond, prixUnitaire, couleur));
+            }
+
+        } catch (IOException e) {
+            System.out.println("Erreur : impossible de lire CatalogueRevetements.txt");
+            e.printStackTrace();
+        }
+
+        return liste;
     }
 
-    public void setIdRevetment(int idRevetement) {
-        this.idRevetement = idRevetement;
-    }
-    
-    
-    public String chercheRevetement(String typeSupport) {
-        
+    public static ArrayList<Revetement> getRevetementsMur() {
+        ArrayList<Revetement> resultat = new ArrayList<>();
 
-    try {
-
-        List<String> lignes =
-                Files.readAllLines(Paths.get("revetements.txt"));
-
-        for(String ligne : lignes) {
-
-            String[] parts = ligne.split(";");
-
-            int id = Integer.parseInt(parts[0]);
-
-            if(id == idRevetement) {
-
-                boolean compatible = false;
-
-                switch(typeSupport) {
-
-                    case "MUR":
-                        compatible =
-                                Integer.parseInt(parts[2]) == 1;
-                        break;
-
-                    case "SOL":
-                        compatible =
-                                Integer.parseInt(parts[3]) == 1;
-                        break;
-
-                    case "PLAFOND":
-                        compatible =
-                                Integer.parseInt(parts[4]) == 1;
-                        break;
-                }
-
-                if(compatible) {
-
-                    return parts[1];
-                }
-                else {
-
-                    return "Revêtement incompatible";
-                }
+        for (Revetement r : chargerDepuisFichier()) {
+            if (r.isPourMur()) {
+                resultat.add(r);
             }
         }
 
-    } catch(IOException e) {
-
-        e.printStackTrace();
+        return resultat;
     }
 
-    return "Revêtement introuvable";
+    public static ArrayList<Revetement> getRevetementsSol() {
+        ArrayList<Revetement> resultat = new ArrayList<>();
+
+        for (Revetement r : chargerDepuisFichier()) {
+            if (r.isPourSol()) {
+                resultat.add(r);
+            }
+        }
+
+        return resultat;
     }
-   
+
+    public static ArrayList<Revetement> getRevetementsPlafond() {
+        ArrayList<Revetement> resultat = new ArrayList<>();
+
+        for (Revetement r : chargerDepuisFichier()) {
+            if (r.isPourPlafond()) {
+                resultat.add(r);
+            }
+        }
+
+        return resultat;
+    }
+
+    public double calculerPrix(double surface) {
+        return surface * prixUnitaire;
+    }
+
+    public int getIdRevetement() {
+        return idRevetement;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public boolean isPourMur() {
+        return pourMur;
+    }
+
+    public boolean isPourSol() {
+        return pourSol;
+    }
+
+    public boolean isPourPlafond() {
+        return pourPlafond;
+    }
+
+    public double getPrixUnitaire() {
+        return prixUnitaire;
+    }
+
+    public String getCouleur() {
+        return couleur;
+    }
+
+    @Override
+    public String toString() {
+        return designation + " (" + prixUnitaire + " €/m²)";
+    }
 }

@@ -8,17 +8,11 @@ package com.mycompany.devisbatiments.elements;
  *
  * @author eglan
  */
-public class Maison {
-    
       
-    private int IdMaison; 
-
-    public int getIdMaison() {
-        return IdMaison;
-    }
-
-    public void setIdMaison(int IdMaison) {
-        this.IdMaison = IdMaison;
+   public class Maison extends Batiments {
+   
+    public Maison (String Id, double largeur, double longueur, int nbEtage) {
+       super(Id, largeur, longueur, nbEtage);
     }
 
     

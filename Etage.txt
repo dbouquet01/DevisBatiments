@@ -1,1 +1,8 @@
-idEtage;idBatiment;nbPiece;Escalier,Devis
+idEtage;idProjet;nomEtage;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
+P1_RDC;P1;RDC;5;false;false;24.75;2713.97
+P2_RDC;P2;RDC;3;true;true;11.00;1349.10
+P2_ETAGE1;P2;ETAGE1;5;true;true;15.08;1930.05
+P2_ETAGE2;P2;ETAGE2;5;true;true;15.08;1930.05
+P2_ETAGE3;P2;ETAGE3;5;true;true;15.08;1930.05
+P2_ETAGE4;P2;ETAGE4;5;true;true;15.08;1930.05
+P2_ETAGE5;P2;ETAGE5;5;true;true;15.08;1930.05okay

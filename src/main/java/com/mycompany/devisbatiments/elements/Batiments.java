@@ -10,54 +10,57 @@ import java.util.ArrayList;
  *
  * @author eglan
  */
-public class Batiments {
-    String IdBatiment;
-    int nbNiveau; 
-    private ArrayList<Niveau> niveaux;
+public abstract class Batiments {
+   
+    protected String Id;
+    protected double largeur;
+    protected double longueur;
+    protected int nbEtage;
+   
+public Batiments (String Id, double largeur, double longueur, int nbEtage){
+    this.Id = Id;
+    this.largeur=largeur;
+    this.longueur=longueur;
+    this.nbEtage= nbEtage; }
 
- 
-    
-    public String getIdBat() {
-        return IdBatiment;
-    }
-
-    public void setIdBat(String IdBat) {
-        this.IdBatiment = IdBat;
-    }
-
-    public int getNbNiveau() {
-        return nbNiveau;
+    public String getId() {
+        return Id;
     }
 
-    public void setNbNiveau(int nbNiveau) {
-        this.nbNiveau = nbNiveau;
+
+    public void setId(String Id) {
+        this.Id = Id;
     }
-    
-  
-    
-    
-    
-    public void afficher() {
-        System.out.println("Bâtiment : " + IdBatiment);
-        System.out.println("Nombre de niveaux : " + nbNiveau);
+
+    public double getLargeur() {
+        return largeur;
     }
-    
-    public double devisBatiment() {
-    double total = 0;
-    for (Niveau n : niveaux) {
-        total += n.devisNiveau();
+
+    public void setLargeur(double largeur) {
+        this.largeur = largeur;
     }
-    return total;
+
+    public double getLongueur() {
+        return longueur;
+    }
+
+    public void setLongueur(double longueur) {
+        this.longueur = longueur;
+    }
+
+    public int getNbEtage() {
+        return nbEtage;
+    }
+
+    public void setNbEtage(int nbEtage) {
+        this.nbEtage = nbEtage;
+    }
+   
+    public double calculerSuperficie() {
+    return this.largeur * this.longueur;
 }
    
-    
-    
-
-
-    
-    //il manque la methode dessiner mais je sais pas comment l'ecrire 
-
-    
 }
-    
+
+   
 

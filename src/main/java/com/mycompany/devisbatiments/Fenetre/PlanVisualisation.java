@@ -98,7 +98,7 @@ public class PlanVisualisation {
         root.setCenter(zoneDessin);
 
         Scene scene =
-                new Scene(root, 800, 550);
+                new Scene(root, 850, 650);
 
         stage.setScene(scene);
 

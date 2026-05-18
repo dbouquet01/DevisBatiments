@@ -4,10 +4,6 @@
  */
 package com.mycompany.devisbatiments.elements;
 
-/**
- *
- * @author eglan
- */
 public class Coin {
 
     private double x;
@@ -18,11 +14,17 @@ public class Coin {
         this.y = y;
     }
 
-    public double obtenirX() {
+    public double distanceAvec(Coin autre) {
+        double dx = autre.x - this.x;
+        double dy = autre.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public double getX() {
         return x;
     }
 
-    public double obtenirY() {
+    public double getY() {
         return y;
     }
 }

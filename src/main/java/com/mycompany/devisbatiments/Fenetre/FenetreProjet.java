@@ -33,12 +33,12 @@ public class FenetreProjet {
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(30));
 
-        
-        
-        
-        
-        
-        
+       
+       
+       
+       
+       
+       
         TextField barreRecherche = new TextField();
         barreRecherche.setPromptText("Entrez le id du projet...");
         barreRecherche.setPrefWidth(300);
@@ -50,10 +50,10 @@ public class FenetreProjet {
         searchBar.setAlignment(Pos.CENTER);
         searchBar.setPadding(new Insets(20));
 
-        
-        
-        
-        
+       
+       
+       
+       
         VBox zoneResultats = new VBox(15);
         zoneResultats.setAlignment(Pos.TOP_LEFT);
         zoneResultats.setPadding(new Insets(20));
@@ -65,11 +65,11 @@ public class FenetreProjet {
         Text detailsText = new Text(); // Pour afficher les infos (ID, largeur, longueur, etc.)
         zoneResultats.getChildren().addAll(lblInfos, detailsText);
 
-        
-        
-        
-        
-        
+       
+       
+       
+       
+       
        btnRechercher.setOnAction(e -> {
            String nomCherche = barreRecherche.getText().trim();
            try {
@@ -138,18 +138,26 @@ public class FenetreProjet {
                 ex.printStackTrace();
             }
         });
-        
-        
-        
-        
-        
+       
+       
+       
+       
+       
 
        
         Button retour = new Button("Retour");
         retour.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
         retour.setOnAction(e -> new FenetreAccueil().afficher(stage));
-
         
+        Button btnPlans = new Button("Voir les plans");
+        btnPlans.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
+        btnPlans.setOnAction(e -> {
+        PlanVisualisation fenetrePlans = new PlanVisualisation();
+        fenetrePlans.afficher();
+        });
+
+
+       
         ComboBox<String> modificationBox = new ComboBox<>();
 
         modificationBox.getItems().addAll(
@@ -160,7 +168,7 @@ public class FenetreProjet {
 
         modificationBox.setPromptText("Modification");
 
-        modificationBox.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
+        modificationBox.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #F0F8FF;-fx-text-fill: white;-fx-cursor: hand;");
 
         HBox bottomContainer = new HBox();
 
@@ -176,6 +184,7 @@ public class FenetreProjet {
         bottomContainer.getChildren().addAll(
         retour,
         espace,
+        btnPlans,
         modificationBox
     );
         // Layout Principal
@@ -193,3 +202,4 @@ public class FenetreProjet {
         stage.show();
     }
 }
+

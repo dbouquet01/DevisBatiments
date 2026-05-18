@@ -1,1 +1,3 @@
-idDevis; 
+idDevis;idProjet;coutMurs;coutSols;coutPlafonds;coutTotal
+D1;P1;1204.50;1238.46;271.01;2713.97
+D2;P2;6110.10;3943.16;946.08;10999.34

@@ -4,9 +4,7 @@
  */
 package com.mycompany.devisbatiments.Fenetre;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -51,6 +48,7 @@ public class FenetreNouveauProjet {
 
         btnmaison.setStyle("-fx-font-size: 24px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-alignment: center;-fx-cursor: hand;");
         btnmaison.setOnAction(e -> { 
+            new FenetreAttributsMaison().afficher(stage);
     // Plus tard tu mettras : new FenetreAttributsMaison().afficher(stage);
 });        
         

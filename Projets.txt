@@ -3,3 +3,4 @@ idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreApparte
 P1;MaisonR;MAISON;1;2.5;120;0;D1
 P2;ImmeubleB;IMMEUBLE;5;15;1200;20;D2
 
+P4;Maison A;MAISON;1;2.5;63.0;0;D_P4

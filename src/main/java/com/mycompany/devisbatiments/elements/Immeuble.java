@@ -8,18 +8,9 @@ package com.mycompany.devisbatiments.elements;
  *
  * @author eglan
  */
-public class Immeuble {
-    
-     
-    private int IdImmeuble;
-
-    public int getIdImmeuble() {
-        return IdImmeuble;
+public class Immeuble extends Batiments {
+   
+    public Immeuble(String Id, double largeur, double longueur, int nbEtage) {
+       super(Id, largeur, longueur, nbEtage);
     }
-
-    public void setIdImmeuble(int IdImmeuble) {
-        this.IdImmeuble = IdImmeuble;
-    }
-    
-    
 }
