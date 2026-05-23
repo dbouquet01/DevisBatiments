@@ -41,7 +41,7 @@ public class App extends Application {
     
         // Bouton historique
     loginLayout.getChildren().addAll(titre, btnCo );
-    Scene loginScene = new Scene(loginLayout, 300, 250);
+    Scene loginScene = new Scene(loginLayout, 900, 550);
     loginStage.setScene(loginScene);
     loginStage.setTitle("Connexion");
     loginStage.show();

@@ -72,7 +72,7 @@ public class FenetreProjet {
 
                     String[] parties = ligne.split(";");
 
-                    if (parties.length < 10) {
+                    if (parties.length < 8) {
                         continue;
                     }
 
@@ -84,6 +84,8 @@ public class FenetreProjet {
                     String surface = parties[5].trim();
                     String appartements = parties[6].trim();
                     String devis = parties[7].trim();
+                    String largeur = parties[8].trim();
+                    String longueur = parties[9].trim();
                    
 
                     if (id.equalsIgnoreCase(nomCherche)) {
@@ -93,6 +95,8 @@ public class FenetreProjet {
                         typeTrouve[0] = type;
                         nbEtagesTrouve[0] = Integer.parseInt(etages);
                         surfaceTrouvee[0] = Double.parseDouble(surface);
+                        largeurTrouvee[0] = Double.parseDouble(largeur);
+                        longueurTrouvee[0] = Double.parseDouble(longueur);
                        
 
                         detailsText.setText(
