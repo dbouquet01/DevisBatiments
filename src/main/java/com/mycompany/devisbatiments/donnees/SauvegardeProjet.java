@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.devisbatiments.donnees;
 
 import java.io.IOException;
@@ -16,7 +12,7 @@ public class SauvegardeProjet {
     private static final String FICHIER_DEVIS = "Devis.txt";
 
     private static final String HEADER_PROJETS =
-            "idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis";
+            "idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur";
 
     private static final String HEADER_PLAN =
             "idProjet;vue;piece;x;y;largeur;longueur;hauteur;idRevetement";
@@ -37,7 +33,7 @@ public class SauvegardeProjet {
     public static void sauvegarderProjet(String idProjet, String designation, String type,
                                          int nombreEtages, double hauteurTotale,
                                          double surfaceTotale, int nombreAppartements,
-                                         String idDevis) {
+                                         String idDevis, double largeur, double longueur) {
         try {
             verifierFichier(FICHIER_PROJETS, HEADER_PROJETS);
 
@@ -53,7 +49,9 @@ public class SauvegardeProjet {
                     hauteurTotale + ";" +
                     surfaceTotale + ";" +
                     nombreAppartements + ";" +
-                    idDevis;
+                    idDevis + ";" +
+                    largeur + ";" +
+                    longueur;
 
             boolean remplace = false;
 
@@ -67,7 +65,7 @@ public class SauvegardeProjet {
 
                 String[] parts = ligne.split(";");
 
-                if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(idProjet)) {
+                if (parts.length > 0 && normaliser(parts[0]).equals(normaliser(idProjet))) {
                     nouvellesLignes.add(nouvelleLigne);
                     remplace = true;
                 } else {
@@ -111,6 +109,10 @@ public class SauvegardeProjet {
 
             boolean remplace = false;
 
+            String idProjetNormalise = normaliser(idProjet);
+            String vueNormalisee = normaliser(vue);
+            String nomElementNormalise = normaliser(nomElement);
+
             for (int i = 0; i < lignes.size(); i++) {
                 String ligne = lignes.get(i);
 
@@ -121,17 +123,22 @@ public class SauvegardeProjet {
 
                 String[] parts = ligne.split(";");
 
-                if (parts.length >= 3
-                        && parts[0].trim().equalsIgnoreCase(idProjet)
-                        && parts[1].trim().equalsIgnoreCase(vue)
-                        && parts[2].trim().equalsIgnoreCase(nomElement)) {
+                if (parts.length >= 3) {
+                    String idExistant = normaliser(parts[0]);
+                    String vueExistante = normaliser(parts[1]);
+                    String nomExistant = normaliser(parts[2]);
 
-                    nouvellesLignes.add(nouvelleLigne);
-                    remplace = true;
+                    if (idExistant.equals(idProjetNormalise)
+                            && vueExistante.equals(vueNormalisee)
+                            && nomExistant.equals(nomElementNormalise)) {
 
-                } else {
-                    nouvellesLignes.add(ligne);
+                        nouvellesLignes.add(nouvelleLigne);
+                        remplace = true;
+                        continue;
+                    }
                 }
+
+                nouvellesLignes.add(ligne);
             }
 
             if (!remplace) {
@@ -177,9 +184,9 @@ public class SauvegardeProjet {
                 String[] parts = ligne.split(";");
 
                 if (parts.length >= 3
-                        && parts[0].trim().equalsIgnoreCase(idDevis)
-                        && parts[1].trim().equalsIgnoreCase(idProjet)
-                        && parts[2].trim().equalsIgnoreCase(element)) {
+                        && normaliser(parts[0]).equals(normaliser(idDevis))
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[2]).equals(normaliser(element))) {
 
                     nouvellesLignes.add(nouvelleLigne);
                     remplace = true;
@@ -198,5 +205,27 @@ public class SauvegardeProjet {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String normaliser(String texte) {
+        if (texte == null) {
+            return "";
+        }
+
+        return texte
+                .trim()
+                .toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("ê", "e")
+                .replace("ë", "e")
+                .replace("à", "a")
+                .replace("â", "a")
+                .replace("ù", "u")
+                .replace("û", "u")
+                .replace("î", "i")
+                .replace("ï", "i")
+                .replace("ô", "o")
+                .replace("ç", "c");
     }
 }

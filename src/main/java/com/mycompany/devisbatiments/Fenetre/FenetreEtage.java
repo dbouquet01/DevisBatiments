@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.elements.Batiments;
@@ -13,6 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class FenetreEtage {
 
@@ -47,7 +46,7 @@ public class FenetreEtage {
 
         for (int i = 0; i <= batiment.getNbEtage(); i++) {
 
-            String nomEtage = (i == 0) ? "Rez-de-chaussée" : "Étage " + i;
+            String nomEtage = (i == 0) ? "RDC" : "Etage " + i;
 
             Label lblEtage = new Label(nomEtage);
             lblEtage.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -84,12 +83,43 @@ public class FenetreEtage {
         btnRetour.setStyle(styleBouton);
 
         btnRetour.setOnAction(e -> {
-            if (batiment instanceof Maison) {
-                new FenetreAttributsMaison().afficher(stage);
-            } else {
-                new FenetreAttributsImmeuble().afficher(stage);
+    // On lit la désignation dans Projets.txt
+    String designation = "";
+    try (BufferedReader reader = new BufferedReader(new FileReader("Projets.txt"))) {
+        String ligne;
+        reader.readLine(); // ignorer en-tête
+        while ((ligne = reader.readLine()) != null) {
+            if (ligne.trim().isEmpty()) continue;
+            String[] parts = ligne.split(";");
+            if (parts.length >= 2 && parts[0].trim().equalsIgnoreCase(batiment.getId())) {
+                designation = parts[1].trim();
+                break;
             }
-        });
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+
+    if (batiment instanceof Maison) {
+        new FenetreAttributsMaison().afficher(
+            stage,
+            batiment.getId(),
+            designation,
+            batiment.getLargeur(),
+            batiment.getLongueur(),
+            batiment.getNbEtage()
+        );
+    } else {
+        new FenetreAttributsImmeuble().afficher(
+            stage,
+            batiment.getId(),
+            designation,
+            batiment.getLargeur(),
+            batiment.getLongueur(),
+            batiment.getNbEtage()
+        );
+    }
+});
 
         HBox bottomBox = new HBox(btnRetour);
         bottomBox.setPadding(new Insets(20));

@@ -1,22 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
+import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Maison;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 
 public class FenetreAttributsMaison {
 
     public void afficher(Stage stage) {
-        // --- TITRE ---
+        afficher(stage, "", "", 0, 0, 1);
+    }
+
+    public void afficher(Stage stage, String idExistant, String designationExistante,
+                         double largeurExistante, double longueurExistante, int nbEtagesExistant) {
+
         Label titre = new Label("ATTRIBUTS DE LA MAISON");
         titre.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -24,7 +26,6 @@ public class FenetreAttributsMaison {
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(30));
 
-        // --- FORMULAIRE ---
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(20);
@@ -33,76 +34,84 @@ public class FenetreAttributsMaison {
 
         String styleLabel = "-fx-font-size: 16px; -fx-font-weight: bold;";
 
-        TextField fieldId          = new TextField();
+        TextField fieldId = new TextField();
         TextField fieldDesignation = new TextField();
-        TextField fieldLargeur     = new TextField();  // séparé en 2 champs
-        TextField fieldLongueur    = new TextField();  // pour passer à Maison(id, larg, long, nb)
-        TextField fieldEtage       = new TextField();
+        TextField fieldLargeur = new TextField();
+        TextField fieldLongueur = new TextField();
+        TextField fieldEtage = new TextField();
 
-        ajouterLigne(grid, "ID :",             fieldId,          0, styleLabel);
-        ajouterLigne(grid, "Désignation :",    fieldDesignation, 1, styleLabel);
-        ajouterLigne(grid, "Largeur (m) :",    fieldLargeur,     2, styleLabel);
-        ajouterLigne(grid, "Longueur (m) :",   fieldLongueur,    3, styleLabel);
-        ajouterLigne(grid, "Nombre d'étages :", fieldEtage,      4, styleLabel);
+        fieldId.setText(idExistant);
+        fieldDesignation.setText(designationExistante);
 
-        // --- LABEL D'ERREUR (caché par défaut) ---
-        // On l'affiche si l'utilisateur laisse un champ vide ou met une valeur invalide
+        if (largeurExistante > 0) {
+            fieldLargeur.setText(String.valueOf(largeurExistante));
+        }
+
+        if (longueurExistante > 0) {
+            fieldLongueur.setText(String.valueOf(longueurExistante));
+        }
+
+        fieldEtage.setText(String.valueOf(nbEtagesExistant));
+
+        ajouterLigne(grid, "ID :", fieldId, 0, styleLabel);
+        ajouterLigne(grid, "Désignation :", fieldDesignation, 1, styleLabel);
+        ajouterLigne(grid, "Largeur (m) :", fieldLargeur, 2, styleLabel);
+        ajouterLigne(grid, "Longueur (m) :", fieldLongueur, 3, styleLabel);
+        ajouterLigne(grid, "Nombre d'étages :", fieldEtage, 4, styleLabel);
+
         Label lblErreur = new Label("");
         lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
 
-        // --- BOUTONS ---
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
-                           + "-fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;";
+                + "-fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;";
 
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> new FenetreNouveauProjet().afficher(stage));
+        btnRetour.setOnAction(e -> new FenetreProjet().afficher(stage));
 
         Button btnSuivant = new Button("ÉTAPE SUIVANTE →");
         btnSuivant.setStyle(styleBouton);
 
         btnSuivant.setOnAction(e -> {
-            // 1. On récupère les valeurs saisies
-            String id          = fieldId.getText().trim();
+            String id = fieldId.getText().trim();
             String designation = fieldDesignation.getText().trim();
-            String txtLargeur  = fieldLargeur.getText().trim();
-            String txtLongueur = fieldLongueur.getText().trim();
-            String txtEtage    = fieldEtage.getText().trim();
+            String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
+            String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
+            String txtEtage = fieldEtage.getText().trim();
 
-            // 2. Validation : aucun champ ne doit être vide
             if (id.isEmpty() || designation.isEmpty() || txtLargeur.isEmpty()
                     || txtLongueur.isEmpty() || txtEtage.isEmpty()) {
                 lblErreur.setText("Veuillez remplir tous les champs.");
                 return;
             }
 
-            // 3. Conversion des valeurs numériques avec gestion d'erreur
             try {
-                double largeur  = Double.parseDouble(txtLargeur);
+                double largeur = Double.parseDouble(txtLargeur);
                 double longueur = Double.parseDouble(txtLongueur);
-                int    nbEtages = Integer.parseInt(txtEtage);
+                int nbEtages = Integer.parseInt(txtEtage);
 
-                // 4. Création de l'objet Maison avec les vraies données
-               Maison maison = new Maison(id, largeur, longueur, nbEtages);
+                Maison maison = new Maison(id, largeur, longueur, nbEtages);
 
                 String idDevis = "D_" + id;
                 double hauteurTotale = nbEtages * 2.5;
-                double surfaceTotale = largeur * longueur * nbEtages;
+                double surfaceTotale = largeur * longueur * (nbEtages + 1);
 
                 SauvegardeProjet.sauvegarderProjet(
-                    id,
-                    designation,
-                    "MAISON",
-                    nbEtages,
-                    hauteurTotale,
-                    surfaceTotale,
-                    0,
-                    idDevis
+                        id,
+                        designation,
+                        "MAISON",
+                        nbEtages,
+                        hauteurTotale,
+                        surfaceTotale,
+                        0,
+                        idDevis,
+                        largeur,
+                        longueur
                 );
 
                 new FenetreEtage(maison).afficher(stage);
+
             } catch (NumberFormatException ex) {
-                // Si l'utilisateur a mis du texte dans un champ numérique
                 lblErreur.setText("Largeur, longueur et étages doivent être des nombres.");
             }
         });
@@ -113,7 +122,6 @@ public class FenetreAttributsMaison {
         bottomBox.getChildren().addAll(btnRetour, btnSuivant);
         bottomBox.setAlignment(Pos.CENTER);
 
-        // --- MISE EN PAGE FINALE ---
         VBox centre = new VBox(10, grid, lblErreur);
         centre.setAlignment(Pos.CENTER);
 
@@ -135,4 +143,3 @@ public class FenetreAttributsMaison {
         grid.add(field, 1, ligne);
     }
 }
-

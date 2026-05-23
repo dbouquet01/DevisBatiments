@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 
 public class FenetreListePieces {
 
@@ -38,6 +39,16 @@ public class FenetreListePieces {
         this.surfaceAppart = batiment.getLargeur() * batiment.getLongueur();
     }
 
+    
+    public FenetreListePieces(Batiments batiment, String nomEtage, ArrayList<String> nomsPieces) {
+    this.batiment = batiment;
+    this.nomEtage = nomEtage;
+    this.numAppart = 0;
+    this.surfaceAppart = batiment.getLargeur() * batiment.getLongueur();
+    this.nomsPieces.addAll(nomsPieces);
+}
+    
+    
     public void afficher(Stage stage) {
 
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
@@ -78,6 +89,29 @@ public class FenetreListePieces {
         VBox listePieces = new VBox(8);
         listePieces.setAlignment(Pos.CENTER);
         listePieces.setPadding(new Insets(10));
+        
+        for (String nomExistant : nomsPieces) {
+        Label lblNumero = new Label("Pièce " + (nomsPieces.indexOf(nomExistant) + 1));
+        lblNumero.setStyle("-fx-font-size: 13px; -fx-text-fill: grey;");
+        lblNumero.setMinWidth(80);
+
+        Label lblNom = new Label(nomExistant);
+        lblNom.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        lblNom.setMinWidth(250);
+
+        Button btnEntrer = new Button("Entrer →");
+        btnEntrer.setStyle(styleBouton);
+        final String nomCapture = nomExistant;
+        btnEntrer.setOnAction(ev -> {
+        new FenetrePiece(batiment, nomEtage, nomCapture, surfaceAppart, nomsPieces).afficher(stage);
+});
+
+    HBox ligne = new HBox(20, lblNumero, lblNom, btnEntrer);
+    ligne.setAlignment(Pos.CENTER_LEFT);
+    ligne.setStyle("-fx-background-color: #F4F4F4; -fx-border-color: #0F056B; "
+            + "-fx-border-width: 1; -fx-padding: 10 20;");
+    listePieces.getChildren().add(ligne);
+}
 
         // --- LOGIQUE AJOUT PIÈCE ---
         btnAjouter.setOnAction(e -> {
@@ -90,6 +124,11 @@ public class FenetreListePieces {
             lblErreur.setText("");
             nomsPieces.add(nomPiece);
             fieldNomPiece.clear();
+            
+
+    
+
+
 
             Label lblNumero = new Label("Pièce " + nomsPieces.size());
             lblNumero.setStyle("-fx-font-size: 13px; -fx-text-fill: grey;");
@@ -105,7 +144,7 @@ public class FenetreListePieces {
             final String nomCapture = nomPiece;
 
             btnEntrer.setOnAction(ev -> {
-                new FenetrePiece(batiment, nomEtage, nomCapture, surfaceAppart).afficher(stage);
+            new FenetrePiece(batiment, nomEtage, nomCapture, surfaceAppart, nomsPieces).afficher(stage);
             });
 
             HBox ligne = new HBox(20, lblNumero, lblNom, btnEntrer);
@@ -126,7 +165,14 @@ public class FenetreListePieces {
             }
         });
 
-        HBox bottomBox = new HBox(btnRetour);
+        Button btnDevis = new Button("VOIR LE DEVIS");
+        btnDevis.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; "
+        + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
+        btnDevis.setOnAction(e -> {
+        new FenetreRecapitulatif(batiment, nomEtage).afficher(stage);
+});
+
+        HBox bottomBox = new HBox(20, btnRetour, btnDevis);
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.BOTTOM_LEFT);
 

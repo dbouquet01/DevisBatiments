@@ -56,8 +56,8 @@ public Batiments (String Id, double largeur, double longueur, int nbEtage){
         this.nbEtage = nbEtage;
     }
    
-    public double calculerSuperficie() {
-    return this.largeur * this.longueur;
+public double calculerSuperficie() {
+    return this.largeur * this.longueur * (this.nbEtage + 1);
 }
    
 }

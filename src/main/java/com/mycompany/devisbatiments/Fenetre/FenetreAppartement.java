@@ -54,7 +54,7 @@ public class FenetreAppartement {
         ligneNb.setAlignment(Pos.CENTER);
 
         
-        Label lblSurfaceInfo = new Label("");
+        Label lblSurfaceInfo = new Label("Surface totale de l'étage : " + String.format("%.2f", surfaceEtage) + " m²");
         lblSurfaceInfo.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F056B; -fx-font-weight: bold;");
 
         // --- LISTE DES APPARTEMENTS (cachée jusqu'à validation) ---

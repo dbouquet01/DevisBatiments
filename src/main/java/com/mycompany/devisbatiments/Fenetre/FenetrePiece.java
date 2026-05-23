@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
-import com.mycompany.devisbatiments.elements.Batiments;
-import com.mycompany.devisbatiments.elements.Piece;
-import com.mycompany.devisbatiments.elements.Revetement;
+import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
+import com.mycompany.devisbatiments.elements.*;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+
+
 
 public class FenetrePiece {
 
@@ -21,282 +19,468 @@ public class FenetrePiece {
     private final String nomEtage;
     private final String nomPiece;
     private final double surfacePiece;
-
-    private final double xOrigine;
-    private final double yOrigine;
+    private final ArrayList<String> nomsPieces;
 
     private Piece piece;
 
-    public FenetrePiece(Batiments batiment, String nomEtage) {
-        this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.nomPiece = "Pièce";
-        this.surfacePiece = 0;
-        this.xOrigine = 0;
-        this.yOrigine = 0;
-    }
-
     public FenetrePiece(Batiments batiment, String nomEtage,
-                        String nomPiece, double surfacePiece) {
-        this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.nomPiece = nomPiece;
-        this.surfacePiece = surfacePiece;
-        this.xOrigine = 0;
-        this.yOrigine = 0;
-    }
-
-    public FenetrePiece(Batiments batiment, String nomEtage,
-                        String nomPiece, double xOrigine, double yOrigine,
-                        double largeur, double longueur) {
-        this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.nomPiece = nomPiece;
-        this.surfacePiece = largeur * longueur;
-        this.xOrigine = xOrigine;
-        this.yOrigine = yOrigine;
-    }
+                    String nomPiece, double surfacePiece,
+                    ArrayList<String> nomsPieces) {
+    this.batiment = batiment;
+    this.nomEtage = nomEtage;
+    this.nomPiece = nomPiece;
+    this.surfacePiece = surfacePiece;
+    this.nomsPieces = nomsPieces;
+}
 
     public void afficher(Stage stage) {
 
-        String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
-                + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
-        String styleLabel = "-fx-font-size: 14px; -fx-font-weight: bold;";
-        String styleTitreSec = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0F056B;";
+        String styleBouton =
+                "-fx-background-color: #0F056B;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-padding: 8 18;" +
+                "-fx-cursor: hand;";
 
-        Label titre = new Label("PIÈCE : " + nomPiece + "  —  " + nomEtage);
-        titre.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        BorderPane root =
+                new BorderPane();
 
-        VBox topBox = new VBox(titre);
-        topBox.setAlignment(Pos.CENTER);
-        topBox.setPadding(new Insets(25));
+        root.setStyle(
+                "-fx-background-color: #F5F5F5;"
+        );
 
-        Label titreDimensions = new Label("1. Dimensions de la pièce");
-        titreDimensions.setStyle(styleTitreSec);
+        Label titre =
+                new Label(
+                        "CONFIGURATION PIÈCE — "
+                                + nomPiece
+                                + " / "
+                                + nomEtage
+                );
 
-        GridPane gridDim = new GridPane();
-        gridDim.setHgap(15);
+        titre.setStyle(
+                "-fx-font-size: 22px;" +
+                "-fx-font-weight: bold;"
+        );
+
+        HBox top =
+                new HBox(titre);
+
+        top.setAlignment(Pos.CENTER);
+
+        top.setPadding(
+                new Insets(12)
+        );
+
+        root.setTop(top);
+
+        VBox panneauGauche =
+                new VBox(12);
+
+        panneauGauche.setPadding(
+                new Insets(15)
+        );
+
+        panneauGauche.setPrefWidth(760);
+
+        TextField fieldX =
+                new TextField();
+
+        TextField fieldY =
+                new TextField();
+
+        TextField fieldLargeur =
+                new TextField();
+
+        TextField fieldLongueur =
+                new TextField();
+
+        TextField fieldHauteur =
+                new TextField();
+
+        GridPane gridDim =
+                new GridPane();
+
+        gridDim.setHgap(10);
         gridDim.setVgap(10);
-        gridDim.setPadding(new Insets(10));
-        gridDim.setAlignment(Pos.CENTER);
 
-        TextField fieldLargeur = new TextField();
-        TextField fieldLongueur = new TextField();
-        TextField fieldHauteur = new TextField();
+        gridDim.add(new Label("X origine :"), 0, 0);
+        gridDim.add(fieldX, 1, 0);
 
-        if (surfacePiece > 0) {
-            fieldLargeur.setPromptText("ex: 3.0");
-            fieldLongueur.setPromptText("ex: " + String.format("%.1f", surfacePiece / 3.0));
-        }
+        gridDim.add(new Label("Y origine :"), 0, 1);
+        gridDim.add(fieldY, 1, 1);
 
-        ajouterLigne(gridDim, "Largeur (m) :", fieldLargeur, 0, styleLabel);
-        ajouterLigne(gridDim, "Longueur (m) :", fieldLongueur, 1, styleLabel);
-        ajouterLigne(gridDim, "Hauteur (m) :", fieldHauteur, 2, styleLabel);
+        gridDim.add(new Label("Largeur (m) :"), 0, 2);
+        gridDim.add(fieldLargeur, 1, 2);
 
-        Label lblOrigine = new Label(
-                String.format("Origine plan : x = %.2f ; y = %.2f", xOrigine, yOrigine)
+        gridDim.add(new Label("Longueur (m) :"), 0, 3);
+        gridDim.add(fieldLongueur, 1, 3);
+
+        gridDim.add(new Label("Hauteur (m) :"), 0, 4);
+        gridDim.add(fieldHauteur, 1, 4);
+
+        VBox boxDim =
+                new VBox(
+                        10,
+                        new Label("1. Dimensions / position"),
+                        gridDim
+                );
+
+        boxDim.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-padding: 12;" +
+                "-fx-border-color: #0F056B;"
         );
-        lblOrigine.setStyle("-fx-font-size: 13px;");
 
-        Label lblSurfaceMur = new Label("Surface murs : —");
-        Label lblSurfaceSol = new Label("Surface sol : —");
-        Label lblSurfacePlafond = new Label("Surface plafond : —");
+        ComboBox<Revetement> comboMur =
+                new ComboBox<>();
 
-        Button btnCalculer = new Button("Calculer les surfaces");
-        btnCalculer.setStyle(styleBouton);
+        ComboBox<Revetement> comboSol =
+                new ComboBox<>();
 
-        Label lblErreurDim = new Label("");
-        lblErreurDim.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
+        ComboBox<Revetement> comboPlafond =
+                new ComboBox<>();
 
-        VBox zoneDimensions = new VBox(
-                8,
-                titreDimensions,
-                gridDim,
-                lblOrigine,
-                btnCalculer,
-                lblErreurDim,
-                lblSurfaceMur,
-                lblSurfaceSol,
-                lblSurfacePlafond
+        comboMur.getItems().addAll(
+                Revetement.getRevetementsMur()
         );
-        zoneDimensions.setAlignment(Pos.CENTER);
-        zoneDimensions.setPadding(new Insets(10));
 
-        Label titreRevetements = new Label("2. Choix des revêtements");
-        titreRevetements.setStyle(styleTitreSec);
+        comboSol.getItems().addAll(
+                Revetement.getRevetementsSol()
+        );
 
-        ComboBox<Revetement> comboMur = new ComboBox<>();
-        ComboBox<Revetement> comboSol = new ComboBox<>();
-        ComboBox<Revetement> comboPlafond = new ComboBox<>();
+        comboPlafond.getItems().addAll(
+                Revetement.getRevetementsPlafond()
+        );
 
-        comboMur.getItems().addAll(Revetement.getRevetementsMur());
-        comboSol.getItems().addAll(Revetement.getRevetementsSol());
-        comboPlafond.getItems().addAll(Revetement.getRevetementsPlafond());
+        GridPane gridRev =
+                new GridPane();
 
-        comboMur.setPromptText("Choisir revêtement mur...");
-        comboSol.setPromptText("Choisir revêtement sol...");
-        comboPlafond.setPromptText("Choisir revêtement plafond...");
+        gridRev.setHgap(10);
+        gridRev.setVgap(10);
 
-        GridPane gridRev = new GridPane();
-        gridRev.setHgap(15);
-        gridRev.setVgap(12);
-        gridRev.setPadding(new Insets(10));
-        gridRev.setAlignment(Pos.CENTER);
-
-        Label lblMur = new Label("Revêtement Mur :");
-        lblMur.setStyle(styleLabel);
-
-        Label lblSol = new Label("Revêtement Sol :");
-        lblSol.setStyle(styleLabel);
-
-        Label lblPlafond = new Label("Revêtement Plafond :");
-        lblPlafond.setStyle(styleLabel);
-
-        gridRev.add(lblMur, 0, 0);
+        gridRev.add(new Label("Murs :"), 0, 0);
         gridRev.add(comboMur, 1, 0);
-        gridRev.add(lblSol, 0, 1);
+
+        gridRev.add(new Label("Sol :"), 0, 1);
         gridRev.add(comboSol, 1, 1);
-        gridRev.add(lblPlafond, 0, 2);
+
+        gridRev.add(new Label("Plafond :"), 0, 2);
         gridRev.add(comboPlafond, 1, 2);
 
-        Label titreCout = new Label("3. Coût estimé");
-        titreCout.setStyle(styleTitreSec);
+        VBox boxRev =
+                new VBox(
+                        10,
+                        new Label("2. Revêtements"),
+                        gridRev
+                );
 
-        Label lblCoutMur = new Label("Coût murs : —");
-        Label lblCoutSol = new Label("Coût sol : —");
-        Label lblCoutPlafond = new Label("Coût plafond : —");
-        Label lblCoutTotal = new Label("TOTAL : —");
-
-        lblCoutTotal.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0F056B;");
-
-        Button btnCalculerCout = new Button("Calculer le coût");
-        btnCalculerCout.setStyle(styleBouton);
-        btnCalculerCout.setDisable(true);
-
-        Label lblErreurRev = new Label("");
-        lblErreurRev.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
-
-        VBox zoneCout = new VBox(
-                8,
-                titreCout,
-                lblCoutMur,
-                lblCoutSol,
-                lblCoutPlafond,
-                lblCoutTotal,
-                lblErreurRev
+        boxRev.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-padding: 12;" +
+                "-fx-border-color: #0F056B;"
         );
-        zoneCout.setAlignment(Pos.CENTER);
+
+        HBox ligneHaut =
+                new HBox(
+                        15,
+                        boxDim,
+                        boxRev
+                );
+
+        Label lblSurfaceMur =
+                new Label("Surface murs : -");
+
+        Label lblSurfaceSol =
+                new Label("Surface sol : -");
+
+        Label lblSurfacePlafond =
+                new Label("Surface plafond : -");
+
+        Label lblPrixMur =
+                new Label("Prix murs : -");
+
+        Label lblPrixSol =
+                new Label("Prix sol : -");
+
+        Label lblPrixPlafond =
+                new Label("Prix plafond : -");
+
+        Label lblPrixTotal =
+                new Label("TOTAL : -");
+
+        GridPane resultats =
+                new GridPane();
+
+        resultats.setHgap(30);
+        resultats.setVgap(8);
+
+        resultats.add(lblSurfaceMur, 0, 0);
+        resultats.add(lblPrixMur, 1, 0);
+
+        resultats.add(lblSurfaceSol, 0, 1);
+        resultats.add(lblPrixSol, 1, 1);
+
+        resultats.add(lblSurfacePlafond, 0, 2);
+        resultats.add(lblPrixPlafond, 1, 2);
+
+        resultats.add(lblPrixTotal, 0, 3);
+
+        VBox boxCalcul =
+                new VBox(
+                        10,
+                        new Label("3. Calcul"),
+                        resultats
+                );
+
+        boxCalcul.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-padding: 12;" +
+                "-fx-border-color: #0F056B;"
+        );
+
+        Label lblMessage =
+                new Label("");
+
+        Button btnCalculer =
+                new Button("CALCULER");
+
+        btnCalculer.setStyle(styleBouton);
+
+        Button btnEnregistrer =
+                new Button("ENREGISTRER");
+
+        btnEnregistrer.setStyle(styleBouton);
+
+        Button btnRetour =
+                new Button("RETOUR");
+
+        btnRetour.setStyle(styleBouton);
+
+        HBox boutons =
+                new HBox(
+                        15,
+                        btnCalculer,
+                        btnEnregistrer,
+                        btnRetour
+                );
+
+        panneauGauche.getChildren().addAll(
+                ligneHaut,
+                boxCalcul,
+                lblMessage,
+                boutons
+        );
+
+        PlanDessin plan =
+                new PlanDessin(batiment);
+
+        VBox panneauDessin =
+                new VBox(
+                        10,
+                        new Label("Plan du projet"),
+                        plan
+                );
+
+        panneauDessin.setPadding(
+                new Insets(15)
+        );
+
+        root.setLeft(panneauGauche);
+        root.setCenter(panneauDessin);
 
         btnCalculer.setOnAction(e -> {
+
             try {
-                String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
-                String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
-                String txtHauteur = fieldHauteur.getText().trim().replace(",", ".");
 
-                if (txtLargeur.isEmpty() || txtLongueur.isEmpty() || txtHauteur.isEmpty()) {
-                    lblErreurDim.setText("Veuillez remplir toutes les dimensions.");
-                    return;
-                }
+                double x =
+                        Double.parseDouble(
+                                fieldX.getText()
+                                        .replace(",", ".")
+                        );
 
-                double largeur = Double.parseDouble(txtLargeur);
-                double longueur = Double.parseDouble(txtLongueur);
-                double hauteur = Double.parseDouble(txtHauteur);
+                double y =
+                        Double.parseDouble(
+                                fieldY.getText()
+                                        .replace(",", ".")
+                        );
 
-                if (largeur <= 0 || longueur <= 0 || hauteur <= 0) {
-                    lblErreurDim.setText("Les dimensions doivent être positives.");
-                    return;
-                }
+                double largeur =
+                        Double.parseDouble(
+                                fieldLargeur.getText()
+                                        .replace(",", ".")
+                        );
 
-                piece = new Piece(nomPiece, xOrigine, yOrigine, largeur, longueur, hauteur);
+                double longueur =
+                        Double.parseDouble(
+                                fieldLongueur.getText()
+                                        .replace(",", ".")
+                        );
 
-                lblSurfaceMur.setText(String.format("Surface murs : %.2f m²", piece.calculerSurfaceMurs()));
-                lblSurfaceSol.setText(String.format("Surface sol : %.2f m²", piece.calculerSurfaceSol()));
-                lblSurfacePlafond.setText(String.format("Surface plafond : %.2f m²", piece.calculerSurfacePlafond()));
+                double hauteur =
+                        Double.parseDouble(
+                                fieldHauteur.getText()
+                                        .replace(",", ".")
+                        );
 
-                lblErreurDim.setText("");
-                lblErreurRev.setText("");
-                btnCalculerCout.setDisable(false);
+                piece =
+                        new Piece(
+                                nomPiece,
+                                x,
+                                y,
+                                largeur,
+                                longueur,
+                                hauteur
+                        );
 
-            } catch (Exception ex) {
-                lblErreurDim.setText("Erreur : " + ex.getMessage());
+                Revetement revMur =
+                        comboMur.getValue();
+
+                Revetement revSol =
+                        comboSol.getValue();
+
+                Revetement revPlafond =
+                        comboPlafond.getValue();
+
+                piece.appliquerRevetementMurs(revMur);
+                piece.appliquerRevetementSol(revSol);
+                piece.appliquerRevetementPlafond(revPlafond);
+
+                lblSurfaceMur.setText(
+                        "Surface murs : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerSurfaceMurs()
+                                )
+                );
+
+                lblSurfaceSol.setText(
+                        "Surface sol : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerSurfaceSol()
+                                )
+                );
+
+                lblSurfacePlafond.setText(
+                        "Surface plafond : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerSurfacePlafond()
+                                )
+                );
+
+                lblPrixMur.setText(
+                        "Prix murs : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerPrixMurs()
+                                )
+                                + " €"
+                );
+
+                lblPrixSol.setText(
+                        "Prix sol : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerPrixSol()
+                                )
+                                + " €"
+                );
+
+                lblPrixPlafond.setText(
+                        "Prix plafond : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerPrixPlafond()
+                                )
+                                + " €"
+                );
+
+                lblPrixTotal.setText(
+                        "TOTAL : "
+                                + String.format(
+                                        "%.2f",
+                                        piece.calculerPrixTotal()
+                                )
+                                + " €"
+                );
+
+            } catch(Exception ex) {
+
                 ex.printStackTrace();
             }
         });
 
-        btnCalculerCout.setOnAction(e -> {
+        btnEnregistrer.setOnAction(e -> {
             try {
-                if (piece == null) {
-                    lblErreurRev.setText("Veuillez d'abord calculer les surfaces.");
-                    return;
-                }
+                double x = Double.parseDouble(fieldX.getText().trim().replace(",", "."));
+                double y = Double.parseDouble(fieldY.getText().trim().replace(",", "."));
+                double largeur = Double.parseDouble(fieldLargeur.getText().trim().replace(",", "."));
+                double longueur = Double.parseDouble(fieldLongueur.getText().trim().replace(",", "."));
+                double hauteur = Double.parseDouble(fieldHauteur.getText().trim().replace(",", "."));
 
                 Revetement revMur = comboMur.getValue();
                 Revetement revSol = comboSol.getValue();
                 Revetement revPlafond = comboPlafond.getValue();
 
                 if (revMur == null || revSol == null || revPlafond == null) {
-                    lblErreurRev.setText("Veuillez choisir un revêtement pour chaque surface.");
+                    lblMessage.setStyle("-fx-text-fill: red;");
+                    lblMessage.setText("Choisissez les 3 revêtements.");
                     return;
                 }
+
+        // IMPORTANT : on recrée la pièce avec les valeurs actuelles des champs
+                piece = new Piece(nomPiece, x, y, largeur, longueur, hauteur);
 
                 piece.appliquerRevetementMurs(revMur);
                 piece.appliquerRevetementSol(revSol);
                 piece.appliquerRevetementPlafond(revPlafond);
 
-                lblCoutMur.setText(String.format("Coût murs : %.2f €", piece.calculerPrixMurs()));
-                lblCoutSol.setText(String.format("Coût sol : %.2f €", piece.calculerPrixSol()));
-                lblCoutPlafond.setText(String.format("Coût plafond : %.2f €", piece.calculerPrixPlafond()));
-                lblCoutTotal.setText(String.format("TOTAL : %.2f €", piece.calculerPrixTotal()));
+                SauvegardeProjet.sauvegarderElementPlan(
+                    batiment.getId(),
+                    nomEtage,
+                    nomPiece,
+                    x,
+                    y,
+                    largeur,
+                    longueur,
+                    hauteur,
+                    revSol.getIdRevetement()
+                );
 
-                lblErreurRev.setText("");
+                SauvegardeProjet.sauvegarderDevis(
+                    "D_" + batiment.getId(),
+                    batiment.getId(),
+                    nomPiece,
+                    piece.calculerPrixMurs(),
+                    piece.calculerPrixSol(),
+                    piece.calculerPrixPlafond(),
+                    piece.calculerPrixTotal()
+                );
+
+                plan.actualiser();
+
+                    lblMessage.setStyle("-fx-text-fill: green;");
+                    lblMessage.setText("Pièce enregistrée et plan mis à jour.");
 
             } catch (Exception ex) {
-                lblErreurRev.setText("Erreur : " + ex.getMessage());
+                lblMessage.setStyle("-fx-text-fill: red;");
+                lblMessage.setText("Impossible d'enregistrer la pièce.");
                 ex.printStackTrace();
             }
         });
 
-        Button btnRetour = new Button("RETOUR");
-        btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> {
-            new FenetreListePieces(batiment, nomEtage).afficher(stage);
-        });
+      btnRetour.setOnAction(e -> {
+      new FenetreListePieces(batiment, nomEtage, nomsPieces).afficher(stage);
+});
 
-        HBox bottomBox = new HBox(btnRetour);
-        bottomBox.setPadding(new Insets(15));
-        bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+        Scene scene =
+                new Scene(root, 1450, 820);
 
-        VBox col1 = new VBox(15, zoneDimensions);
-        col1.setAlignment(Pos.TOP_CENTER);
-        col1.setPrefWidth(320);
+        stage.setMaximized(true);
 
-        VBox col2 = new VBox(15, titreRevetements, gridRev, btnCalculerCout);
-        col2.setAlignment(Pos.TOP_CENTER);
-        col2.setPrefWidth(350);
-
-        VBox col3 = new VBox(15, zoneCout);
-        col3.setAlignment(Pos.TOP_CENTER);
-        col3.setPrefWidth(280);
-
-        HBox centre = new HBox(20, col1, col2, col3);
-        centre.setAlignment(Pos.TOP_CENTER);
-        centre.setPadding(new Insets(20));
-
-        BorderPane root = new BorderPane();
-        root.setTop(topBox);
-        root.setCenter(centre);
-        root.setBottom(bottomBox);
-
-        Scene scene = new Scene(root, 1100, 650);
-        stage.setTitle("Pièce : " + nomPiece);
         stage.setScene(scene);
-        stage.show();
-    }
 
-    private void ajouterLigne(GridPane grid, String texte, TextField field, int ligne, String style) {
-        Label lbl = new Label(texte);
-        lbl.setStyle(style);
-        grid.add(lbl, 0, ligne);
-        grid.add(field, 1, ligne);
+        stage.show();
     }
 }

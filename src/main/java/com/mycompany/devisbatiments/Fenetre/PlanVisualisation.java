@@ -1,17 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -19,376 +11,254 @@ import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 
 public class PlanVisualisation {
 
     private Pane zoneDessin;
+    private String projetInitial;
 
-    // =====================================
-    // AFFICHER FENETRE
-    // =====================================
+    public PlanVisualisation() {
+        this.projetInitial = "";
+    }
+
+    public PlanVisualisation(String projetInitial) {
+        this.projetInitial = projetInitial;
+    }
 
     public void afficher() {
-
         Stage stage = new Stage();
 
-        Label Projet = new Label("PROJET :");
-        Projet.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;");
+        Label lblProjet = new Label("PROJET :");
+        lblProjet.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;");
 
-        TextField champProjet = new TextField();
-
+        TextField champProjet = new TextField(projetInitial);
         champProjet.setPromptText("Ex : P1");
 
-        Label Vue = new Label("VUE :");
-        Vue.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;");
+        Label lblVue = new Label("VUE :");
+        lblVue.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;");
 
         TextField champVue = new TextField();
-        champVue.setPromptText("Ex : ETAGE1 / RDC / FACE.."
-        );
-
-        
+        champVue.setPromptText("Ex : RDC / Etage 1 / FACE...");
 
         Button btnAfficher = new Button("AFFICHER");
         btnAfficher.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
-       
-
 
         zoneDessin = new Pane();
+        zoneDessin.setPrefSize(750, 550);
+        zoneDessin.setStyle("-fx-background-color: white; -fx-border-color: #0F056B; -fx-border-width: 2;");
 
-        zoneDessin.setPrefSize(700, 550);
+        btnAfficher.setOnAction(e -> afficherPlan(
+                champProjet.getText().trim(),
+                champVue.getText().trim()
+        ));
 
-        zoneDessin.setStyle(
-                "-fx-background-color: white;"
-        );
+        HBox topBar = new HBox(10, lblProjet, champProjet, lblVue, champVue, btnAfficher);
+        topBar.setPadding(new Insets(10));
 
-        btnAfficher.setOnAction(e -> {
-
-            String projet =
-                    champProjet.getText();
-
-            String vue =
-                    champVue.getText();
-
-            afficherPlan(
-                    projet,
-                    vue
-            );
-        });
-
-        HBox topBar = new HBox(10);
-
-        topBar.setPadding(
-                new Insets(10)
-        );
-
-        topBar.getChildren().addAll(
-                Projet,
-                champProjet,
-                Vue,
-                champVue,
-                btnAfficher
-        );
-
-        BorderPane root =
-                new BorderPane();
-
+        BorderPane root = new BorderPane();
         root.setTop(topBar);
-
         root.setCenter(zoneDessin);
 
-        Scene scene =
-                new Scene(root, 850, 650);
-
+        Scene scene = new Scene(root, 900, 650);
         stage.setScene(scene);
-
-        stage.setTitle(
-                "Visualisation des Plans"
-        );
-
+        stage.setTitle("Visualisation des Plans");
         stage.show();
     }
 
-    // =====================================
-    // RECUPERATION COULEUR
-    // =====================================
+    private void afficherPlan(String projetRecherche, String vueRecherche) {
+        zoneDessin.getChildren().clear();
 
-    private Color getCouleurDepuisCatalogue(
-            int idRevetement
-    ) {
+        double largeurProjet = chercherLargeurProjet(projetRecherche);
+        double longueurProjet = chercherLongueurProjet(projetRecherche);
 
-        try {
+        if (largeurProjet <= 0 || longueurProjet <= 0) {
+            zoneDessin.getChildren().add(new Text(40, 40, "Impossible de retrouver la surface totale du projet."));
+            return;
+        }
 
-            BufferedReader reader =
-                    new BufferedReader(
-                            new FileReader(
-                                    "CatalogueRevetements.txt"
-                            )
-                    );
+        double marge = 40;
+        double largeurZone = zoneDessin.getPrefWidth() - 2 * marge;
+        double hauteurZone = zoneDessin.getPrefHeight() - 2 * marge;
+
+        double echelleX = largeurZone / largeurProjet;
+        double echelleY = hauteurZone / longueurProjet;
+        double echelle = Math.min(echelleX, echelleY);
+
+        double largeurDessinProjet = largeurProjet * echelle;
+        double longueurDessinProjet = longueurProjet * echelle;
+
+        double origineX = (zoneDessin.getPrefWidth() - largeurDessinProjet) / 2;
+        double origineY = (zoneDessin.getPrefHeight() - longueurDessinProjet) / 2;
+
+        Rectangle surfaceTotale = new Rectangle(
+                origineX,
+                origineY,
+                largeurDessinProjet,
+                longueurDessinProjet
+        );
+
+        surfaceTotale.setFill(Color.TRANSPARENT);
+        surfaceTotale.setStroke(Color.BLACK);
+        surfaceTotale.setStrokeWidth(4);
+
+        zoneDessin.getChildren().add(surfaceTotale);
+
+        Text titre = new Text(
+                origineX,
+                Math.max(20, origineY - 10),
+                "Surface totale : " + largeurProjet + " m x " + longueurProjet + " m"
+        );
+
+        zoneDessin.getChildren().add(titre);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
 
             String ligne;
-
-            // ignorer en-tête
             reader.readLine();
 
-            while (
-                    (ligne = reader.readLine())
-                            != null
-            ) {
+            while ((ligne = reader.readLine()) != null) {
 
-                if (
-                        ligne.trim().isEmpty()
-                ) {
+                if (ligne.trim().isEmpty()) {
                     continue;
                 }
 
-                String[] infos =
-                        ligne.split(";");
+                String[] infos = ligne.split(";");
 
-                int id =
-                        Integer.parseInt(
-                                infos[0].trim()
-                        );
+                if (infos.length < 9) {
+                    continue;
+                }
 
-                String couleur =
-                        infos[6].trim();
+                String projet = infos[0].trim();
+                String vue = infos[1].trim();
+                String nomPiece = infos[2].trim();
 
-                if (id == idRevetement) {
+                if (!projet.equalsIgnoreCase(projetRecherche)
+                        || !vue.equalsIgnoreCase(vueRecherche)) {
+                    continue;
+                }
 
-                    reader.close();
+                double x = Double.parseDouble(infos[3].trim());
+                double y = Double.parseDouble(infos[4].trim());
+                double largeur = Double.parseDouble(infos[5].trim());
+                double longueur = Double.parseDouble(infos[6].trim());
 
-                    return Color.web(
-                            couleur
-                    );
+                int idRevetement = Integer.parseInt(infos[8].trim());
+
+                Rectangle rectPiece = new Rectangle(
+                        origineX + x * echelle,
+                        origineY + y * echelle,
+                        largeur * echelle,
+                        longueur * echelle
+                );
+
+                rectPiece.setFill(getCouleurDepuisCatalogue(idRevetement));
+                rectPiece.setStroke(Color.BLACK);
+                rectPiece.setStrokeWidth(1.5);
+
+                Text textePiece = new Text(nomPiece);
+                textePiece.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+                double texteX = origineX + x * echelle + (largeur * echelle) / 2 - (nomPiece.length() * 3.5);
+                double texteY = origineY + y * echelle + (longueur * echelle) / 2;
+
+                textePiece.setX(texteX);
+                textePiece.setY(texteY);
+
+                zoneDessin.getChildren().addAll(rectPiece, textePiece);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private double chercherLargeurProjet(String idProjet) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Projets.txt"))) {
+
+            String ligne;
+            reader.readLine();
+
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] infos = ligne.split(";");
+
+                if (infos.length < 10) {
+                    continue;
+                }
+
+                if (infos[0].trim().equalsIgnoreCase(idProjet)) {
+                    return Double.parseDouble(infos[8].trim());
                 }
             }
 
-            reader.close();
-
-        }
-
-        catch (Exception e) {
-
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return Color.WHITE;
+        return 0;
     }
 
-    // =====================================
-    // AFFICHAGE PLAN
-    // =====================================
-
-    private void afficherPlan(
-            String projetRecherche,
-            String vueRecherche
-    ) {
-
-        zoneDessin.getChildren().clear();
-
-        try {
-
-            BufferedReader reader =
-                    new BufferedReader(
-                            new FileReader(
-                                    "PlanProjets.txt"
-                            )
-                    );
+    private double chercherLongueurProjet(String idProjet) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("Projets.txt"))) {
 
             String ligne;
-
             reader.readLine();
 
-            int minX = Integer.MAX_VALUE;
-            int minY = Integer.MAX_VALUE;
-
-            int maxX = 0;
-            int maxY = 0;
-
-            while (
-                    (ligne = reader.readLine())
-                            != null
-            ) {
-
-                if (
-                        ligne.trim().isEmpty()
-                ) {
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) {
                     continue;
                 }
 
-                String[] infos =
-                        ligne.split(";");
+                String[] infos = ligne.split(";");
 
-                if (infos.length < 8) {
+                if (infos.length < 10) {
                     continue;
                 }
 
-                String projet =
-                        infos[0].trim();
-
-                String vue =
-                        infos[1].trim();
-
-                String piece =
-                        infos[2].trim();
-
-                int x =
-                        Integer.parseInt(
-                                infos[3].trim()
-                        );
-
-                int y =
-                        Integer.parseInt(
-                                infos[4].trim()
-                        );
-
-                int largeur =
-                        Integer.parseInt(
-                                infos[5].trim()
-                        );
-
-                int hauteur =
-                        Integer.parseInt(
-                                infos[6].trim()
-                        );
-
-                int idRevetement =
-                        Integer.parseInt(
-                                infos[7].trim()
-                        );
-
-                if (
-                        projet.equalsIgnoreCase(
-                                projetRecherche.trim()
-                        )
-                        &&
-                        vue.equalsIgnoreCase(
-                                vueRecherche.trim()
-                        )
-                ) {
-
-                    minX = Math.min(minX, x);
-                    minY = Math.min(minY, y);
-
-                    maxX = Math.max(
-                            maxX,
-                            x + largeur
-                    );
-
-                    maxY = Math.max(
-                            maxY,
-                            y + hauteur
-                    );
-
-                    Rectangle rect =
-                            new Rectangle(
-                                    x,
-                                    y,
-                                    largeur,
-                                    hauteur
-                            );
-
-                    rect.setFill(
-                            getCouleurDepuisCatalogue(
-                                    idRevetement
-                            )
-                    );
-
-                    rect.setStroke(
-                            Color.BLACK
-                    );
-
-                    rect.setStrokeWidth(1);
-
-                    zoneDessin
-                            .getChildren()
-                            .add(rect);
-
-                    // =====================================
-                    // TEXTE CENTRE
-                    // =====================================
-
-                    if (
-                            !piece.equalsIgnoreCase(
-                                    "Mur"
-                            )
-                            &&
-                            !piece.equalsIgnoreCase(
-                                    "Fenetre"
-                            )
-                            &&
-                            !piece.equalsIgnoreCase(
-                                    "Porte"
-                            )
-                            &&
-                            !piece.equalsIgnoreCase(
-                                    "LigneEtage"
-                            )
-                    ) {
-
-                        Text texte =
-                                new Text(piece);
-
-                        texte.setStyle( "-fx-font-size: 14px;"
-                                        +
-                                        "-fx-font-weight: bold;"
-                        );
-
-                        texte.setX(
-                                x
-                                        + largeur / 2.0
-                                        - piece.length() * 3
-                        );
-
-                        texte.setY(
-                                y
-                                        + hauteur / 2.0
-                        );
-
-                        zoneDessin
-                                .getChildren()
-                                .add(texte);
-                    }
+                if (infos[0].trim().equalsIgnoreCase(idProjet)) {
+                    return Double.parseDouble(infos[9].trim());
                 }
             }
 
-            // =====================================
-            // CONTOUR EXTERIEUR
-            // =====================================
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            if (
-                    minX != Integer.MAX_VALUE
-            ) {
+        return 0;
+    }
 
-                Rectangle contour =
-                        new Rectangle(
-                                minX,
-                                minY,
-                                maxX - minX,
-                                maxY - minY
-                        );
+    private Color getCouleurDepuisCatalogue(int idRevetement) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CatalogueRevetements.txt"))) {
 
-                contour.setFill(
-                        Color.TRANSPARENT
-                );
+            String ligne;
+            reader.readLine();
 
-                contour.setStroke(
-                        Color.BLACK
-                );
+            while ((ligne = reader.readLine()) != null) {
 
-                contour.setStrokeWidth(6);
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
 
-                zoneDessin
-                        .getChildren()
-                        .add(0, contour);
+                String[] infos = ligne.split(";");
+
+                if (infos.length < 7) {
+                    continue;
+                }
+
+                int id = Integer.parseInt(infos[0].trim());
+
+                if (id == idRevetement) {
+                    return Color.web(infos[6].trim());
+                }
             }
 
-            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        catch (IOException ex) {
-
-            ex.printStackTrace();
-        }
+        return Color.LIGHTGRAY;
     }
 }
