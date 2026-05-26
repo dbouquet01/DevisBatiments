@@ -10,11 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class FenetreAttributsImmeuble {
+import java.util.ArrayList;
+import java.util.HashMap;
 
-    public void afficher(Stage stage) {
-        afficher(stage, "", "", 0, 0, 1);
-    }
+public class FenetreAttributsImmeuble {
 
     public void afficher(Stage stage, String idExistant, String designationExistante,
                          double largeurExistante, double longueurExistante, int nbEtagesExistant) {
@@ -40,6 +39,11 @@ public class FenetreAttributsImmeuble {
         TextField fieldLongueur = new TextField();
         TextField fieldEtage = new TextField();
 
+        fieldId.setPromptText("Ex : IMB001");
+        fieldDesignation.setPromptText("Ex : Résidence Les Lilas");
+        fieldLargeur.setPromptText("Ex : 25.5");
+        fieldLongueur.setPromptText("Ex : 40");
+        fieldEtage.setPromptText("Ex : 5");
         fieldId.setText(idExistant);
         fieldDesignation.setText(designationExistante);
 
@@ -51,7 +55,9 @@ public class FenetreAttributsImmeuble {
             fieldLongueur.setText(String.valueOf(longueurExistante));
         }
 
-        fieldEtage.setText(String.valueOf(nbEtagesExistant));
+        if (nbEtagesExistant > 0) {
+            fieldEtage.setText(String.valueOf(nbEtagesExistant));
+        }
 
         ajouterLigne(grid, "ID :", fieldId, 0, styleLabel);
         ajouterLigne(grid, "Désignation :", fieldDesignation, 1, styleLabel);
@@ -90,36 +96,20 @@ public class FenetreAttributsImmeuble {
                 double longueur = Double.parseDouble(txtLongueur);
                 int nbEtages = Integer.parseInt(txtEtage);
 
-                Immeuble immeuble = new Immeuble(id, largeur, longueur, nbEtages);
+                if (largeur <= 0 || longueur <= 0 || nbEtages < 0) {
+                    lblErreur.setText("Les dimensions doivent être positives et le nombre d'étages ne peut pas être négatif.");
+                    return;
+                }
 
-                String idDevis = "D_" + id;
-                double hauteurTotale = nbEtages * 3.0;
-                double surfaceTotale = largeur * longueur * (nbEtages + 1);
-
-                SauvegardeProjet.sauvegarderProjet(
-                        id,
-                        designation,
-                        "IMMEUBLE",
-                        nbEtages,
-                        hauteurTotale,
-                        surfaceTotale,
-                        0,
-                        idDevis,
-                        largeur,
-                        longueur
-                );
-
-                new FenetreEtage(immeuble).afficher(stage);
+                afficherSaisieAppartements(stage, id, designation, largeur, longueur, nbEtages);
 
             } catch (NumberFormatException ex) {
                 lblErreur.setText("Les valeurs numériques sont invalides.");
             }
         });
 
-        HBox bottomBox = new HBox();
+        HBox bottomBox = new HBox(30, btnRetour, btnSuivant);
         bottomBox.setPadding(new Insets(30));
-        bottomBox.setSpacing(400);
-        bottomBox.getChildren().addAll(btnRetour, btnSuivant);
         bottomBox.setAlignment(Pos.CENTER);
 
         VBox centre = new VBox(10, grid, lblErreur);
@@ -132,6 +122,140 @@ public class FenetreAttributsImmeuble {
 
         Scene scene = new Scene(root, 1000, 600);
         stage.setTitle("Attributs Immeuble");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void afficherSaisieAppartements(Stage stage, String id, String designation,
+                                            double largeur, double longueur, int nbEtages) {
+
+        Label titre = new Label("APPARTEMENTS PAR ÉTAGE");
+        titre.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+
+        VBox topBox = new VBox(titre);
+        topBox.setAlignment(Pos.CENTER);
+        topBox.setPadding(new Insets(25));
+
+        String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
+                + "-fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;";
+
+        String styleLabel = "-fx-font-size: 15px; -fx-font-weight: bold;";
+
+        VBox listeChamps = new VBox(12);
+        listeChamps.setAlignment(Pos.CENTER);
+        listeChamps.setPadding(new Insets(20));
+
+        ArrayList<TextField> champsApparts = new ArrayList<>();
+
+        for (int i = 0; i <= nbEtages; i++) {
+            String nomEtage = (i == 0) ? "RDC" : "Etage " + i;
+
+            Label lblEtage = new Label(nomEtage + " :");
+            lblEtage.setStyle(styleLabel);
+            lblEtage.setMinWidth(120);
+
+            TextField fieldNbApparts = new TextField();
+            fieldNbApparts.setPromptText("Nombre d'appartements");
+            fieldNbApparts.setMaxWidth(180);
+
+            champsApparts.add(fieldNbApparts);
+
+            HBox ligne = new HBox(15, lblEtage, fieldNbApparts);
+            ligne.setAlignment(Pos.CENTER);
+            listeChamps.getChildren().add(ligne);
+        }
+
+        Label lblErreur = new Label("");
+        lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
+
+        Button btnRetour = new Button("RETOUR");
+        btnRetour.setStyle(styleBouton);
+        btnRetour.setOnAction(e -> afficher(stage, id, designation, largeur, longueur, nbEtages));
+
+        Button btnValider = new Button("VALIDER L'IMMEUBLE →");
+        btnValider.setStyle(styleBouton);
+
+        btnValider.setOnAction(e -> {
+            HashMap<String, Integer> nbAppartsParEtage = new HashMap<>();
+            int totalAppartements = 0;
+
+            try {
+                for (int i = 0; i <= nbEtages; i++) {
+                    String nomEtage = (i == 0) ? "RDC" : "Etage " + i;
+                    String txt = champsApparts.get(i).getText().trim();
+
+                    if (txt.isEmpty()) {
+                        lblErreur.setText("Veuillez remplir le nombre d'appartements pour " + nomEtage + ".");
+                        return;
+                    }
+
+                    int nbApparts = Integer.parseInt(txt);
+
+                    if (nbApparts <= 0) {
+                        lblErreur.setText("Le nombre d'appartements doit être positif pour " + nomEtage + ".");
+                        return;
+                    }
+
+                    nbAppartsParEtage.put(nomEtage, nbApparts);
+                    totalAppartements += nbApparts;
+                }
+
+                Immeuble immeuble = new Immeuble(id, designation, largeur, longueur, nbEtages);
+
+                String idDevis = "D_" + id;
+                double hauteurTotale = nbEtages * 3.0;
+                double surfaceEtage = largeur * longueur;
+                double surfaceTotale = surfaceEtage * (nbEtages + 1);
+
+                SauvegardeProjet.sauvegarderProjet(
+                        id,
+                        designation,
+                        "IMMEUBLE",
+                        nbEtages,
+                        hauteurTotale,
+                        surfaceTotale,
+                        totalAppartements,
+                        idDevis,
+                        largeur,
+                        longueur
+                );
+
+                for (int i = 0; i <= nbEtages; i++) {
+                    String nomEtage = (i == 0) ? "RDC" : "Etage " + i;
+                    int nbApparts = nbAppartsParEtage.get(nomEtage);
+
+                    SauvegardeProjet.sauvegarderEtage(
+                            id,
+                            nomEtage,
+                            nbApparts,
+                            surfaceEtage
+                    );
+                }
+
+                new FenetreEtage(immeuble, nbAppartsParEtage).afficher(stage);
+
+            } catch (NumberFormatException ex) {
+                lblErreur.setText("Veuillez entrer uniquement des nombres entiers.");
+            }
+        });
+
+        HBox bottomBox = new HBox(30, btnRetour, btnValider);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.setPadding(new Insets(25));
+
+        VBox centre = new VBox(15, listeChamps, lblErreur);
+        centre.setAlignment(Pos.TOP_CENTER);
+
+        ScrollPane scrollPane = new ScrollPane(centre);
+        scrollPane.setFitToWidth(true);
+
+        BorderPane root = new BorderPane();
+        root.setTop(topBox);
+        root.setCenter(scrollPane);
+        root.setBottom(bottomBox);
+
+        Scene scene = new Scene(root, 1000, 600);
+        stage.setTitle("Appartements par étage");
         stage.setScene(scene);
         stage.show();
     }

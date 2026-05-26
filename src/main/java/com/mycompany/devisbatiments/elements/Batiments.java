@@ -13,12 +13,14 @@ import java.util.ArrayList;
 public abstract class Batiments {
    
     protected String Id;
+    protected String Designation;
     protected double largeur;
     protected double longueur;
     protected int nbEtage;
    
 public Batiments (String Id, double largeur, double longueur, int nbEtage){
     this.Id = Id;
+    this.Designation = Designation;
     this.largeur=largeur;
     this.longueur=longueur;
     this.nbEtage= nbEtage; }
@@ -31,6 +33,16 @@ public Batiments (String Id, double largeur, double longueur, int nbEtage){
     public void setId(String Id) {
         this.Id = Id;
     }
+
+    public String getDesignation() {
+        return Designation;
+    }
+
+    public void setDesignation(String Designation) {
+        this.Designation = Designation;
+    }
+    
+    
 
     public double getLargeur() {
         return largeur;

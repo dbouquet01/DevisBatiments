@@ -1,8 +1,23 @@
-idEtage;idProjet;nomEtage;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
+idEtage;idProjet;nomEtage;nbAppartements;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
 P1_RDC;P1;RDC;5;false;false;24.75;2713.97
 P2_RDC;P2;RDC;3;true;true;11.00;1349.10
 P2_ETAGE1;P2;ETAGE1;5;true;true;15.08;1930.05
 P2_ETAGE2;P2;ETAGE2;5;true;true;15.08;1930.05
 P2_ETAGE3;P2;ETAGE3;5;true;true;15.08;1930.05
 P2_ETAGE4;P2;ETAGE4;5;true;true;15.08;1930.05
-P2_ETAGE5;P2;ETAGE5;5;true;true;15.08;1930.05okay
+P2_ETAGE5;P2;ETAGE5;5;true;true;15.08;1930.05
+P3_RDC;P3;RDC;2;0;false;false;120.0;0
+P3_ETAGE1;P3;Etage 1;3;0;false;false;120.0;0
+P3_ETAGE2;P3;Etage 2;3;0;false;false;120.0;0
+P3_ETAGE3;P3;Etage 3;3;0;false;false;120.0;0
+P3_ETAGE4;P3;Etage 4;3;0;false;false;120.0;0
+P16_RDC;P16;RDC;2;0;false;false;90.0;0
+P16_ETAGE1;P16;Etage 1;3;0;false;false;90.0;0
+P16_ETAGE2;P16;Etage 2;4;0;false;false;90.0;0
+P16_ETAGE3;P16;Etage 3;5;0;false;false;90.0;0
+P16_ETAGE4;P16;Etage 4;6;0;false;false;90.0;0
+IMB001_RDC;IMB001;RDC;2;0;false;false;90.0;0
+IMB001_ETAGE1;IMB001;Etage 1;4;0;false;false;90.0;0
+IMB001_ETAGE2;IMB001;Etage 2;5;0;false;false;90.0;0
+IMB001_ETAGE3;IMB001;Etage 3;6;0;false;false;90.0;0
+IMB001_ETAGE4;IMB001;Etage 4;7;0;false;false;90.0;0

@@ -2,6 +2,7 @@ package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Maison;
+import java.util.HashMap;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,10 +12,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class FenetreAttributsMaison {
-
-    public void afficher(Stage stage) {
-        afficher(stage, "", "", 0, 0, 1);
-    }
 
     public void afficher(Stage stage, String idExistant, String designationExistante,
                          double largeurExistante, double longueurExistante, int nbEtagesExistant) {
@@ -40,6 +37,11 @@ public class FenetreAttributsMaison {
         TextField fieldLongueur = new TextField();
         TextField fieldEtage = new TextField();
 
+        fieldId.setPromptText("Ex : M001");
+        fieldDesignation.setPromptText("Ex : Maison familiale");
+        fieldLargeur.setPromptText("Ex : 12.5");
+        fieldLongueur.setPromptText("Ex : 18");
+        fieldEtage.setPromptText("Ex : 1");
         fieldId.setText(idExistant);
         fieldDesignation.setText(designationExistante);
 
@@ -51,7 +53,9 @@ public class FenetreAttributsMaison {
             fieldLongueur.setText(String.valueOf(longueurExistante));
         }
 
-        fieldEtage.setText(String.valueOf(nbEtagesExistant));
+        if (nbEtagesExistant > 0) {
+            fieldEtage.setText(String.valueOf(nbEtagesExistant));
+        }
 
         ajouterLigne(grid, "ID :", fieldId, 0, styleLabel);
         ajouterLigne(grid, "Désignation :", fieldDesignation, 1, styleLabel);
@@ -109,7 +113,7 @@ public class FenetreAttributsMaison {
                         longueur
                 );
 
-                new FenetreEtage(maison).afficher(stage);
+                new FenetreEtage(maison, new HashMap<>()).afficher(stage);
 
             } catch (NumberFormatException ex) {
                 lblErreur.setText("Largeur, longueur et étages doivent être des nombres.");

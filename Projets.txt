@@ -1,5 +1,8 @@
 idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur
 
-P1;MaisonR;MAISON;1;2.5;120;0;D_P1;12;10
+P1;MaisonR;MAISON;1;2.5;240.0;0;D_P1;12.0;10.0
 P2;ImmeubleB;IMMEUBLE;5;15;1200;20;D_P2;20;12
 P10;A;MAISON;2;5.0;144.0;0;D_P10;8.0;6.0
+P16;Immeuble A;IMMEUBLE;4;12.0;450.0;20;D_P16;10.0;9.0
+P3;Immeuble A;IMMEUBLE;4;12.0;600.0;14;D_P3;10.0;12.0
+IMB001;Immeuble A;IMMEUBLE;4;12.0;450.0;24;D_IMB001;9.0;10.0
