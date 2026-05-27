@@ -44,107 +44,25 @@ public class SauvegardeProjet {
                                          int nombreEtages, double hauteurTotale,
                                          double surfaceTotale, int nombreAppartements,
                                          String idDevis, double largeur, double longueur) {
-        try {
-            verifierFichier(FICHIER_PROJETS, HEADER_PROJETS);
+        String ligne = idProjet + ";" + designation + ";" + type + ";" + nombreEtages + ";"
+                + hauteurTotale + ";" + surfaceTotale + ";" + nombreAppartements + ";"
+                + idDevis + ";" + largeur + ";" + longueur;
 
-            Path path = Paths.get(FICHIER_PROJETS);
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            String nouvelleLigne =
-                    idProjet + ";" +
-                    designation + ";" +
-                    type + ";" +
-                    nombreEtages + ";" +
-                    hauteurTotale + ";" +
-                    surfaceTotale + ";" +
-                    nombreAppartements + ";" +
-                    idDevis + ";" +
-                    largeur + ";" +
-                    longueur;
-
-            boolean remplace = false;
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_PROJETS : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                if (parts.length > 0 && normaliser(parts[0]).equals(normaliser(idProjet))) {
-                    nouvellesLignes.add(nouvelleLigne);
-                    remplace = true;
-                } else {
-                    nouvellesLignes.add(ligne);
-                }
-            }
-
-            if (!remplace) {
-                nouvellesLignes.add(nouvelleLigne);
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        upsert(FICHIER_PROJETS, HEADER_PROJETS, ligne, parts ->
+                parts.length > 0 && normaliser(parts[0]).equals(normaliser(idProjet))
+        );
     }
 
     public static void sauvegarderEtage(String idProjet, String nomEtage,
                                         int nbAppartements, double surfaceTotale) {
-        try {
-            verifierFichier(FICHIER_ETAGE, HEADER_ETAGE);
+        String idEtage = idProjet + "_" + nomEtage.replace(" ", "").toUpperCase();
 
-            Path path = Paths.get(FICHIER_ETAGE);
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
+        String ligne = idEtage + ";" + idProjet + ";" + nomEtage + ";" + nbAppartements
+                + ";0;false;false;" + surfaceTotale + ";0";
 
-            String idEtage = idProjet + "_" + nomEtage.replace(" ", "").toUpperCase();
-
-            String nouvelleLigne =
-                    idEtage + ";" +
-                    idProjet + ";" +
-                    nomEtage + ";" +
-                    nbAppartements + ";" +
-                    0 + ";" +
-                    false + ";" +
-                    false + ";" +
-                    surfaceTotale + ";" +
-                    0;
-
-            boolean remplace = false;
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_ETAGE : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                if (parts.length > 0 && normaliser(parts[0]).equals(normaliser(idEtage))) {
-                    nouvellesLignes.add(nouvelleLigne);
-                    remplace = true;
-                } else {
-                    nouvellesLignes.add(ligne);
-                }
-            }
-
-            if (!remplace) {
-                nouvellesLignes.add(nouvelleLigne);
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        upsert(FICHIER_ETAGE, HEADER_ETAGE, ligne, parts ->
+                parts.length > 0 && normaliser(parts[0]).equals(normaliser(idEtage))
+        );
     }
 
     public static void sauvegarderElementPlan(String idProjet, String vue, String nomElement,
@@ -152,122 +70,29 @@ public class SauvegardeProjet {
                                               double largeur, double longueur,
                                               double hauteur,
                                               int idRevetement) {
-        try {
-            verifierFichier(FICHIER_PLAN, HEADER_PLAN);
+        String ligne = idProjet + ";" + vue + ";" + nomElement + ";" + x + ";" + y + ";"
+                + largeur + ";" + longueur + ";" + hauteur + ";" + idRevetement;
 
-            Path path = Paths.get(FICHIER_PLAN);
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            String nouvelleLigne =
-                    idProjet + ";" +
-                    vue + ";" +
-                    nomElement + ";" +
-                    x + ";" +
-                    y + ";" +
-                    largeur + ";" +
-                    longueur + ";" +
-                    hauteur + ";" +
-                    idRevetement;
-
-            boolean remplace = false;
-
-            String idProjetNormalise = normaliser(idProjet);
-            String vueNormalisee = normaliser(vue);
-            String nomElementNormalise = normaliser(nomElement);
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_PLAN : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                if (parts.length >= 3) {
-                    String idExistant = normaliser(parts[0]);
-                    String vueExistante = normaliser(parts[1]);
-                    String nomExistant = normaliser(parts[2]);
-
-                    if (idExistant.equals(idProjetNormalise)
-                            && vueExistante.equals(vueNormalisee)
-                            && nomExistant.equals(nomElementNormalise)) {
-
-                        nouvellesLignes.add(nouvelleLigne);
-                        remplace = true;
-                        continue;
-                    }
-                }
-
-                nouvellesLignes.add(ligne);
-            }
-
-            if (!remplace) {
-                nouvellesLignes.add(nouvelleLigne);
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        upsert(FICHIER_PLAN, HEADER_PLAN, ligne, parts ->
+                parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).equals(normaliser(nomElement))
+        );
     }
 
     public static void sauvegarderDevis(String idDevis, String idProjet, String element,
                                         double coutMurs, double coutSol,
                                         double coutPlafond, double total) {
-        try {
-            verifierFichier(FICHIER_DEVIS, HEADER_DEVIS);
+        String ligne = idDevis + ";" + idProjet + ";" + element + ";"
+                + coutMurs + ";" + coutSol + ";" + coutPlafond + ";" + total;
 
-            Path path = Paths.get(FICHIER_DEVIS);
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            String nouvelleLigne =
-                    idDevis + ";" +
-                    idProjet + ";" +
-                    element + ";" +
-                    coutMurs + ";" +
-                    coutSol + ";" +
-                    coutPlafond + ";" +
-                    total;
-
-            boolean remplace = false;
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_DEVIS : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                if (parts.length >= 3
+        upsert(FICHIER_DEVIS, HEADER_DEVIS, ligne, parts ->
+                parts.length >= 3
                         && normaliser(parts[0]).equals(normaliser(idDevis))
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[2]).equals(normaliser(element))) {
-
-                    nouvellesLignes.add(nouvelleLigne);
-                    remplace = true;
-
-                } else {
-                    nouvellesLignes.add(ligne);
-                }
-            }
-
-            if (!remplace) {
-                nouvellesLignes.add(nouvelleLigne);
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                        && normaliser(parts[2]).equals(normaliser(element))
+        );
     }
 
     public static void sauvegarderPiece(String idProjet, String nomEtage, String nomPiece,
@@ -276,81 +101,29 @@ public class SauvegardeProjet {
                                         int idRevetementMur, int idRevetementSol, int idRevetementPlaf,
                                         double coutMurs, double coutSol,
                                         double coutPlafond, double total) {
-        try {
-            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
+        String idEtage = idProjet + "_" + nomEtage.replace(" ", "").toUpperCase();
+        String idPiece = idEtage + "_" + nomPiece.replace(" ", "");
 
-            String idEtage = idProjet + "_" + nomEtage.replace(" ", "").toUpperCase();
-            String idPiece = idEtage + "_" + nomPiece.replace(" ", "");
+        double surfaceSol = largeur * longueur;
+        double surfaceMurs = 2 * (largeur + longueur) * hauteur;
+        double surfacePlafond = largeur * longueur;
 
-            double surfaceSol = largeur * longueur;
-            double surfaceMurs = 2 * (largeur + longueur) * hauteur;
-            double surfacePlafond = largeur * longueur;
+        String ligne = idPiece + ";" + idProjet + ";" + idEtage + ";" + nomPiece + ";" + nomEtage + ";"
+                + x + ";" + y + ";" + largeur + ";" + longueur + ";"
+                + largeur + ";" + longueur + ";" + hauteur + ";"
+                + surfaceSol + ";" + surfaceMurs + ";" + surfacePlafond + ";"
+                + idRevetementMur + ";" + idRevetementSol + ";" + idRevetementPlaf + ";"
+                + coutMurs + ";" + coutSol + ";" + coutPlafond + ";" + total;
 
-            String nouvelleLigne =
-                    idPiece + ";" +
-                    idProjet + ";" +
-                    idEtage + ";" +
-                    nomPiece + ";" +
-                    nomEtage + ";" +
-                    x + ";" +
-                    y + ";" +
-                    largeur + ";" +
-                    longueur + ";" +
-                    largeur + ";" +
-                    longueur + ";" +
-                    hauteur + ";" +
-                    surfaceSol + ";" +
-                    surfaceMurs + ";" +
-                    surfacePlafond + ";" +
-                    idRevetementMur + ";" +
-                    idRevetementSol + ";" +
-                    idRevetementPlaf + ";" +
-                    coutMurs + ";" +
-                    coutSol + ";" +
-                    coutPlafond + ";" +
-                    total;
-
-            Path path = Paths.get(FICHIER_PIECE);
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            boolean remplace = false;
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_PIECE : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                if (parts.length >= 5
+        upsert(FICHIER_PIECE, HEADER_PIECE, ligne, parts ->
+                parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
                         && normaliser(parts[4]).equals(normaliser(nomEtage))
-                        && normaliser(parts[3]).equals(normaliser(nomPiece))) {
-
-                    nouvellesLignes.add(nouvelleLigne);
-                    remplace = true;
-
-                } else {
-                    nouvellesLignes.add(ligne);
-                }
-            }
-
-            if (!remplace) {
-                nouvellesLignes.add(nouvelleLigne);
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                        && normaliser(parts[3]).equals(normaliser(nomPiece))
+        );
     }
 
-    public static String[] chargerPiece(String idProjet, String nomEtage, String nomPiece) {
+    public static String[] chargerPiece(String idProjet, String vue, String nomPiece) {
         try {
             Path path = Paths.get(FICHIER_PIECE);
 
@@ -371,9 +144,8 @@ public class SauvegardeProjet {
 
                 if (parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[4]).equals(normaliser(nomEtage))
+                        && normaliser(parts[4]).equals(normaliser(vue))
                         && normaliser(parts[3]).equals(normaliser(nomPiece))) {
-
                     return parts;
                 }
             }
@@ -385,8 +157,7 @@ public class SauvegardeProjet {
         return null;
     }
 
-
-    public static ArrayList<String> chargerNomsPieces(String idProjet, String vuePlan) {
+    public static ArrayList<String> chargerNomsPieces(String idProjet, String vue) {
         ArrayList<String> noms = new ArrayList<>();
 
         try {
@@ -409,11 +180,11 @@ public class SauvegardeProjet {
 
                 if (parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[4]).equals(normaliser(vuePlan))) {
+                        && normaliser(parts[4]).equals(normaliser(vue))) {
 
                     String nomPiece = parts[3].trim();
 
-                    if (!nomPiece.isEmpty() && !contientNomPiece(noms, nomPiece)) {
+                    if (!nomPiece.isEmpty() && !contient(noms, nomPiece)) {
                         noms.add(nomPiece);
                     }
                 }
@@ -426,79 +197,133 @@ public class SauvegardeProjet {
         return noms;
     }
 
-    public static void supprimerPiece(String idProjet, String vuePlan, String nomPiece) {
-        supprimerPieceDansFichierPiece(idProjet, vuePlan, nomPiece);
-        supprimerPieceDansFichierPlan(idProjet, vuePlan, nomPiece);
-        supprimerPieceDansFichierDevis(idProjet, nomPiece);
-    }
-
-    private static void supprimerPieceDansFichierPiece(String idProjet, String vuePlan, String nomPiece) {
-        try {
-            Path path = Paths.get(FICHIER_PIECE);
-
-            if (!Files.exists(path)) {
-                return;
-            }
-
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_PIECE : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                boolean ligneASupprimer = parts.length >= 5
+    public static void supprimerPiece(String idProjet, String vue, String nomPiece) {
+        supprimerDansFichier(FICHIER_PIECE, HEADER_PIECE, parts ->
+                parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[4]).equals(normaliser(vuePlan))
-                        && normaliser(parts[3]).equals(normaliser(nomPiece));
+                        && normaliser(parts[4]).equals(normaliser(vue))
+                        && normaliser(parts[3]).equals(normaliser(nomPiece))
+        );
 
-                if (!ligneASupprimer) {
-                    nouvellesLignes.add(ligne);
-                }
-            }
-
-            Files.write(path, nouvellesLignes);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void supprimerPieceDansFichierPlan(String idProjet, String vuePlan, String nomPiece) {
-        try {
-            Path path = Paths.get(FICHIER_PLAN);
-
-            if (!Files.exists(path)) {
-                return;
-            }
-
-            List<String> lignes = Files.readAllLines(path);
-            List<String> nouvellesLignes = new ArrayList<>();
-
-            for (int i = 0; i < lignes.size(); i++) {
-                String ligne = lignes.get(i);
-
-                if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_PLAN : ligne);
-                    continue;
-                }
-
-                String[] parts = ligne.split(";");
-
-                boolean ligneASupprimer = parts.length >= 3
+        supprimerDansFichier(FICHIER_PLAN, HEADER_PLAN, parts ->
+                parts.length >= 3
                         && normaliser(parts[0]).equals(normaliser(idProjet))
-                        && normaliser(parts[1]).equals(normaliser(vuePlan))
-                        && normaliser(parts[2]).equals(normaliser(nomPiece));
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).equals(normaliser(nomPiece))
+        );
 
-                if (!ligneASupprimer) {
+        supprimerDansFichier(FICHIER_DEVIS, HEADER_DEVIS, parts ->
+                parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser("D_" + idProjet))
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[2]).equals(normaliser(nomPiece))
+        );
+    }
+
+    public static void supprimerAppartementsAutoEtage(String idProjet, String nomEtage) {
+        supprimerDansFichier(FICHIER_PLAN, HEADER_PLAN, parts ->
+                parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(nomEtage))
+                        && estAppartement(parts[2])
+        );
+    }
+
+    public static void sauvegarderAppartementAuto(String idProjet, String nomEtage,
+                                                  int numeroAppartement,
+                                                  double x, double y,
+                                                  double largeur, double longueur,
+                                                  double hauteur,
+                                                  int idRevetement) {
+        sauvegarderElementPlan(
+                idProjet,
+                nomEtage,
+                "Appartement" + numeroAppartement,
+                x,
+                y,
+                largeur,
+                longueur,
+                hauteur,
+                idRevetement
+        );
+    }
+
+    public static void sauvegarderAppartementsAutoEtage(String idProjet, String nomEtage,
+                                                        int nbAppartements,
+                                                        double largeurBatiment,
+                                                        double longueurBatiment,
+                                                        double yCouloir,
+                                                        double largeurCouloir,
+                                                        int nbPiecesCommunes,
+                                                        int idRevetementAppartement) {
+        supprimerAppartementsAutoEtage(idProjet, nomEtage);
+
+        if (nbAppartements <= 0 || largeurBatiment <= 0 || longueurBatiment <= 0) {
+            return;
+        }
+
+        double haut = Math.max(0, yCouloir);
+        double bas = Math.max(0, longueurBatiment - (yCouloir + largeurCouloir));
+
+        double yZone = bas >= haut ? yCouloir + largeurCouloir : 0;
+        double longueurZone = bas >= haut ? bas : haut;
+
+        int nbBlocs = nbAppartements + Math.max(0, nbPiecesCommunes);
+
+        if (nbBlocs <= 0 || longueurZone <= 0) {
+            return;
+        }
+
+        double largeurBloc = largeurBatiment / nbBlocs;
+
+        for (int i = 1; i <= nbAppartements; i++) {
+            sauvegarderAppartementAuto(
+                    idProjet,
+                    nomEtage,
+                    i,
+                    (i - 1) * largeurBloc,
+                    yZone,
+                    largeurBloc,
+                    longueurZone,
+                    3.0,
+                    idRevetementAppartement
+            );
+        }
+    }
+
+    private interface ConditionLigne {
+        boolean correspond(String[] parts);
+    }
+
+    private static void upsert(String fichier, String header, String nouvelleLigne, ConditionLigne condition) {
+        try {
+            verifierFichier(fichier, header);
+
+            Path path = Paths.get(fichier);
+            List<String> lignes = Files.readAllLines(path);
+            List<String> nouvellesLignes = new ArrayList<>();
+            boolean remplace = false;
+
+            for (int i = 0; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (i == 0 || ligne.trim().isEmpty()) {
+                    nouvellesLignes.add(i == 0 ? header : ligne);
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (condition.correspond(parts)) {
+                    nouvellesLignes.add(nouvelleLigne);
+                    remplace = true;
+                } else {
                     nouvellesLignes.add(ligne);
                 }
+            }
+
+            if (!remplace) {
+                nouvellesLignes.add(nouvelleLigne);
             }
 
             Files.write(path, nouvellesLignes);
@@ -508,16 +333,11 @@ public class SauvegardeProjet {
         }
     }
 
-    private static void supprimerPieceDansFichierDevis(String idProjet, String nomPiece) {
+    private static void supprimerDansFichier(String fichier, String header, ConditionLigne condition) {
         try {
-            Path path = Paths.get(FICHIER_DEVIS);
+            verifierFichier(fichier, header);
 
-            if (!Files.exists(path)) {
-                return;
-            }
-
-            String idDevis = "D_" + idProjet;
-
+            Path path = Paths.get(fichier);
             List<String> lignes = Files.readAllLines(path);
             List<String> nouvellesLignes = new ArrayList<>();
 
@@ -525,18 +345,13 @@ public class SauvegardeProjet {
                 String ligne = lignes.get(i);
 
                 if (i == 0 || ligne.trim().isEmpty()) {
-                    nouvellesLignes.add(i == 0 ? HEADER_DEVIS : ligne);
+                    nouvellesLignes.add(i == 0 ? header : ligne);
                     continue;
                 }
 
                 String[] parts = ligne.split(";");
 
-                boolean ligneASupprimer = parts.length >= 3
-                        && normaliser(parts[0]).equals(normaliser(idDevis))
-                        && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[2]).equals(normaliser(nomPiece));
-
-                if (!ligneASupprimer) {
+                if (!condition.correspond(parts)) {
                     nouvellesLignes.add(ligne);
                 }
             }
@@ -548,15 +363,19 @@ public class SauvegardeProjet {
         }
     }
 
-    private static boolean contientNomPiece(ArrayList<String> noms, String nomPiece) {
-        for (String nom : noms) {
-            if (normaliser(nom).equals(normaliser(nomPiece))) {
+    private static boolean contient(ArrayList<String> liste, String valeur) {
+        for (String item : liste) {
+            if (normaliser(item).equals(normaliser(valeur))) {
                 return true;
             }
         }
         return false;
     }
 
+    private static boolean estAppartement(String texte) {
+        String n = normaliser(texte);
+        return n.startsWith("appartement") || n.startsWith("appart");
+    }
 
     private static String normaliser(String texte) {
         if (texte == null) {
@@ -579,4 +398,4 @@ public class SauvegardeProjet {
                 .replace("ô", "o")
                 .replace("ç", "c");
     }
-} 
+}

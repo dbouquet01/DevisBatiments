@@ -54,13 +54,13 @@ public class PlanEtage {
         String nom;
         boolean appartement;
         int idRevetement;
-        double surfaceReelle;
+        double surfaceTheorique;
 
-        BlocPlan(String nom, boolean appartement, int idRevetement, double surfaceReelle) {
+        BlocPlan(String nom, boolean appartement, int idRevetement, double surfaceTheorique) {
             this.nom = nom;
             this.appartement = appartement;
             this.idRevetement = idRevetement;
-            this.surfaceReelle = surfaceReelle;
+            this.surfaceTheorique = surfaceTheorique;
         }
     }
 
@@ -99,13 +99,13 @@ public class PlanEtage {
         }
 
         double surfaceHabitable = Math.max(0, surfaceEtage - surfaceCouloir - surfaceZonesCommunes);
-        double surfaceParAppart = nbApparts > 0 ? surfaceHabitable / nbApparts : 0;
+        double surfaceMoyenne = nbApparts > 0 ? surfaceHabitable / nbApparts : 0;
 
         Label info = new Label(
                 nomEtage + " — " + nbApparts + " appartement(s)"
                         + " — Pièces communes : " + zonesCommunes.size()
                         + " — Couloir : " + String.format("%.2f", surfaceCouloir) + " m²"
-                        + " — Appart moyen : " + String.format("%.2f", surfaceParAppart) + " m²"
+                        + " — Surface habitable restante : " + String.format("%.2f", surfaceHabitable) + " m²"
         );
         info.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0F056B;");
 
@@ -172,7 +172,7 @@ public class PlanEtage {
 
         Pane dessin = creerDessinEtage(
                 nbApparts,
-                surfaceParAppart,
+                surfaceMoyenne,
                 sliderCouloir.getValue(),
                 choixRevetementCouloir.getValue(),
                 zonesCommunes
@@ -190,7 +190,7 @@ public class PlanEtage {
 
             Pane nouveauDessin = creerDessinEtage(
                     nbApparts,
-                    surfaceParAppart,
+                    surfaceMoyenne,
                     yCouloir,
                     choixRevetementCouloir.getValue(),
                     zonesCommunes
@@ -202,7 +202,7 @@ public class PlanEtage {
         choixRevetementCouloir.setOnAction(e -> {
             Pane nouveauDessin = creerDessinEtage(
                     nbApparts,
-                    surfaceParAppart,
+                    surfaceMoyenne,
                     sliderCouloir.getValue(),
                     choixRevetementCouloir.getValue(),
                     zonesCommunes
@@ -244,14 +244,16 @@ public class PlanEtage {
                     rev.getIdRevetement()
             );
 
+            sauvegarderAppartementsSelonAffichage(
+                    nbApparts,
+                    surfaceMoyenne,
+                    yCouloir,
+                    zonesCommunes,
+                    rev.getIdRevetement()
+            );
+
             lblEtat.setText("Couloir validé");
             lblEtat.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-
-            /*
-             * La surface réelle des blocs ne change pas quand on déplace le couloir :
-             * surface couloir = largeur bâtiment x 1,50 m.
-             * Donc seule la répartition visuelle change, pas les surfaces théoriques.
-             */
         });
 
         Button btnRetour = new Button("RETOUR ÉTAGES");
@@ -278,7 +280,7 @@ public class PlanEtage {
     }
 
     private Pane creerDessinEtage(int nbApparts,
-                                  double surfaceParAppart,
+                                  double surfaceMoyenne,
                                   double yCouloirMetres,
                                   Revetement revetementCouloir,
                                   ArrayList<ZoneCommune> zonesCommunes) {
@@ -317,7 +319,7 @@ public class PlanEtage {
             yCouloirPixels = yDepart + hauteurTotale - hauteurCouloirPixels;
         }
 
-        ArrayList<BlocPlan> blocs = construireBlocs(nbApparts, surfaceParAppart, zonesCommunes);
+        ArrayList<BlocPlan> blocs = construireBlocs(nbApparts, surfaceMoyenne, zonesCommunes);
 
         double hauteurZoneHaut = Math.max(0, yCouloirPixels - yDepart);
         double hauteurZoneBas = Math.max(0, (yDepart + hauteurTotale) - (yCouloirPixels + hauteurCouloirPixels));
@@ -338,19 +340,38 @@ public class PlanEtage {
             }
         }
 
-        dessinerLigneBlocs(dessin, blocsHaut, xDepart, yDepart, largeurTotale, hauteurZoneHaut);
+        dessinerLigneBlocs(
+                dessin,
+                blocsHaut,
+                xDepart,
+                yDepart,
+                largeurTotale,
+                hauteurZoneHaut
+        );
 
-        dessinerCouloir(dessin, xDepart, yCouloirPixels, largeurTotale,
-                hauteurCouloirPixels, revetementCouloir);
+        dessinerCouloir(
+                dessin,
+                xDepart,
+                yCouloirPixels,
+                largeurTotale,
+                hauteurCouloirPixels,
+                revetementCouloir
+        );
 
-        dessinerLigneBlocs(dessin, blocsBas, xDepart,
-                yCouloirPixels + hauteurCouloirPixels, largeurTotale, hauteurZoneBas);
+        dessinerLigneBlocs(
+                dessin,
+                blocsBas,
+                xDepart,
+                yCouloirPixels + hauteurCouloirPixels,
+                largeurTotale,
+                hauteurZoneBas
+        );
 
         return dessin;
     }
 
     private ArrayList<BlocPlan> construireBlocs(int nbApparts,
-                                                double surfaceParAppart,
+                                                double surfaceMoyenne,
                                                 ArrayList<ZoneCommune> zonesCommunes) {
         ArrayList<BlocPlan> blocs = new ArrayList<>();
 
@@ -359,7 +380,7 @@ public class PlanEtage {
         }
 
         for (int i = 1; i <= nbApparts; i++) {
-            blocs.add(new BlocPlan("Appart " + i, true, 0, surfaceParAppart));
+            blocs.add(new BlocPlan("Appart " + i, true, 0, surfaceMoyenne));
         }
 
         return blocs;
@@ -397,15 +418,15 @@ public class PlanEtage {
                                     double hauteur) {
         if (blocs.isEmpty() || hauteur <= 5) return;
 
-        double largeurBloc = largeur / blocs.size();
+        double largeurBlocPixels = largeur / blocs.size();
 
         for (int i = 0; i < blocs.size(); i++) {
             BlocPlan bloc = blocs.get(i);
 
-            double bx = x + i * largeurBloc;
+            double bx = x + i * largeurBlocPixels;
             double by = y;
 
-            Rectangle rect = new Rectangle(bx, by, largeurBloc, hauteur);
+            Rectangle rect = new Rectangle(bx, by, largeurBlocPixels, hauteur);
 
             if (bloc.appartement) {
                 rect.setFill(Color.web("#F8F8F8"));
@@ -417,11 +438,15 @@ public class PlanEtage {
                 rect.setStrokeWidth(2.5);
             }
 
+            double largeurReelle = pixelsVersMetresLargeur(largeurBlocPixels);
+            double longueurReelle = pixelsVersMetresLongueur(hauteur);
+            double surfaceReelleAffichee = largeurReelle * longueurReelle;
+
             Text titre = new Text(bx + 8, by + 22, bloc.nom);
             titre.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
 
             Text surface = new Text(bx + 8, by + 42,
-                    String.format("%.2f m²", bloc.surfaceReelle));
+                    String.format("%.2f m²", surfaceReelleAffichee));
             surface.setStyle("-fx-font-size: 12px;");
 
             dessin.getChildren().addAll(rect, titre, surface);
@@ -454,6 +479,84 @@ public class PlanEtage {
         texte.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
         dessin.getChildren().addAll(couloir, texte);
+    }
+
+    private void sauvegarderAppartementsSelonAffichage(int nbApparts,
+                                                       double surfaceMoyenne,
+                                                       double yCouloirMetres,
+                                                       ArrayList<ZoneCommune> zonesCommunes,
+                                                       int idRevetementAppartement) {
+        /*
+         * Cette méthode sauvegarde les appartements selon la même logique que l'affichage.
+         * Elle permet à PlanProjets.txt d'avoir des dimensions cohérentes avec le plan affiché.
+         */
+        ArrayList<BlocPlan> blocs = construireBlocs(nbApparts, surfaceMoyenne, zonesCommunes);
+
+        double hauteurZoneHaut = Math.max(0, yCouloirMetres);
+        double hauteurZoneBas = Math.max(0, batiment.getLongueur() - (yCouloirMetres + LARGEUR_COULOIR_METRES));
+
+        int nbHaut = calculerNombreBlocsHaut(blocs.size(), hauteurZoneHaut, hauteurZoneBas);
+
+        ArrayList<BlocPlan> blocsHaut = new ArrayList<>();
+        ArrayList<BlocPlan> blocsBas = new ArrayList<>();
+
+        for (int i = 0; i < blocs.size(); i++) {
+            if (i < nbHaut) {
+                blocsHaut.add(blocs.get(i));
+            } else {
+                blocsBas.add(blocs.get(i));
+            }
+        }
+
+        SauvegardeProjet.supprimerAppartementsAutoEtage(batiment.getId(), nomEtage);
+
+        sauvegarderAppartementsDansLigne(blocsHaut, 0, hauteurZoneHaut, idRevetementAppartement);
+        sauvegarderAppartementsDansLigne(blocsBas, yCouloirMetres + LARGEUR_COULOIR_METRES, hauteurZoneBas, idRevetementAppartement);
+    }
+
+    private void sauvegarderAppartementsDansLigne(ArrayList<BlocPlan> blocs,
+                                                  double y,
+                                                  double longueur,
+                                                  int idRevetementAppartement) {
+        if (blocs.isEmpty() || longueur <= 0) {
+            return;
+        }
+
+        double largeurBloc = batiment.getLargeur() / blocs.size();
+
+        int numeroAppartement = 1;
+
+        for (int i = 0; i < blocs.size(); i++) {
+            BlocPlan bloc = blocs.get(i);
+
+            if (!bloc.appartement) {
+                continue;
+            }
+
+            String nom = bloc.nom.replace(" ", "");
+
+            SauvegardeProjet.sauvegarderElementPlan(
+                    batiment.getId(),
+                    nomEtage,
+                    nom,
+                    i * largeurBloc,
+                    y,
+                    largeurBloc,
+                    longueur,
+                    3.0,
+                    idRevetementAppartement
+            );
+
+            numeroAppartement++;
+        }
+    }
+
+    private double pixelsVersMetresLargeur(double largeurPixels) {
+        return largeurPixels / 700.0 * batiment.getLargeur();
+    }
+
+    private double pixelsVersMetresLongueur(double hauteurPixels) {
+        return hauteurPixels / 350.0 * batiment.getLongueur();
     }
 
     private ArrayList<ZoneCommune> chargerZonesCommunes() {
@@ -528,4 +631,3 @@ public class PlanEtage {
         return Color.LIGHTGRAY;
     }
 }
-

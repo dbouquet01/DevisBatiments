@@ -49,27 +49,19 @@ public class FenetreListePieces {
     }
 
     public FenetreListePieces(Batiments batiment, String nomEtage, ArrayList<String> nomsPieces) {
-        this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.numAppart = 0;
-        this.surfaceAppart = batiment.getLargeur() * batiment.getLongueur();
-        this.nbApparts = 0;
-        this.nbAppartsParEtage = new HashMap<>();
+        this(batiment, nomEtage);
         this.nomsPieces.addAll(nomsPieces);
     }
 
     public void afficher(Stage stage) {
-
         chargerPiecesExistantes();
 
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
 
-        Label titre = new Label(
-                numAppart > 0
-                        ? "PIÈCES — " + nomEtage + " | Appartement " + numAppart
-                        : "PIÈCES — " + nomEtage + " | " + batiment.getId()
-        );
+        Label titre = new Label(numAppart > 0
+                ? "PIÈCES — " + nomEtage + " | Appartement " + numAppart
+                : "PIÈCES — " + nomEtage + " | " + batiment.getId());
         titre.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         VBox topBox = new VBox(titre);
@@ -83,12 +75,6 @@ public class FenetreListePieces {
         fieldNomPiece.setPromptText("Nom de la pièce");
         fieldNomPiece.setMaxWidth(300);
 
-        Button btnAjouter = new Button("+ AJOUTER UNE PIÈCE");
-        btnAjouter.setStyle(styleBouton);
-
-        HBox ligneAjout = new HBox(15, fieldNomPiece, btnAjouter);
-        ligneAjout.setAlignment(Pos.CENTER);
-
         Label lblErreur = new Label("");
         lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
 
@@ -96,8 +82,8 @@ public class FenetreListePieces {
         listePieces.setAlignment(Pos.TOP_CENTER);
         listePieces.setPadding(new Insets(10));
 
-        actualiserListePieces(stage, listePieces, styleBouton);
-
+        Button btnAjouter = new Button("+ AJOUTER UNE PIÈCE");
+        btnAjouter.setStyle(styleBouton);
         btnAjouter.setOnAction(e -> {
             String nomPiece = fieldNomPiece.getText().trim();
 
@@ -116,6 +102,11 @@ public class FenetreListePieces {
             fieldNomPiece.clear();
             actualiserListePieces(stage, listePieces, styleBouton);
         });
+
+        HBox ligneAjout = new HBox(15, fieldNomPiece, btnAjouter);
+        ligneAjout.setAlignment(Pos.CENTER);
+
+        actualiserListePieces(stage, listePieces, styleBouton);
 
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(styleBouton);
@@ -176,8 +167,8 @@ public class FenetreListePieces {
         }
     }
 
-    private void ajouterLignePiece(Stage stage, VBox listePieces, String nomPiece, int numero, String styleBouton) {
-
+    private void ajouterLignePiece(Stage stage, VBox listePieces, String nomPiece,
+                                   int numero, String styleBouton) {
         Label lblNumero = new Label("Pièce " + numero);
         lblNumero.setStyle("-fx-font-size: 13px; -fx-text-fill: grey;");
         lblNumero.setMinWidth(90);
@@ -188,33 +179,18 @@ public class FenetreListePieces {
 
         Button btnEntrer = new Button("Entrer →");
         btnEntrer.setStyle(styleBouton);
-        btnEntrer.setOnAction(e -> {
-            new FenetrePiece(
-                    batiment,
-                    getVuePlan(),
-                    nomPiece,
-                    surfaceAppart,
-                    nomsPieces
-            ).afficher(stage);
-        });
+        btnEntrer.setOnAction(e -> new FenetrePiece(
+                batiment,
+                getVuePlan(),
+                nomPiece,
+                surfaceAppart,
+                nomsPieces
+        ).afficher(stage));
 
         Button btnSupprimer = new Button("Supprimer");
         btnSupprimer.setStyle("-fx-background-color: #B00020; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
-        btnSupprimer.setOnAction(e -> {
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmation.setTitle("Supprimer la pièce");
-            confirmation.setHeaderText("Supprimer " + nomPiece + " ?");
-            confirmation.setContentText("La pièce sera supprimée de la liste, du plan et du devis enregistré.");
-
-            confirmation.showAndWait().ifPresent(reponse -> {
-                if (reponse == ButtonType.OK) {
-                    SauvegardeProjet.supprimerPiece(batiment.getId(), getVuePlan(), nomPiece);
-                    nomsPieces.remove(nomPiece);
-                    actualiserListePieces(stage, listePieces, styleBouton);
-                }
-            });
-        });
+        btnSupprimer.setOnAction(e -> supprimerPiece(stage, listePieces, nomPiece, styleBouton));
 
         HBox ligne = new HBox(20, lblNumero, lblNom, btnEntrer, btnSupprimer);
         ligne.setAlignment(Pos.CENTER_LEFT);
@@ -223,6 +199,21 @@ public class FenetreListePieces {
                 + "-fx-border-width: 1; -fx-padding: 10 20;");
 
         listePieces.getChildren().add(ligne);
+    }
+
+    private void supprimerPiece(Stage stage, VBox listePieces, String nomPiece, String styleBouton) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Supprimer la pièce");
+        confirmation.setHeaderText("Supprimer " + nomPiece + " ?");
+        confirmation.setContentText("La pièce sera supprimée de la liste, du plan et du devis enregistré.");
+
+        confirmation.showAndWait().ifPresent(reponse -> {
+            if (reponse == ButtonType.OK) {
+                SauvegardeProjet.supprimerPiece(batiment.getId(), getVuePlan(), nomPiece);
+                nomsPieces.remove(nomPiece);
+                actualiserListePieces(stage, listePieces, styleBouton);
+            }
+        });
     }
 
     private void chargerPiecesExistantes() {
@@ -260,9 +251,7 @@ public class FenetreListePieces {
             return "";
         }
 
-        return texte
-                .trim()
-                .toLowerCase()
+        return texte.trim().toLowerCase()
                 .replace("é", "e")
                 .replace("è", "e")
                 .replace("ê", "e")
@@ -277,4 +266,3 @@ public class FenetreListePieces {
                 .replace("ç", "c");
     }
 }
-
