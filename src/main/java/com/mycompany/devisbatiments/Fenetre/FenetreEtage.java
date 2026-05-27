@@ -6,6 +6,7 @@ import com.mycompany.devisbatiments.elements.Maison;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
@@ -28,9 +29,12 @@ public class FenetreEtage {
         Label titre = new Label("ÉTAGES DU BÂTIMENT : " + batiment.getId());
         titre.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        VBox topBox = new VBox(titre);
+        Label aide = new Label("Pour un immeuble : visualise d'abord l'étage pour placer le couloir, puis ajoute les pièces communes.");
+        aide.setStyle("-fx-font-size: 13px; -fx-text-fill: grey;");
+
+        VBox topBox = new VBox(8, titre, aide);
         topBox.setAlignment(Pos.CENTER);
-        topBox.setPadding(new Insets(30));
+        topBox.setPadding(new Insets(25));
 
         VBox listeEtages = new VBox(15);
         listeEtages.setAlignment(Pos.CENTER);
@@ -42,6 +46,9 @@ public class FenetreEtage {
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
 
+        String styleBoutonVert = "-fx-background-color: #28A745; -fx-text-fill: white; "
+                + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
+
         double surfaceEtage = batiment.getLargeur() * batiment.getLongueur();
 
         for (int i = 0; i <= batiment.getNbEtage(); i++) {
@@ -50,11 +57,11 @@ public class FenetreEtage {
 
             Label lblEtage = new Label(nomEtage);
             lblEtage.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-            lblEtage.setMinWidth(160);
+            lblEtage.setMinWidth(130);
 
             Label lblInfo = new Label("");
             lblInfo.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F056B;");
-            lblInfo.setMinWidth(180);
+            lblInfo.setMinWidth(170);
 
             if (!(batiment instanceof Maison)) {
                 int nbApparts = nbAppartsParEtage.getOrDefault(nomEtage, 0);
@@ -64,8 +71,13 @@ public class FenetreEtage {
             Button btnEntrer = new Button("Entrer →");
             btnEntrer.setStyle(styleBouton);
 
-            Button btnVisualiser = new Button("Visualiser");
+            Button btnVisualiser = new Button("Visualiser / placer couloir");
             btnVisualiser.setStyle(styleBouton);
+
+            Button btnAjouterPiece = new Button("+ Pièce commune");
+            btnAjouterPiece.setStyle(styleBoutonVert);
+            btnAjouterPiece.setVisible(!(batiment instanceof Maison));
+            btnAjouterPiece.setManaged(!(batiment instanceof Maison));
 
             final String nomEtageCapture = nomEtage;
 
@@ -73,7 +85,7 @@ public class FenetreEtage {
                 if (batiment instanceof Maison) {
                     new FenetreListePieces(batiment, nomEtageCapture).afficher(stage);
                 } else {
-                    int nbApparts = nbAppartsParEtage.get(nomEtageCapture);
+                    int nbApparts = nbAppartsParEtage.getOrDefault(nomEtageCapture, 0);
 
                     new FenetreAppartement(
                             batiment,
@@ -91,15 +103,32 @@ public class FenetreEtage {
                     plan.afficher();
                 } else {
                     new PlanEtage(
+                            batiment,
+                            nomEtageCapture,
+                            surfaceEtage,
+                            nbAppartsParEtage
+                    ).afficher(stage);
+                }
+            });
+
+            btnAjouterPiece.setOnAction(e -> {
+                if (!GestionCouloirEtage.couloirExiste(batiment.getId(), nomEtageCapture)) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Couloir obligatoire");
+                    alert.setHeaderText("Place d'abord le couloir.");
+                    alert.setContentText("Clique sur « Visualiser / placer couloir », choisis la position du couloir, puis valide le couloir avant d'ajouter une pièce commune.");
+                    alert.showAndWait();
+                    return;
+                }
+
+                new FenetrePieceCommuneEtage(
                         batiment,
                         nomEtageCapture,
-                        surfaceEtage,
                         nbAppartsParEtage
-        ).afficher(stage);
-    }
-});
+                ).afficher(stage);
+            });
 
-            HBox ligne = new HBox(20, lblEtage, lblInfo, btnEntrer, btnVisualiser);
+            HBox ligne = new HBox(18, lblEtage, lblInfo, btnEntrer, btnVisualiser, btnAjouterPiece);
             ligne.setAlignment(Pos.CENTER_LEFT);
             ligne.setStyle(styleLigne);
             ligne.setPadding(new Insets(10, 20, 10, 20));
@@ -127,12 +156,17 @@ public class FenetreEtage {
                         batiment.getDesignation(),
                         batiment.getLargeur(),
                         batiment.getLongueur(),
-                        batiment.getNbEtage()
+                        batiment.getNbEtage(),
+                        nbAppartsParEtage
                 );
             }
         });
 
-        HBox bottomBox = new HBox(btnRetour);
+        Button btnMenuPrincipal = new Button("MENU PRINCIPAL");
+        btnMenuPrincipal.setStyle(styleBouton);
+        btnMenuPrincipal.setOnAction(e -> new FenetreProjet().afficher(stage));
+
+        HBox bottomBox = new HBox(20, btnRetour, btnMenuPrincipal);
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.BOTTOM_LEFT);
 
@@ -141,7 +175,7 @@ public class FenetreEtage {
         root.setCenter(listeEtages);
         root.setBottom(bottomBox);
 
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1200, 650);
         stage.setTitle("Étages");
         stage.setScene(scene);
         stage.show();

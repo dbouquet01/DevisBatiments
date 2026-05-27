@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +19,30 @@ public class FenetreAttributsImmeuble {
 
     public void afficher(Stage stage, String idExistant, String designationExistante,
                          double largeurExistante, double longueurExistante, int nbEtagesExistant) {
+
+        HashMap<String, Integer> nbAppartsCharges = chargerNbAppartementsDepuisEtage(idExistant);
+
+        afficher(
+                stage,
+                idExistant,
+                designationExistante,
+                largeurExistante,
+                longueurExistante,
+                nbEtagesExistant,
+                nbAppartsCharges
+        );
+    }
+
+    public void afficher(Stage stage, String idExistant, String designationExistante,
+                         double largeurExistante, double longueurExistante,
+                         int nbEtagesExistant,
+                         HashMap<String, Integer> nbAppartsExistants) {
+
+        if (nbAppartsExistants == null || nbAppartsExistants.isEmpty()) {
+            nbAppartsExistants = chargerNbAppartementsDepuisEtage(idExistant);
+        }
+
+        final HashMap<String, Integer> nbAppartsPreRemplis = nbAppartsExistants;
 
         Label titre = new Label("ATTRIBUTS DE L'IMMEUBLE");
         titre.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
@@ -44,6 +70,7 @@ public class FenetreAttributsImmeuble {
         fieldLargeur.setPromptText("Ex : 25.5");
         fieldLongueur.setPromptText("Ex : 40");
         fieldEtage.setPromptText("Ex : 5");
+
         fieldId.setText(idExistant);
         fieldDesignation.setText(designationExistante);
 
@@ -101,7 +128,15 @@ public class FenetreAttributsImmeuble {
                     return;
                 }
 
-                afficherSaisieAppartements(stage, id, designation, largeur, longueur, nbEtages);
+                afficherSaisieAppartements(
+                        stage,
+                        id,
+                        designation,
+                        largeur,
+                        longueur,
+                        nbEtages,
+                        nbAppartsPreRemplis
+                );
 
             } catch (NumberFormatException ex) {
                 lblErreur.setText("Les valeurs numériques sont invalides.");
@@ -127,7 +162,12 @@ public class FenetreAttributsImmeuble {
     }
 
     private void afficherSaisieAppartements(Stage stage, String id, String designation,
-                                            double largeur, double longueur, int nbEtages) {
+                                            double largeur, double longueur, int nbEtages,
+                                            HashMap<String, Integer> nbAppartsExistants) {
+
+        if (nbAppartsExistants == null || nbAppartsExistants.isEmpty()) {
+            nbAppartsExistants = chargerNbAppartementsDepuisEtage(id);
+        }
 
         Label titre = new Label("APPARTEMENTS PAR ÉTAGE");
         titre.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
@@ -158,6 +198,10 @@ public class FenetreAttributsImmeuble {
             fieldNbApparts.setPromptText("Nombre d'appartements");
             fieldNbApparts.setMaxWidth(180);
 
+            if (nbAppartsExistants.containsKey(nomEtage)) {
+                fieldNbApparts.setText(String.valueOf(nbAppartsExistants.get(nomEtage)));
+            }
+
             champsApparts.add(fieldNbApparts);
 
             HBox ligne = new HBox(15, lblEtage, fieldNbApparts);
@@ -168,9 +212,19 @@ public class FenetreAttributsImmeuble {
         Label lblErreur = new Label("");
         lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
 
+        final HashMap<String, Integer> nbAppartsPourRetour = new HashMap<>(nbAppartsExistants);
+
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> afficher(stage, id, designation, largeur, longueur, nbEtages));
+        btnRetour.setOnAction(e -> afficher(
+                stage,
+                id,
+                designation,
+                largeur,
+                longueur,
+                nbEtages,
+                nbAppartsPourRetour
+        ));
 
         Button btnValider = new Button("VALIDER L'IMMEUBLE →");
         btnValider.setStyle(styleBouton);
@@ -258,6 +312,44 @@ public class FenetreAttributsImmeuble {
         stage.setTitle("Appartements par étage");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private HashMap<String, Integer> chargerNbAppartementsDepuisEtage(String idProjet) {
+        HashMap<String, Integer> nbApparts = new HashMap<>();
+
+        if (idProjet == null || idProjet.trim().isEmpty()) {
+            return nbApparts;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("Etage.txt"))) {
+            String ligne;
+            reader.readLine();
+
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] p = ligne.split(";");
+
+                if (p.length < 4) {
+                    continue;
+                }
+
+                String idProjetLigne = p[1].trim();
+                String nomEtage = p[2].trim();
+                int nbAppartements = Integer.parseInt(p[3].trim());
+
+                if (idProjetLigne.equalsIgnoreCase(idProjet)) {
+                    nbApparts.put(nomEtage, nbAppartements);
+                }
+            }
+
+        } catch (Exception e) {
+            // Si Etage.txt n'existe pas encore ou est vide, on garde les champs vides.
+        }
+
+        return nbApparts;
     }
 
     private void ajouterLigne(GridPane grid, String texte, TextField field, int ligne, String style) {

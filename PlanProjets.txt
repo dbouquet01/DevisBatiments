@@ -100,4 +100,12 @@ IMB001;RDC;Appartement2;5.5;0.0;3.5;5.0;3.0;13
 IMB001;RDC;Couloir;3.5;0.0;2.0;10.0;3.0;2
 IMB001;RDC;Appartement3;0.0;5.0;3.5;5.0;3.0;15
 IMB001;RDC;Appartement4;5.5;5.0;3.5;5.0;3.0;15
-P20;RDC;Salon;0.0;0.0;10.0;8.0;2.0;2
+P18;RDC;ReperePlan;0.0;0.0;12.0;7.0;2.5;2
+P18;Etage 1;ReperePlan;0.0;0.0;12.0;7.0;2.5;2
+P19;RDC;ReperePlan;0.0;0.0;12.0;9.0;3.0;2
+P21;RDC;Salle de sport;0.0;0.0;6.0;2.3;3.0;2
+P21;RDC;Couloir;0.0;5.910919433744083;20.0;1.5;3.0;2
+P21;Etage 1;Couloir;0.0;4.25;20.0;1.5;3.0;2
+P21;Etage 1;Salle de sport;0.0;0.0;7.0;4.2;3.0;2
+P21;Etage 2;Couloir;0.0;6.14819402647723;20.0;1.5;3.0;2
+P21;Etage 3;Couloir;0.0;4.25;20.0;1.5;3.0;2

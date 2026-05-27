@@ -1,0 +1,5 @@
+idProjet;nomEtage;yCouloir;largeurCouloir;idRevetement
+P21;RDC;5.910919433744083;1.5;2
+P21;Etage 1;4.25;1.5;2
+P21;Etage 2;6.14819402647723;1.5;2
+P21;Etage 3;4.25;1.5;2

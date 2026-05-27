@@ -386,13 +386,16 @@ public class SauvegardeProjet {
     }
 
 
-    public static ArrayList<String> chargerNomsPieces(String idProjet, String vue) {
-        ArrayList<String> nomsPieces = new ArrayList<>();
+    public static ArrayList<String> chargerNomsPieces(String idProjet, String vuePlan) {
+        ArrayList<String> noms = new ArrayList<>();
 
         try {
-            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
-
             Path path = Paths.get(FICHIER_PIECE);
+
+            if (!Files.exists(path)) {
+                return noms;
+            }
+
             List<String> lignes = Files.readAllLines(path);
 
             for (int i = 1; i < lignes.size(); i++) {
@@ -406,12 +409,12 @@ public class SauvegardeProjet {
 
                 if (parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[4]).equals(normaliser(vue))) {
+                        && normaliser(parts[4]).equals(normaliser(vuePlan))) {
 
-                    String nomPiece = parts[3];
+                    String nomPiece = parts[3].trim();
 
-                    if (!contientNomPiece(nomsPieces, nomPiece)) {
-                        nomsPieces.add(nomPiece);
+                    if (!nomPiece.isEmpty() && !contientNomPiece(noms, nomPiece)) {
+                        noms.add(nomPiece);
                     }
                 }
             }
@@ -420,20 +423,23 @@ public class SauvegardeProjet {
             e.printStackTrace();
         }
 
-        return nomsPieces;
+        return noms;
     }
 
-    public static void supprimerPiece(String idProjet, String vue, String nomPiece) {
-        supprimerPieceDansFichierPiece(idProjet, vue, nomPiece);
-        supprimerPieceDansPlan(idProjet, vue, nomPiece);
-        supprimerPieceDansDevis(idProjet, nomPiece);
+    public static void supprimerPiece(String idProjet, String vuePlan, String nomPiece) {
+        supprimerPieceDansFichierPiece(idProjet, vuePlan, nomPiece);
+        supprimerPieceDansFichierPlan(idProjet, vuePlan, nomPiece);
+        supprimerPieceDansFichierDevis(idProjet, nomPiece);
     }
 
-    private static void supprimerPieceDansFichierPiece(String idProjet, String vue, String nomPiece) {
+    private static void supprimerPieceDansFichierPiece(String idProjet, String vuePlan, String nomPiece) {
         try {
-            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
-
             Path path = Paths.get(FICHIER_PIECE);
+
+            if (!Files.exists(path)) {
+                return;
+            }
+
             List<String> lignes = Files.readAllLines(path);
             List<String> nouvellesLignes = new ArrayList<>();
 
@@ -447,12 +453,12 @@ public class SauvegardeProjet {
 
                 String[] parts = ligne.split(";");
 
-                boolean estPieceASupprimer = parts.length >= 5
+                boolean ligneASupprimer = parts.length >= 5
                         && normaliser(parts[1]).equals(normaliser(idProjet))
-                        && normaliser(parts[4]).equals(normaliser(vue))
+                        && normaliser(parts[4]).equals(normaliser(vuePlan))
                         && normaliser(parts[3]).equals(normaliser(nomPiece));
 
-                if (!estPieceASupprimer) {
+                if (!ligneASupprimer) {
                     nouvellesLignes.add(ligne);
                 }
             }
@@ -464,11 +470,14 @@ public class SauvegardeProjet {
         }
     }
 
-    private static void supprimerPieceDansPlan(String idProjet, String vue, String nomPiece) {
+    private static void supprimerPieceDansFichierPlan(String idProjet, String vuePlan, String nomPiece) {
         try {
-            verifierFichier(FICHIER_PLAN, HEADER_PLAN);
-
             Path path = Paths.get(FICHIER_PLAN);
+
+            if (!Files.exists(path)) {
+                return;
+            }
+
             List<String> lignes = Files.readAllLines(path);
             List<String> nouvellesLignes = new ArrayList<>();
 
@@ -482,12 +491,12 @@ public class SauvegardeProjet {
 
                 String[] parts = ligne.split(";");
 
-                boolean estPieceASupprimer = parts.length >= 3
+                boolean ligneASupprimer = parts.length >= 3
                         && normaliser(parts[0]).equals(normaliser(idProjet))
-                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[1]).equals(normaliser(vuePlan))
                         && normaliser(parts[2]).equals(normaliser(nomPiece));
 
-                if (!estPieceASupprimer) {
+                if (!ligneASupprimer) {
                     nouvellesLignes.add(ligne);
                 }
             }
@@ -499,11 +508,16 @@ public class SauvegardeProjet {
         }
     }
 
-    private static void supprimerPieceDansDevis(String idProjet, String nomPiece) {
+    private static void supprimerPieceDansFichierDevis(String idProjet, String nomPiece) {
         try {
-            verifierFichier(FICHIER_DEVIS, HEADER_DEVIS);
-
             Path path = Paths.get(FICHIER_DEVIS);
+
+            if (!Files.exists(path)) {
+                return;
+            }
+
+            String idDevis = "D_" + idProjet;
+
             List<String> lignes = Files.readAllLines(path);
             List<String> nouvellesLignes = new ArrayList<>();
 
@@ -517,11 +531,12 @@ public class SauvegardeProjet {
 
                 String[] parts = ligne.split(";");
 
-                boolean estDevisASupprimer = parts.length >= 3
+                boolean ligneASupprimer = parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idDevis))
                         && normaliser(parts[1]).equals(normaliser(idProjet))
                         && normaliser(parts[2]).equals(normaliser(nomPiece));
 
-                if (!estDevisASupprimer) {
+                if (!ligneASupprimer) {
                     nouvellesLignes.add(ligne);
                 }
             }
@@ -533,14 +548,15 @@ public class SauvegardeProjet {
         }
     }
 
-    private static boolean contientNomPiece(ArrayList<String> nomsPieces, String nomPiece) {
-        for (String nom : nomsPieces) {
+    private static boolean contientNomPiece(ArrayList<String> noms, String nomPiece) {
+        for (String nom : noms) {
             if (normaliser(nom).equals(normaliser(nomPiece))) {
                 return true;
             }
         }
         return false;
     }
+
 
     private static String normaliser(String texte) {
         if (texte == null) {
