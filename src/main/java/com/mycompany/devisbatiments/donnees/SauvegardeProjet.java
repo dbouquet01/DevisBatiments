@@ -385,6 +385,163 @@ public class SauvegardeProjet {
         return null;
     }
 
+
+    public static ArrayList<String> chargerNomsPieces(String idProjet, String vue) {
+        ArrayList<String> nomsPieces = new ArrayList<>();
+
+        try {
+            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
+
+            Path path = Paths.get(FICHIER_PIECE);
+            List<String> lignes = Files.readAllLines(path);
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 5
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[4]).equals(normaliser(vue))) {
+
+                    String nomPiece = parts[3];
+
+                    if (!contientNomPiece(nomsPieces, nomPiece)) {
+                        nomsPieces.add(nomPiece);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return nomsPieces;
+    }
+
+    public static void supprimerPiece(String idProjet, String vue, String nomPiece) {
+        supprimerPieceDansFichierPiece(idProjet, vue, nomPiece);
+        supprimerPieceDansPlan(idProjet, vue, nomPiece);
+        supprimerPieceDansDevis(idProjet, nomPiece);
+    }
+
+    private static void supprimerPieceDansFichierPiece(String idProjet, String vue, String nomPiece) {
+        try {
+            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
+
+            Path path = Paths.get(FICHIER_PIECE);
+            List<String> lignes = Files.readAllLines(path);
+            List<String> nouvellesLignes = new ArrayList<>();
+
+            for (int i = 0; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (i == 0 || ligne.trim().isEmpty()) {
+                    nouvellesLignes.add(i == 0 ? HEADER_PIECE : ligne);
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                boolean estPieceASupprimer = parts.length >= 5
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[4]).equals(normaliser(vue))
+                        && normaliser(parts[3]).equals(normaliser(nomPiece));
+
+                if (!estPieceASupprimer) {
+                    nouvellesLignes.add(ligne);
+                }
+            }
+
+            Files.write(path, nouvellesLignes);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void supprimerPieceDansPlan(String idProjet, String vue, String nomPiece) {
+        try {
+            verifierFichier(FICHIER_PLAN, HEADER_PLAN);
+
+            Path path = Paths.get(FICHIER_PLAN);
+            List<String> lignes = Files.readAllLines(path);
+            List<String> nouvellesLignes = new ArrayList<>();
+
+            for (int i = 0; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (i == 0 || ligne.trim().isEmpty()) {
+                    nouvellesLignes.add(i == 0 ? HEADER_PLAN : ligne);
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                boolean estPieceASupprimer = parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).equals(normaliser(nomPiece));
+
+                if (!estPieceASupprimer) {
+                    nouvellesLignes.add(ligne);
+                }
+            }
+
+            Files.write(path, nouvellesLignes);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void supprimerPieceDansDevis(String idProjet, String nomPiece) {
+        try {
+            verifierFichier(FICHIER_DEVIS, HEADER_DEVIS);
+
+            Path path = Paths.get(FICHIER_DEVIS);
+            List<String> lignes = Files.readAllLines(path);
+            List<String> nouvellesLignes = new ArrayList<>();
+
+            for (int i = 0; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (i == 0 || ligne.trim().isEmpty()) {
+                    nouvellesLignes.add(i == 0 ? HEADER_DEVIS : ligne);
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                boolean estDevisASupprimer = parts.length >= 3
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[2]).equals(normaliser(nomPiece));
+
+                if (!estDevisASupprimer) {
+                    nouvellesLignes.add(ligne);
+                }
+            }
+
+            Files.write(path, nouvellesLignes);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean contientNomPiece(ArrayList<String> nomsPieces, String nomPiece) {
+        for (String nom : nomsPieces) {
+            if (normaliser(nom).equals(normaliser(nomPiece))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static String normaliser(String texte) {
         if (texte == null) {
             return "";

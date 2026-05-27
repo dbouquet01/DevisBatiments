@@ -10,7 +10,7 @@ package com.mycompany.devisbatiments.elements;
  */
 public class Immeuble extends Batiments {
    
-    public Immeuble(String Id, String Designation, double largeur, double longueur, int nbEtage) {
-       super(Id, largeur, longueur, nbEtage);
+    public Immeuble(String Id, String designation, double largeur, double longueur, int nbEtage) {
+       super(Id, designation, largeur, longueur, nbEtage);
     }
 }

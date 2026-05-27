@@ -18,9 +18,9 @@ public abstract class Batiments {
     protected double longueur;
     protected int nbEtage;
    
-public Batiments (String Id, double largeur, double longueur, int nbEtage){
+public Batiments (String Id,String designation, double largeur, double longueur, int nbEtage){
     this.Id = Id;
-    this.Designation = Designation;
+    this.Designation = designation;
     this.largeur=largeur;
     this.longueur=longueur;
     this.nbEtage= nbEtage; }

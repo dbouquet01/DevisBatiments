@@ -111,14 +111,25 @@ public class FenetreEtage {
         btnRetour.setStyle(styleBouton);
 
         btnRetour.setOnAction(e -> {
-            new FenetreAttributsImmeuble().afficher(
-                    stage,
-                    batiment.getId(),
-                    batiment.getDesignation(),
-                    batiment.getLargeur(),
-                    batiment.getLongueur(),
-                    batiment.getNbEtage()
-            );
+            if (batiment instanceof Maison) {
+                new FenetreAttributsMaison().afficher(
+                        stage,
+                        batiment.getId(),
+                        batiment.getDesignation(),
+                        batiment.getLargeur(),
+                        batiment.getLongueur(),
+                        batiment.getNbEtage()
+                );
+            } else {
+                new FenetreAttributsImmeuble().afficher(
+                        stage,
+                        batiment.getId(),
+                        batiment.getDesignation(),
+                        batiment.getLargeur(),
+                        batiment.getLongueur(),
+                        batiment.getNbEtage()
+                );
+            }
         });
 
         HBox bottomBox = new HBox(btnRetour);

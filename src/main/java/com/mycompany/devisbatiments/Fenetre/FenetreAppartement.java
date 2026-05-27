@@ -18,6 +18,8 @@ import java.util.HashMap;
 
 public class FenetreAppartement {
 
+    private static final double LARGEUR_COULOIR_METRES = 1.50;
+
     private final Batiments batiment;
     private final String nomEtage;
     private final double surfaceEtage;
@@ -45,10 +47,19 @@ public class FenetreAppartement {
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(25));
 
-        double surfaceParAppart = surfaceEtage / nbApparts;
+        if (nbApparts <= 0) {
+            afficherErreur(stage, topBox, styleBouton);
+            return;
+        }
+
+        double surfaceCouloir = calculerSurfaceCouloir();
+        double surfaceHabitable = calculerSurfaceHabitable();
+        double surfaceParAppart = surfaceHabitable / nbApparts;
 
         Label lblSurfaceInfo = new Label(
                 "Surface étage : " + String.format("%.2f", surfaceEtage)
+                        + " m² — Couloir : " + String.format("%.2f", surfaceCouloir)
+                        + " m² — Surface restante : " + String.format("%.2f", surfaceHabitable)
                         + " m² — Surface par appartement : "
                         + String.format("%.2f", surfaceParAppart) + " m²"
         );
@@ -60,7 +71,8 @@ public class FenetreAppartement {
 
         for (int i = 1; i <= nbApparts; i++) {
 
-            Label lblAppart = new Label("Appartement " + i);
+            Label lblAppart = new Label("Appartement " + i
+                    + " — " + String.format("%.2f", surfaceParAppart) + " m²");
             lblAppart.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
             lblAppart.setMinWidth(250);
 
@@ -109,5 +121,47 @@ public class FenetreAppartement {
         stage.setTitle("Appartement — " + nomEtage);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void afficherErreur(Stage stage, VBox topBox, String styleBouton) {
+        Label erreur = new Label("Aucun appartement n'est enregistré pour cet étage.");
+        erreur.setStyle("-fx-font-size: 16px; -fx-text-fill: red; -fx-font-weight: bold;");
+
+        Button btnRetour = new Button("RETOUR");
+        btnRetour.setStyle(styleBouton);
+        btnRetour.setOnAction(e -> new FenetreEtage(batiment, nbAppartsParEtage).afficher(stage));
+
+        VBox centre = new VBox(20, erreur);
+        centre.setAlignment(Pos.CENTER);
+
+        HBox bottomBox = new HBox(btnRetour);
+        bottomBox.setPadding(new Insets(20));
+        bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+
+        BorderPane root = new BorderPane();
+        root.setTop(topBox);
+        root.setCenter(centre);
+        root.setBottom(bottomBox);
+
+        Scene scene = new Scene(root, 1000, 600);
+        stage.setTitle("Appartement — " + nomEtage);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private double calculerSurfaceCouloir() {
+        double largeurBatiment = batiment.getLargeur();
+        double longueurBatiment = batiment.getLongueur();
+
+        if (largeurBatiment <= 0 || longueurBatiment <= 0) {
+            return 0;
+        }
+
+        double largeurCouloir = Math.min(LARGEUR_COULOIR_METRES, longueurBatiment);
+        return largeurBatiment * largeurCouloir;
+    }
+
+    private double calculerSurfaceHabitable() {
+        return Math.max(0, surfaceEtage - calculerSurfaceCouloir());
     }
 }

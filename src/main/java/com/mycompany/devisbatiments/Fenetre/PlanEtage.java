@@ -22,6 +22,8 @@ import java.util.HashMap;
 
 public class PlanEtage {
 
+    private static final double LARGEUR_COULOIR_METRES = 1.50;
+
     private final Batiments batiment;
     private final String nomEtage;
     private final double surfaceEtage;
@@ -50,11 +52,7 @@ public class PlanEtage {
 
         int nbApparts = nbAppartsParEtage.getOrDefault(nomEtage, 0);
 
-        Label info = new Label(
-                nomEtage + " — " + nbApparts + " appartement(s) — Surface : "
-                        + String.format("%.2f", surfaceEtage) + " m²"
-        );
-        info.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0F056B;");
+        Label info = creerLabelInfo(nbApparts);
 
         ComboBox<String> choixCouloir = new ComboBox<>();
         choixCouloir.getItems().addAll(
@@ -95,6 +93,21 @@ public class PlanEtage {
         stage.show();
     }
 
+    private Label creerLabelInfo(int nbApparts) {
+        double surfaceCouloir = calculerSurfaceCouloir();
+        double surfaceHabitable = calculerSurfaceHabitable();
+        double surfaceParAppart = nbApparts > 0 ? surfaceHabitable / nbApparts : 0;
+
+        Label info = new Label(
+                nomEtage + " — " + nbApparts + " appartement(s)"
+                        + " — Surface étage : " + String.format("%.2f", surfaceEtage) + " m²"
+                        + " — Couloir : " + String.format("%.2f", surfaceCouloir) + " m²"
+                        + " — Surface/appart : " + String.format("%.2f", surfaceParAppart) + " m²"
+        );
+        info.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0F056B;");
+        return info;
+    }
+
     private Pane creerDessinEtage(int nbApparts, String positionCouloir) {
 
         Pane dessin = new Pane();
@@ -113,7 +126,7 @@ public class PlanEtage {
 
         double largeurTotale = 600;
         double hauteurTotale = 300;
-        double hauteurCouloir = 60;
+        double hauteurCouloir = calculerHauteurCouloirDessin(hauteurTotale);
 
         if (positionCouloir.equals("Couloir en haut")) {
 
@@ -161,19 +174,16 @@ public class PlanEtage {
 
         } else if (positionCouloir.equals("Couloir au milieu")) {
 
-            double hauteurAppart = 120;
+            double hauteurAppart = (hauteurTotale - hauteurCouloir) / 2;
 
             if (nbApparts == 1) {
 
-                double largeurAppart = 220;
-                double largeurCouloir = 380;
-
                 dessinerAppartement(
                         dessin,
-                        xDepart + largeurCouloir,
+                        xDepart,
                         yDepart,
-                        largeurAppart,
-                        hauteurAppart * 2 + hauteurCouloir,
+                        largeurTotale,
+                        hauteurAppart,
                         1
                 );
 
@@ -181,7 +191,7 @@ public class PlanEtage {
                         dessin,
                         xDepart,
                         yDepart + hauteurAppart,
-                        largeurCouloir,
+                        largeurTotale,
                         hauteurCouloir
                 );
 
@@ -267,13 +277,42 @@ public class PlanEtage {
                         xDepart + largeurCouloir,
                         yDepart,
                         largeurBout,
-                        hauteurAppart * 2 + hauteurCouloir,
+                        hauteurTotale,
                         nbApparts
                 );
             }
         }
 
         return dessin;
+    }
+
+    private double calculerSurfaceCouloir() {
+        double largeurBatiment = batiment.getLargeur();
+        double longueurBatiment = batiment.getLongueur();
+
+        if (largeurBatiment <= 0 || longueurBatiment <= 0) {
+            return 0;
+        }
+
+        double largeurCouloir = Math.min(LARGEUR_COULOIR_METRES, longueurBatiment);
+        return largeurBatiment * largeurCouloir;
+    }
+
+    private double calculerSurfaceHabitable() {
+        return Math.max(0, surfaceEtage - calculerSurfaceCouloir());
+    }
+
+    private double calculerHauteurCouloirDessin(double hauteurTotaleDessin) {
+        double longueurBatiment = batiment.getLongueur();
+
+        if (longueurBatiment <= 0) {
+            return 0;
+        }
+
+        double proportion = LARGEUR_COULOIR_METRES / longueurBatiment;
+        proportion = Math.max(0, Math.min(proportion, 1));
+
+        return hauteurTotaleDessin * proportion;
     }
 
     private void dessinerAppartement(Pane dessin,
@@ -306,9 +345,9 @@ public class PlanEtage {
         couloir.setStrokeWidth(2);
 
         Text texte = new Text(
-                x + largeur / 2 - 30,
+                x + largeur / 2 - 55,
                 y + hauteur / 2 + 5,
-                "Couloir"
+                "Couloir 1,50 m"
         );
         texte.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
 

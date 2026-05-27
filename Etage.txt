@@ -21,3 +21,8 @@ IMB001_ETAGE1;IMB001;Etage 1;4;0;false;false;90.0;0
 IMB001_ETAGE2;IMB001;Etage 2;5;0;false;false;90.0;0
 IMB001_ETAGE3;IMB001;Etage 3;6;0;false;false;90.0;0
 IMB001_ETAGE4;IMB001;Etage 4;7;0;false;false;90.0;0
+P17_RDC;P17;RDC;2;0;false;false;250.0;0
+P17_ETAGE1;P17;Etage 1;3;0;false;false;250.0;0
+P17_ETAGE2;P17;Etage 2;4;0;false;false;250.0;0
+P17_ETAGE3;P17;Etage 3;1;0;false;false;250.0;0
+P17_ETAGE4;P17;Etage 4;1;0;false;false;250.0;0

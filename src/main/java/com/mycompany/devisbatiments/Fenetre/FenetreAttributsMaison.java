@@ -94,8 +94,7 @@ public class FenetreAttributsMaison {
                 double longueur = Double.parseDouble(txtLongueur);
                 int nbEtages = Integer.parseInt(txtEtage);
 
-                Maison maison = new Maison(id, largeur, longueur, nbEtages);
-
+                Maison maison = new Maison(id, designation, largeur, longueur, nbEtages);
                 String idDevis = "D_" + id;
                 double hauteurTotale = nbEtages * 2.5;
                 double surfaceTotale = largeur * longueur * (nbEtages + 1);
