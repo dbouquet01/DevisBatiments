@@ -36,3 +36,14 @@ P21_ETAGE2;P21;Etage 2;3;0;false;false;200.0;0
 P21_ETAGE3;P21;Etage 3;4;0;false;false;200.0;0
 P21_ETAGE4;P21;Etage 4;6;0;false;false;200.0;0
 P21_ETAGE5;P21;Etage 5;7;0;false;false;200.0;0
+IMB003_RDC;IMB003;RDC;4;0;false;false;192.0;0
+IMB003_ETAGE1;IMB003;Etage 1;6;0;false;false;192.0;0
+IMB003_ETAGE2;IMB003;Etage 2;6;0;false;false;192.0;0
+IMB003_ETAGE3;IMB003;Etage 3;6;0;false;false;192.0;0
+IMB003_ETAGE4;IMB003;Etage 4;5;0;false;false;192.0;0
+IMB004_RDC;IMB004;RDC;4;0;false;false;300.0;0
+IMB004_ETAGE1;IMB004;Etage 1;6;0;false;false;300.0;0
+IMB004_ETAGE2;IMB004;Etage 2;6;0;false;false;300.0;0
+IMB004_ETAGE3;IMB004;Etage 3;6;0;false;false;300.0;0
+IMB004_ETAGE4;IMB004;Etage 4;5;0;false;false;300.0;0
+IMB004_ETAGE5;IMB004;Etage 5;5;0;false;false;300.0;0

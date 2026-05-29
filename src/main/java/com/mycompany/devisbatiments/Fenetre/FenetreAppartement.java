@@ -55,6 +55,7 @@ public class FenetreAppartement {
         double surfaceCouloir = calculerSurfaceCouloir();
         double surfaceHabitable = calculerSurfaceHabitable();
         double surfaceParAppart = surfaceHabitable / nbApparts;
+       
 
         Label lblSurfaceInfo = new Label(
                 "Surface étage : " + String.format("%.2f", surfaceEtage)
@@ -164,4 +165,5 @@ public class FenetreAppartement {
     private double calculerSurfaceHabitable() {
         return Math.max(0, surfaceEtage - calculerSurfaceCouloir());
     }
+    
 }

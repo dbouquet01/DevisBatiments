@@ -49,37 +49,27 @@ public class FenetrePiece {
         HBox top = new HBox(titre);
         top.setAlignment(Pos.CENTER);
         top.setPadding(new Insets(12));
-
         root.setTop(top);
 
         VBox panneauGauche = new VBox(12);
         panneauGauche.setPadding(new Insets(15));
         panneauGauche.setPrefWidth(760);
 
-        TextField fieldX = new TextField();
-        TextField fieldY = new TextField();
+        // ── 1. Dimensions ──
+        TextField fieldX       = new TextField();
+        TextField fieldY       = new TextField();
         TextField fieldLargeur = new TextField();
-        TextField fieldLongueur = new TextField();
+        TextField fieldLongueur= new TextField();
         TextField fieldHauteur = new TextField();
 
         GridPane gridDim = new GridPane();
         gridDim.setHgap(10);
         gridDim.setVgap(10);
-
-        gridDim.add(new Label("X origine :"), 0, 0);
-        gridDim.add(fieldX, 1, 0);
-
-        gridDim.add(new Label("Y origine :"), 0, 1);
-        gridDim.add(fieldY, 1, 1);
-
-        gridDim.add(new Label("Largeur (m) :"), 0, 2);
-        gridDim.add(fieldLargeur, 1, 2);
-
-        gridDim.add(new Label("Longueur (m) :"), 0, 3);
-        gridDim.add(fieldLongueur, 1, 3);
-
-        gridDim.add(new Label("Hauteur (m) :"), 0, 4);
-        gridDim.add(fieldHauteur, 1, 4);
+        gridDim.add(new Label("X origine :"),   0, 0); gridDim.add(fieldX,        1, 0);
+        gridDim.add(new Label("Y origine :"),   0, 1); gridDim.add(fieldY,        1, 1);
+        gridDim.add(new Label("Largeur (m) :"), 0, 2); gridDim.add(fieldLargeur,  1, 2);
+        gridDim.add(new Label("Longueur (m) :"),0, 3); gridDim.add(fieldLongueur, 1, 3);
+        gridDim.add(new Label("Hauteur (m) :"), 0, 4); gridDim.add(fieldHauteur,  1, 4);
 
         VBox boxDim = new VBox(10, new Label("1. Dimensions / position"), gridDim);
         boxDim.setStyle(
@@ -87,9 +77,34 @@ public class FenetrePiece {
                 "-fx-padding: 12;" +
                 "-fx-border-color: #0F056B;"
         );
+        boxDim.setPrefWidth(250);
 
-        ComboBox<Revetement> comboMur = new ComboBox<>();
-        ComboBox<Revetement> comboSol = new ComboBox<>();
+        // ── 2. Ouvertures (nombre seulement, surfaces standard utilisées pour le calcul) ──
+        // Fenêtre standard : 1.2 m x 1.2 m = 1.44 m²
+        // Porte standard   : 0.9 m x 2.1 m = 1.89 m²
+        // Trémie standard  : 1.0 m x 2.5 m = 2.50 m²
+        TextField fieldNbFenetre = new TextField(); fieldNbFenetre.setPromptText("0");
+        TextField fieldNbPorte   = new TextField(); fieldNbPorte.setPromptText("0");
+        TextField fieldNbTremie  = new TextField(); fieldNbTremie.setPromptText("0");
+
+        GridPane gridOuv = new GridPane();
+        gridOuv.setHgap(20);
+        gridOuv.setVgap(20);
+        gridOuv.add(new Label("Nombre de fenêtres :"),  0, 0); gridOuv.add(fieldNbFenetre, 1, 0);
+        gridOuv.add(new Label("Nombre de portes :"),    0, 1); gridOuv.add(fieldNbPorte,   1, 1);
+        gridOuv.add(new Label("Nombre de trémies :"),   0, 2); gridOuv.add(fieldNbTremie,  1, 2);
+
+        VBox boxOuv = new VBox(10, new Label("2. Ouvertures"), gridOuv);
+        boxOuv.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-padding: 20;" +
+                "-fx-border-color: #0F056B;"
+        );
+        boxOuv.setPrefWidth(465);
+
+        // ── 3. Revêtements ──
+        ComboBox<Revetement> comboMur     = new ComboBox<>();
+        ComboBox<Revetement> comboSol     = new ComboBox<>();
         ComboBox<Revetement> comboPlafond = new ComboBox<>();
 
         comboMur.getItems().addAll(Revetement.getRevetementsMur());
@@ -99,104 +114,58 @@ public class FenetrePiece {
         GridPane gridRev = new GridPane();
         gridRev.setHgap(10);
         gridRev.setVgap(10);
+        gridRev.add(new Label("Murs :"),    0, 0); gridRev.add(comboMur,     1, 0);
+        gridRev.add(new Label("Sol :"),     0, 1); gridRev.add(comboSol,     1, 1);
+        gridRev.add(new Label("Plafond :"), 0, 2); gridRev.add(comboPlafond, 1, 2);
 
-        gridRev.add(new Label("Murs :"), 0, 0);
-        gridRev.add(comboMur, 1, 0);
-
-        gridRev.add(new Label("Sol :"), 0, 1);
-        gridRev.add(comboSol, 1, 1);
-
-        gridRev.add(new Label("Plafond :"), 0, 2);
-        gridRev.add(comboPlafond, 1, 2);
-
-        VBox boxRev = new VBox(10, new Label("2. Revêtements"), gridRev);
+        VBox boxRev = new VBox(10, new Label("3. Revêtements"), gridRev);
         boxRev.setStyle(
                 "-fx-background-color: white;" +
                 "-fx-padding: 12;" +
                 "-fx-border-color: #0F056B;"
         );
+        boxRev.setPrefWidth(715);
 
-        TextField fieldNbFenetre = new TextField();
-        TextField fieldLargFenetre = new TextField();
-        TextField fieldHautFenetre = new TextField();
+        // ── Chargement données existantes depuis Piece.txt ──
+        String[] donnees = SauvegardeProjet.chargerPiece(batiment.getId(), nomEtage, nomPiece);
+        if (donnees != null && donnees.length >= 18) {
+            try {
+                fieldX.setText(donnees[5].trim());
+                fieldY.setText(donnees[6].trim());
+                fieldLargeur.setText(donnees[9].trim());
+                fieldLongueur.setText(donnees[10].trim());
+                fieldHauteur.setText(donnees[11].trim());
 
-        TextField fieldNbPorte = new TextField();
-        TextField fieldLargPorte = new TextField();
-        TextField fieldHautPorte = new TextField();
+                int idRevMur  = Integer.parseInt(donnees[15].trim());
+                int idRevSol  = Integer.parseInt(donnees[16].trim());
+                int idRevPlaf = Integer.parseInt(donnees[17].trim());
 
-        TextField fieldNbTremie = new TextField();
-        TextField fieldLargTremie = new TextField();
-        TextField fieldLonTremie = new TextField();
+                for (Revetement r : comboMur.getItems())     { if (r.getIdRevetement() == idRevMur)  { comboMur.setValue(r);     break; } }
+                for (Revetement r : comboSol.getItems())     { if (r.getIdRevetement() == idRevSol)  { comboSol.setValue(r);     break; } }
+                for (Revetement r : comboPlafond.getItems()) { if (r.getIdRevetement() == idRevPlaf) { comboPlafond.setValue(r); break; } }
+            } catch (Exception ex) {
+                System.out.println("Impossible de charger les anciennes données de la pièce.");
+            }
+        }
 
-        fieldNbFenetre.setPromptText("0");
-        fieldLargFenetre.setPromptText("m");
-        fieldHautFenetre.setPromptText("m");
+        HBox ligneHaut = new HBox(15, boxDim, boxOuv);
 
-        fieldNbPorte.setPromptText("0");
-        fieldLargPorte.setPromptText("m");
-        fieldHautPorte.setPromptText("m");
-
-        fieldNbTremie.setPromptText("0");
-        fieldLargTremie.setPromptText("m");
-        fieldLonTremie.setPromptText("m");
-
-        GridPane gridOuv = new GridPane();
-        gridOuv.setHgap(8);
-        gridOuv.setVgap(8);
-
-        gridOuv.add(new Label("Fenêtres — nb :"), 0, 0);
-        gridOuv.add(fieldNbFenetre, 1, 0);
-        gridOuv.add(new Label("Larg. (m) :"), 2, 0);
-        gridOuv.add(fieldLargFenetre, 3, 0);
-        gridOuv.add(new Label("Haut. (m) :"), 4, 0);
-        gridOuv.add(fieldHautFenetre, 5, 0);
-
-        gridOuv.add(new Label("Portes — nb :"), 0, 1);
-        gridOuv.add(fieldNbPorte, 1, 1);
-        gridOuv.add(new Label("Larg. (m) :"), 2, 1);
-        gridOuv.add(fieldLargPorte, 3, 1);
-        gridOuv.add(new Label("Haut. (m) :"), 4, 1);
-        gridOuv.add(fieldHautPorte, 5, 1);
-
-        gridOuv.add(new Label("Trémies — nb :"), 0, 2);
-        gridOuv.add(fieldNbTremie, 1, 2);
-        gridOuv.add(new Label("Larg. (m) :"), 2, 2);
-        gridOuv.add(fieldLargTremie, 3, 2);
-        gridOuv.add(new Label("Long. (m) :"), 4, 2);
-        gridOuv.add(fieldLonTremie, 5, 2);
-
-        VBox boxOuv = new VBox(10, new Label("3. Ouvertures"), gridOuv);
-        boxOuv.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-padding: 12;" +
-                "-fx-border-color: #0F056B;"
-        );
-
-        HBox ligneHaut = new HBox(15, boxDim, boxRev, boxOuv);
-
-        Label lblSurfaceMur = new Label("Surface murs : -");
-        Label lblSurfaceSol = new Label("Surface sol : -");
+        // ── 4. Calcul ──
+        Label lblSurfaceMur     = new Label("Surface murs : -");
+        Label lblSurfaceSol     = new Label("Surface sol : -");
         Label lblSurfacePlafond = new Label("Surface plafond : -");
-
-        Label lblPrixMur = new Label("Prix murs : -");
-        Label lblPrixSol = new Label("Prix sol : -");
-        Label lblPrixPlafond = new Label("Prix plafond : -");
-        Label lblPrixTotal = new Label("TOTAL : -");
+        Label lblPrixMur        = new Label("Prix murs : -");
+        Label lblPrixSol        = new Label("Prix sol : -");
+        Label lblPrixPlafond    = new Label("Prix plafond : -");
+        Label lblPrixTotal      = new Label("TOTAL : -");
 
         GridPane resultats = new GridPane();
         resultats.setHgap(30);
         resultats.setVgap(8);
-
-        resultats.add(lblSurfaceMur, 0, 0);
-        resultats.add(lblPrixMur, 1, 0);
-
-        resultats.add(lblSurfaceSol, 0, 1);
-        resultats.add(lblPrixSol, 1, 1);
-
-        resultats.add(lblSurfacePlafond, 0, 2);
-        resultats.add(lblPrixPlafond, 1, 2);
-
-        resultats.add(lblPrixTotal, 0, 3);
+        resultats.add(lblSurfaceMur,     0, 0); resultats.add(lblPrixMur,     1, 0);
+        resultats.add(lblSurfaceSol,     0, 1); resultats.add(lblPrixSol,     1, 1);
+        resultats.add(lblSurfacePlafond, 0, 2); resultats.add(lblPrixPlafond, 1, 2);
+        resultats.add(lblPrixTotal,      0, 3);
 
         VBox boxCalcul = new VBox(10, new Label("4. Calcul"), resultats);
         boxCalcul.setStyle(
@@ -207,89 +176,37 @@ public class FenetrePiece {
 
         Label lblMessage = new Label("");
 
-        Button btnCalculer = new Button("CALCULER");
-        btnCalculer.setStyle(styleBouton);
-
-        Button btnEnregistrer = new Button("ENREGISTRER");
-        btnEnregistrer.setStyle(styleBouton);
-
-        Button btnRetour = new Button("RETOUR");
-        btnRetour.setStyle(styleBouton);
+        Button btnCalculer    = new Button("CALCULER");    btnCalculer.setStyle(styleBouton);
+        Button btnEnregistrer = new Button("ENREGISTRER"); btnEnregistrer.setStyle(styleBouton);
+        Button btnRetour      = new Button("RETOUR");      btnRetour.setStyle(styleBouton);
 
         HBox boutons = new HBox(15, btnCalculer, btnEnregistrer, btnRetour);
 
-        panneauGauche.getChildren().addAll(
-                ligneHaut,
-                boxCalcul,
-                lblMessage,
-                boutons
-        );
+        VBox zoneConfiguration = new VBox(15, ligneHaut, boxRev, boxCalcul);
+
+        panneauGauche.getChildren().addAll(zoneConfiguration, lblMessage, boutons);
 
         PlanDessin plan = new PlanDessin(batiment, nomEtage);
 
-        VBox panneauDessin = new VBox(
-                10,
-                new Label("Plan du projet"),
-                plan
-        );
-
+        VBox panneauDessin = new VBox(10, new Label("Plan du projet"), plan);
         panneauDessin.setPadding(new Insets(15));
 
         root.setLeft(panneauGauche);
         root.setCenter(panneauDessin);
 
-        String[] donnees = SauvegardeProjet.chargerPiece(batiment.getId(), nomEtage, nomPiece);
-
-        if (donnees != null && donnees.length >= 18) {
-            try {
-                fieldX.setText(donnees[5].trim());
-                fieldY.setText(donnees[6].trim());
-                fieldLargeur.setText(donnees[9].trim());
-                fieldLongueur.setText(donnees[10].trim());
-                fieldHauteur.setText(donnees[11].trim());
-
-                int idRevMur = Integer.parseInt(donnees[15].trim());
-                int idRevSol = Integer.parseInt(donnees[16].trim());
-                int idRevPlaf = Integer.parseInt(donnees[17].trim());
-
-                for (Revetement r : comboMur.getItems()) {
-                    if (r.getIdRevetement() == idRevMur) {
-                        comboMur.setValue(r);
-                        break;
-                    }
-                }
-
-                for (Revetement r : comboSol.getItems()) {
-                    if (r.getIdRevetement() == idRevSol) {
-                        comboSol.setValue(r);
-                        break;
-                    }
-                }
-
-                for (Revetement r : comboPlafond.getItems()) {
-                    if (r.getIdRevetement() == idRevPlaf) {
-                        comboPlafond.setValue(r);
-                        break;
-                    }
-                }
-
-            } catch (Exception ex) {
-                System.out.println("Impossible de charger les anciennes données de la pièce.");
-            }
-        }
-
+        // ── Action CALCULER ──
         btnCalculer.setOnAction(e -> {
             try {
-                double x = parseField(fieldX);
-                double y = parseField(fieldY);
-                double largeur = parseField(fieldLargeur);
+                double x        = parseField(fieldX);
+                double y        = parseField(fieldY);
+                double largeur  = parseField(fieldLargeur);
                 double longueur = parseField(fieldLongueur);
-                double hauteur = parseField(fieldHauteur);
+                double hauteur  = parseField(fieldHauteur);
 
                 piece = new Piece(nomPiece, x, y, largeur, longueur, hauteur);
 
-                Revetement revMur = comboMur.getValue();
-                Revetement revSol = comboSol.getValue();
+                Revetement revMur     = comboMur.getValue();
+                Revetement revSol     = comboSol.getValue();
                 Revetement revPlafond = comboPlafond.getValue();
 
                 if (revMur == null || revSol == null || revPlafond == null) {
@@ -302,49 +219,35 @@ public class FenetrePiece {
                 piece.appliquerRevetementSol(revSol);
                 piece.appliquerRevetementPlafond(revPlafond);
 
+                // Surfaces standard : fenêtre 1.2x1.2, porte 0.9x2.1, trémie 1.0x2.5
                 double nbFen = parseFieldOrZero(fieldNbFenetre);
-                double lFen = parseFieldOrZero(fieldLargFenetre);
-                double hFen = parseFieldOrZero(fieldHautFenetre);
-
                 double nbPor = parseFieldOrZero(fieldNbPorte);
-                double lPor = parseFieldOrZero(fieldLargPorte);
-                double hPor = parseFieldOrZero(fieldHautPorte);
-
                 double nbTre = parseFieldOrZero(fieldNbTremie);
-                double lTre = parseFieldOrZero(fieldLargTremie);
-                double lonTre = parseFieldOrZero(fieldLonTremie);
 
-                double soustractionMurs = (nbFen * lFen * hFen) + (nbPor * lPor * hPor);
-                double soustractionSol = nbTre * lTre * lonTre;
+                double soustractionMurs = (nbFen * 1.2 * 1.2) + (nbPor * 0.9 * 2.1);
+                double soustractionSol  =  nbTre * 1.0 * 2.5;
 
-                double surfaceMursReelle = Math.max(0, piece.calculerSurfaceMurs() - soustractionMurs);
-                double surfaceSolReelle = Math.max(0, piece.calculerSurfaceSol() - soustractionSol);
-                double surfacePlafondReelle = Math.max(0, piece.calculerSurfacePlafond() - soustractionSol);
+                double surfMursReelle   = Math.max(0, piece.calculerSurfaceMurs()    - soustractionMurs);
+                double surfSolReelle    = Math.max(0, piece.calculerSurfaceSol()     - soustractionSol);
+                double surfPlafReelle   = Math.max(0, piece.calculerSurfacePlafond() - soustractionSol);
 
-                double prixMurs = revMur.calculerPrix(surfaceMursReelle);
-                double prixSol = revSol.calculerPrix(surfaceSolReelle);
-                double prixPlafond = revPlafond.calculerPrix(surfacePlafondReelle);
-                double prixTotal = prixMurs + prixSol + prixPlafond;
+                double prixMurs   = revMur.calculerPrix(surfMursReelle);
+                double prixSol    = revSol.calculerPrix(surfSolReelle);
+                double prixPlaf   = revPlafond.calculerPrix(surfPlafReelle);
+                double prixTotal  = prixMurs + prixSol + prixPlaf;
 
                 lblSurfaceMur.setText(String.format(
-                        "Surface murs réelle : %.2f m²",
-                        surfaceMursReelle
-                ));
-
+                        "Surface murs réelle : %.2f m²  (brut %.2f - ouv. %.2f)",
+                        surfMursReelle, piece.calculerSurfaceMurs(), soustractionMurs));
                 lblSurfaceSol.setText(String.format(
-                        "Surface sol réelle : %.2f m²",
-                        surfaceSolReelle
-                ));
-
+                        "Surface sol réelle : %.2f m²", surfSolReelle));
                 lblSurfacePlafond.setText(String.format(
-                        "Surface plafond réelle : %.2f m²",
-                        surfacePlafondReelle
-                ));
+                        "Surface plafond réelle : %.2f m²", surfPlafReelle));
 
-                lblPrixMur.setText(String.format("Prix murs : %.2f €", prixMurs));
-                lblPrixSol.setText(String.format("Prix sol : %.2f €", prixSol));
-                lblPrixPlafond.setText(String.format("Prix plafond : %.2f €", prixPlafond));
-                lblPrixTotal.setText(String.format("TOTAL : %.2f €", prixTotal));
+                lblPrixMur.setText(String.format(    "Prix murs : %.2f €",    prixMurs));
+                lblPrixSol.setText(String.format(    "Prix sol : %.2f €",     prixSol));
+                lblPrixPlafond.setText(String.format("Prix plafond : %.2f €", prixPlaf));
+                lblPrixTotal.setText(String.format(  "TOTAL : %.2f €",        prixTotal));
 
                 lblMessage.setText("");
 
@@ -355,16 +258,17 @@ public class FenetrePiece {
             }
         });
 
+        // ── Action ENREGISTRER ──
         btnEnregistrer.setOnAction(e -> {
             try {
-                double x = parseField(fieldX);
-                double y = parseField(fieldY);
-                double largeur = parseField(fieldLargeur);
+                double x        = parseField(fieldX);
+                double y        = parseField(fieldY);
+                double largeur  = parseField(fieldLargeur);
                 double longueur = parseField(fieldLongueur);
-                double hauteur = parseField(fieldHauteur);
+                double hauteur  = parseField(fieldHauteur);
 
-                Revetement revMur = comboMur.getValue();
-                Revetement revSol = comboSol.getValue();
+                Revetement revMur     = comboMur.getValue();
+                Revetement revSol     = comboSol.getValue();
                 Revetement revPlafond = comboPlafond.getValue();
 
                 if (revMur == null || revSol == null || revPlafond == null) {
@@ -374,73 +278,44 @@ public class FenetrePiece {
                 }
 
                 piece = new Piece(nomPiece, x, y, largeur, longueur, hauteur);
-
                 piece.appliquerRevetementMurs(revMur);
                 piece.appliquerRevetementSol(revSol);
                 piece.appliquerRevetementPlafond(revPlafond);
 
                 double nbFen = parseFieldOrZero(fieldNbFenetre);
-                double lFen = parseFieldOrZero(fieldLargFenetre);
-                double hFen = parseFieldOrZero(fieldHautFenetre);
-
                 double nbPor = parseFieldOrZero(fieldNbPorte);
-                double lPor = parseFieldOrZero(fieldLargPorte);
-                double hPor = parseFieldOrZero(fieldHautPorte);
-
                 double nbTre = parseFieldOrZero(fieldNbTremie);
-                double lTre = parseFieldOrZero(fieldLargTremie);
-                double lonTre = parseFieldOrZero(fieldLonTremie);
 
-                double soustractionMurs = (nbFen * lFen * hFen) + (nbPor * lPor * hPor);
-                double soustractionSol = nbTre * lTre * lonTre;
+                double soustractionMurs = (nbFen * 1.2 * 1.2) + (nbPor * 0.9 * 2.1);
+                double soustractionSol  =  nbTre * 1.0 * 2.5;
 
-                double surfaceMursReelle = Math.max(0, piece.calculerSurfaceMurs() - soustractionMurs);
-                double surfaceSolReelle = Math.max(0, piece.calculerSurfaceSol() - soustractionSol);
-                double surfacePlafondReelle = Math.max(0, piece.calculerSurfacePlafond() - soustractionSol);
+                double surfMursReelle   = Math.max(0, piece.calculerSurfaceMurs()    - soustractionMurs);
+                double surfSolReelle    = Math.max(0, piece.calculerSurfaceSol()     - soustractionSol);
+                double surfPlafReelle   = Math.max(0, piece.calculerSurfacePlafond() - soustractionSol);
 
-                double prixMurs = revMur.calculerPrix(surfaceMursReelle);
-                double prixSol = revSol.calculerPrix(surfaceSolReelle);
-                double prixPlafond = revPlafond.calculerPrix(surfacePlafondReelle);
-                double prixTotal = prixMurs + prixSol + prixPlafond;
+                double prixMurs  = revMur.calculerPrix(surfMursReelle);
+                double prixSol   = revSol.calculerPrix(surfSolReelle);
+                double prixPlaf  = revPlafond.calculerPrix(surfPlafReelle);
+                double prixTotal = prixMurs + prixSol + prixPlaf;
 
                 SauvegardeProjet.sauvegarderElementPlan(
-                        batiment.getId(),
-                        nomEtage,
-                        nomPiece,
-                        x,
-                        y,
-                        largeur,
-                        longueur,
-                        hauteur,
+                        batiment.getId(), nomEtage, nomPiece,
+                        x, y, largeur, longueur, hauteur,
                         revSol.getIdRevetement()
                 );
 
                 SauvegardeProjet.sauvegarderDevis(
-                        "D_" + batiment.getId(),
-                        batiment.getId(),
-                        nomPiece,
-                        prixMurs,
-                        prixSol,
-                        prixPlafond,
-                        prixTotal
+                        "D_" + batiment.getId(), batiment.getId(), nomPiece,
+                        prixMurs, prixSol, prixPlaf, prixTotal
                 );
 
                 SauvegardeProjet.sauvegarderPiece(
-                        batiment.getId(),
-                        nomEtage,
-                        nomPiece,
-                        x,
-                        y,
-                        largeur,
-                        longueur,
-                        hauteur,
+                        batiment.getId(), nomEtage, nomPiece,
+                        x, y, largeur, longueur, hauteur,
                         revMur.getIdRevetement(),
                         revSol.getIdRevetement(),
                         revPlafond.getIdRevetement(),
-                        prixMurs,
-                        prixSol,
-                        prixPlafond,
-                        prixTotal
+                        prixMurs, prixSol, prixPlaf, prixTotal
                 );
 
                 plan.actualiser();
@@ -460,7 +335,6 @@ public class FenetrePiece {
         });
 
         Scene scene = new Scene(root, 1450, 820);
-
         stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
@@ -473,9 +347,7 @@ public class FenetrePiece {
     private double parseFieldOrZero(TextField f) {
         try {
             String txt = f.getText().trim().replace(",", ".");
-            if (txt.isEmpty()) {
-                return 0;
-            }
+            if (txt.isEmpty()) return 0;
             return Double.parseDouble(txt);
         } catch (NumberFormatException e) {
             return 0;

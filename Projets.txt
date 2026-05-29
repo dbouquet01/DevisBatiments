@@ -11,3 +11,5 @@ P20;Maison Bouquet;MAISON;2;5.0;240.0;0;D_P20;10.0;8.0
 P18;Projet modèle formes libres;MAISON;1;2.5;168.0;0;D_P18;12.0;7.0
 P19;Petit immeuble formes libres;IMMEUBLE;0;3.0;108.0;2;D_P19;12.0;9.0
 P21;1;IMMEUBLE;3;9.0;800.0;10;D_P21;20.0;10.0
+IMB003;Résidence Bord de Mer;IMMEUBLE;4;12.0;960.0;27;D_IMB003;12.0;16.0
+IMB004;Immeuble Haussmannien;IMMEUBLE;5;15.0;1800.0;32;D_IMB004;15.0;20.0

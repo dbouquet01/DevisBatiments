@@ -128,7 +128,7 @@ public class PlanVisualisation {
         Text titre = new Text(
                 origineX,
                 Math.max(25, origineY - 12),
-                "Surface totale de l'étage : "
+                "Surface totale de l'appartement : "
                         + String.format("%.2f", largeurProjet)
                         + " x "
                         + String.format("%.2f", longueurProjet)
