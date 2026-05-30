@@ -33,7 +33,7 @@ public class FenetreAppartement {
         this.nomEtage = nomEtage;
         this.surfaceEtage = surfaceEtage;
         this.nbApparts = nbApparts;
-        this.nbAppartsParEtage = nbAppartsParEtage;
+        this.nbAppartsParEtage = nbAppartsParEtage == null ? new HashMap<>() : nbAppartsParEtage;
     }
 
     public void afficher(Stage stage) {
@@ -41,10 +41,13 @@ public class FenetreAppartement {
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
 
-        Label titre = new Label("BLOCS / SALLES — " + nomEtage);
+        Label titre = new Label("APPARTEMENTS / PIÈCES COMMUNES — " + nomEtage);
         titre.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
 
-        VBox topBox = new VBox(titre);
+        Label aide = new Label("Les appartements peuvent contenir leurs propres pièces. Les pièces communes restent gérées séparément.");
+        aide.setStyle("-fx-font-size: 13px; -fx-text-fill: grey;");
+
+        VBox topBox = new VBox(6, titre, aide);
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(25));
 
@@ -66,14 +69,21 @@ public class FenetreAppartement {
 
         ArrayList<String> blocsEtage = SauvegardeProjet.chargerNomsElementsPlan(batiment.getId(), nomEtage);
 
-        if (blocsEtage.isEmpty()) {
-            Label vide = new Label("Aucun bloc enregistré sur cet étage.");
+        boolean auMoinsUnBlocVisible = false;
+
+        for (String nomBloc : blocsEtage) {
+            if (estCouloir(nomBloc)) {
+                continue;
+            }
+
+            auMoinsUnBlocVisible = true;
+            ajouterLigneBloc(stage, listeBlocs, blocsEtage, nomBloc, styleBouton);
+        }
+
+        if (!auMoinsUnBlocVisible) {
+            Label vide = new Label("Aucun appartement ou bloc enregistré sur cet étage. Va d'abord dans « Visualiser / placer couloir ».");
             vide.setStyle("-fx-font-size: 15px; -fx-text-fill: grey;");
             listeBlocs.getChildren().add(vide);
-        } else {
-            for (String nomBloc : blocsEtage) {
-                ajouterLigneBloc(stage, listeBlocs, blocsEtage, nomBloc, styleBouton);
-            }
         }
 
         Button btnRetour = new Button("RETOUR");
@@ -103,7 +113,7 @@ public class FenetreAppartement {
         root.setBottom(bottomBox);
 
         Scene scene = new Scene(root);
-        stage.setTitle("Blocs / Salles — " + nomEtage);
+        stage.setTitle("Appartements / pièces communes — " + nomEtage);
         stage.setScene(scene);
         stage.setFullScreen(true);
         stage.show();
@@ -111,35 +121,83 @@ public class FenetreAppartement {
 
     private void ajouterLigneBloc(Stage stage, VBox listeBlocs, ArrayList<String> blocsEtage,
                                   String nomBloc, String styleBouton) {
+
+        boolean appartement = estAppartement(nomBloc);
+
         Label lblBloc = new Label(nomBloc + calculerSurfaceBlocTexte(nomBloc));
         lblBloc.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
         lblBloc.setMinWidth(330);
 
-        Button btnModifier = new Button("Modifier →");
-        btnModifier.setStyle(styleBouton);
-        btnModifier.setOnAction(e -> new FenetrePiece(
-                batiment,
-                nomEtage,
-                nomBloc,
-                surfaceEtage,
-                blocsEtage
-        ).afficher(stage));
-
-        Button btnSupprimer = new Button("Supprimer");
-        btnSupprimer.setStyle("-fx-background-color: #B00020; -fx-text-fill: white; "
-                + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
-        btnSupprimer.setOnAction(e -> {
-            SauvegardeProjet.supprimerPiece(batiment.getId(), nomEtage, nomBloc);
-            afficher(stage);
-        });
-
-        HBox ligne = new HBox(20, lblBloc, btnModifier, btnSupprimer);
+        HBox ligne = new HBox(20);
         ligne.setAlignment(Pos.CENTER_LEFT);
-        ligne.setMaxWidth(950);
+        ligne.setMaxWidth(1100);
         ligne.setStyle("-fx-background-color: #F4F4F4; -fx-border-color: #0F056B; "
                 + "-fx-border-width: 1; -fx-padding: 10 20;");
 
+        ligne.getChildren().add(lblBloc);
+
+        if (appartement) {
+            Button btnPieces = new Button("Gérer les pièces →");
+            btnPieces.setStyle(styleBouton);
+            btnPieces.setOnAction(e -> ouvrirPiecesAppartement(stage, nomBloc));
+
+            Button btnModifierBloc = new Button("Modifier bloc");
+            btnModifierBloc.setStyle(styleBouton);
+            btnModifierBloc.setOnAction(e -> new FenetrePiece(
+                    batiment,
+                    nomEtage,
+                    nomBloc,
+                    surfaceEtage,
+                    blocsEtage
+            ).afficher(stage));
+
+            ligne.getChildren().addAll(btnPieces, btnModifierBloc);
+        } else {
+            Button btnModifier = new Button("Modifier →");
+            btnModifier.setStyle(styleBouton);
+            btnModifier.setOnAction(e -> new FenetrePiece(
+                    batiment,
+                    nomEtage,
+                    nomBloc,
+                    surfaceEtage,
+                    blocsEtage
+            ).afficher(stage));
+
+            Button btnSupprimer = new Button("Supprimer");
+            btnSupprimer.setStyle("-fx-background-color: #B00020; -fx-text-fill: white; "
+                    + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
+            btnSupprimer.setOnAction(e -> {
+                SauvegardeProjet.supprimerPiece(batiment.getId(), nomEtage, nomBloc);
+                afficher(stage);
+            });
+
+            ligne.getChildren().addAll(btnModifier, btnSupprimer);
+        }
+
         listeBlocs.getChildren().add(ligne);
+    }
+
+    private void ouvrirPiecesAppartement(Stage stage, String nomAppartement) {
+        String vueAppartement = creerVueAppartement(nomEtage, nomAppartement);
+
+        new FenetreListePieces(
+                batiment,
+                vueAppartement,
+                nomEtage,
+                nbAppartsParEtage
+        ).afficher(stage);
+    }
+
+    public static String creerVueAppartement(String nomEtage, String nomAppartement) {
+        return nettoyerPourVue(nomEtage) + "_" + nettoyerPourVue(nomAppartement);
+    }
+
+    public static String nettoyerPourVue(String texte) {
+        if (texte == null) {
+            return "";
+        }
+
+        return texte.trim().replace(" ", "");
     }
 
     private String calculerSurfaceBlocTexte(String nomBloc) {
@@ -172,5 +230,34 @@ public class FenetreAppartement {
 
     private double calculerSurfaceHabitable() {
         return Math.max(0, surfaceEtage - calculerSurfaceCouloir());
+    }
+
+    private boolean estAppartement(String nomBloc) {
+        String n = normaliser(nomBloc);
+        return n.startsWith("appartement") || n.startsWith("appart");
+    }
+
+    private boolean estCouloir(String nomBloc) {
+        return normaliser(nomBloc).equals("couloir");
+    }
+
+    private String normaliser(String texte) {
+        if (texte == null) {
+            return "";
+        }
+
+        return texte.trim().toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("ê", "e")
+                .replace("ë", "e")
+                .replace("à", "a")
+                .replace("â", "a")
+                .replace("ù", "u")
+                .replace("û", "u")
+                .replace("î", "i")
+                .replace("ï", "i")
+                .replace("ô", "o")
+                .replace("ç", "c");
     }
 }

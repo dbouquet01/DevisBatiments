@@ -11,9 +11,6 @@ import com.mycompany.devisbatiments.elements.Piece;
 import com.mycompany.devisbatiments.elements.Revetement;
 import com.mycompany.devisbatiments.elements.Tremie;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,6 +19,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -40,7 +39,7 @@ public class FenetrePiece {
         this.nomEtage = nomEtage;
         this.nomPiece = nomPiece;
         this.surfacePiece = surfacePiece;
-        this.nomsPieces = nomsPieces;
+        this.nomsPieces = nomsPieces == null ? new ArrayList<>() : nomsPieces;
     }
 
     public void afficher(Stage stage) {
@@ -80,9 +79,6 @@ public class FenetrePiece {
         comboMur.getItems().addAll(Revetement.getRevetementsMur());
         comboSol.getItems().addAll(Revetement.getRevetementsSol());
         comboPlafond.getItems().addAll(Revetement.getRevetementsPlafond());
-
-        // L'escalier/trémie a son propre revêtement.
-        // Ici on prend les revêtements de sol, car un escalier se revêt comme un sol.
         comboTremie.getItems().addAll(Revetement.getRevetementsSol());
 
         if (!comboMur.getItems().isEmpty()) comboMur.setValue(comboMur.getItems().get(0));
@@ -110,10 +106,10 @@ public class FenetrePiece {
         );
 
         VBox boxRev = creerBox("3. Revêtements",
-                ligne("Murs :", comboMur, 140, 320),
-                ligne("Sol :", comboSol, 140, 320),
-                ligne("Plafond :", comboPlafond, 140, 320),
-                ligne("Escalier :", comboTremie, 140, 320)
+                ligne("Murs :", comboMur, 140, 260),
+                ligne("Sol :", comboSol, 140, 260),
+                ligne("Plafond :", comboPlafond, 140, 260),
+                ligne("Escalier :", comboTremie, 140, 260)
         );
 
         Label lblSurfaceMur = new Label("Surface murs : -");
@@ -161,7 +157,10 @@ public class FenetrePiece {
             ((Region) plan).setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         }
 
-        VBox panneauDroit = new VBox(8, new Label(batiment instanceof Maison ? "Plan de l'étage" : "Plan du bloc"), plan);
+        Label titrePlan = new Label(estVueAppartement()
+                ? "Plan de l'appartement"
+                : (batiment instanceof Maison ? "Plan de l'étage" : "Plan du bloc"));
+        VBox panneauDroit = new VBox(8, titrePlan, plan);
         panneauDroit.setAlignment(Pos.TOP_CENTER);
         panneauDroit.setPadding(new Insets(0, 25, 0, 15));
         panneauDroit.setMaxWidth(Double.MAX_VALUE);
@@ -181,15 +180,14 @@ public class FenetrePiece {
         Button btnRetour = new Button("RETOUR");
         Button btnCalculer = new Button("CALCULER");
         Button btnEnregistrer = new Button("ENREGISTRER");
-        Button btnMenu = new Button("MENU PRINCIPALE");
-        
+        Button btnMenu = new Button("MENU PRINCIPAL");
 
         btnRetour.setStyle(styleBouton);
         btnCalculer.setStyle(styleBouton);
         btnEnregistrer.setStyle(styleBouton);
         btnMenu.setStyle(styleBouton);
 
-        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer,btnMenu);
+        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer, btnMenu);
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setPadding(new Insets(10, 30, 10, 30));
         bottom.setMinHeight(58);
@@ -218,61 +216,9 @@ public class FenetrePiece {
             actualiserPlan(plan);
         });
 
-        btnRetour.setOnAction(e -> {
+        btnRetour.setOnAction(e -> retour(stage));
 
-            if (batiment instanceof Maison) {
-
-                new FenetreListePieces(
-                        batiment,
-                        nomEtage,
-                        nomsPieces
-                ).afficher(stage);
-
-            } else {
-
-                HashMap<String, Integer> nbAppartsParEtage = new HashMap<>();
-
-                try (BufferedReader reader =
-                             new BufferedReader(new FileReader("Etage.txt"))) {
-
-                    reader.readLine();
-
-                    String ligne;
-
-                    while ((ligne = reader.readLine()) != null) {
-
-                        if (ligne.trim().isEmpty()) continue;
-
-                        String[] p = ligne.split(";");
-
-                        if (p.length >= 4
-                                && p[1].trim().equalsIgnoreCase(batiment.getId())) {
-
-                            nbAppartsParEtage.put(
-                                    p[2].trim(),
-                                    Integer.parseInt(p[3].trim())
-                            );
-                        }
-                    }
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
-                new FenetreAppartement(
-                        batiment,
-                        nomEtage,
-                        batiment.getLargeur() * batiment.getLongueur(),
-                        nbAppartsParEtage.getOrDefault(nomEtage, 0),
-                        nbAppartsParEtage
-                ).afficher(stage);
-            }
-        });
-        
-        btnMenu.setOnAction(e -> {
-            FenetreAccueil accueil = new FenetreAccueil();
-            accueil.afficher(stage);
-        });
+        btnMenu.setOnAction(e -> new FenetreAccueil().afficher(stage));
 
         Scene scene = new Scene(root, 1500, 850);
         stage.setTitle("Configuration pièce");
@@ -281,16 +227,47 @@ public class FenetrePiece {
         stage.show();
     }
 
+    private void retour(Stage stage) {
+        if (batiment instanceof Maison) {
+            new FenetreListePieces(
+                    batiment,
+                    nomEtage,
+                    nomsPieces
+            ).afficher(stage);
+            return;
+        }
+
+        HashMap<String, Integer> nbAppartsParEtage = chargerNbAppartsParEtage();
+
+        if (estVueAppartement()) {
+            String etageParent = extraireEtageParent(nomEtage);
+
+            new FenetreListePieces(
+                    batiment,
+                    nomEtage,
+                    etageParent,
+                    nbAppartsParEtage
+            ).afficher(stage);
+            return;
+        }
+
+        new FenetreAppartement(
+                batiment,
+                nomEtage,
+                batiment.getLargeur() * batiment.getLongueur(),
+                nbAppartsParEtage.getOrDefault(nomEtage, 0),
+                nbAppartsParEtage
+        ).afficher(stage);
+    }
+
     private Node creerPlan() {
         if (batiment instanceof Maison) {
             return new PlanDessin(batiment, nomEtage);
         }
 
-        if (nomEtage.contains("_")) {
-            String etageParent = nomEtage.substring(0, nomEtage.indexOf("_"));
-            String nomBloc = nomEtage.substring(nomEtage.indexOf("_") + 1);
-            etageParent = etageParent.equalsIgnoreCase("RDC") ? "RDC" : etageParent.replace("Etage", "Etage ");
-            return new PlanBloc(batiment, etageParent, nomBloc);
+        if (estVueAppartement()) {
+            DimensionsAppartement dim = chargerDimensionsAppartement();
+            return new PlanDessin(batiment, nomEtage, dim.largeur, dim.longueur);
         }
 
         return new PlanBloc(batiment, nomEtage, nomPiece);
@@ -487,6 +464,8 @@ public class FenetrePiece {
         double longueur = parse(fieldLongueur);
         double hauteur = parse(fieldHauteur);
 
+        verifierDimensions(x, y, largeur, longueur, hauteur);
+
         Piece piece = new Piece(nomPiece, x, y, largeur, longueur, hauteur);
 
         double ouverturesMurs = parseZero(fieldNbFenetre) * 1.2 * 1.2
@@ -499,10 +478,11 @@ public class FenetrePiece {
         Tremie tremie = new Tremie(0, 0, largeurTremie, longueurTremie);
         tremie.setRevetement(comboTremie.getValue());
 
+       
+        double surfaceTremieAuSol = nbTremie * tremie.calculerSurfaceAuSol();
         double surfaceMurs = Math.max(0, piece.calculerSurfaceMurs() - ouverturesMurs);
-        double surfaceSol = Math.max(0, piece.calculerSurfaceSol());
-        double surfacePlafond = Math.max(0, piece.calculerSurfacePlafond());
-
+        double surfaceSol = Math.max(0, piece.calculerSurfaceSol() - surfaceTremieAuSol);
+        double surfacePlafond = Math.max(0, piece.calculerSurfacePlafond() - surfaceTremieAuSol);
         double surfaceTremie = nbTremie * tremie.calculerSurfaceRevetement();
 
         double coutMurs = comboMur.getValue().calculerPrix(surfaceMurs);
@@ -515,6 +495,20 @@ public class FenetrePiece {
                 coutMurs, coutSol, coutPlafond, coutTremie);
     }
 
+    private void verifierDimensions(double x, double y, double largeur, double longueur, double hauteur) {
+        if (largeur <= 0 || longueur <= 0 || hauteur <= 0 || x < 0 || y < 0) {
+            throw new IllegalArgumentException();
+        }
+    
+        if (estVueAppartement()) {
+            DimensionsAppartement dim = chargerDimensionsAppartement();
+
+            if (x + largeur > dim.largeur || y + longueur > dim.longueur) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
     private double parse(TextField field) {
         return Double.parseDouble(field.getText().trim().replace(",", "."));
     }
@@ -525,6 +519,115 @@ public class FenetrePiece {
             return texte.isEmpty() ? 0 : Double.parseDouble(texte);
         } catch (Exception e) {
             return 0;
+        }
+    }
+
+    private boolean estVueAppartement() {
+        if (nomEtage == null || !nomEtage.contains("_")) {
+            return false;
+        }
+
+        String nomAppartement = extraireNomAppartement(nomEtage);
+        String n = normaliser(nomAppartement);
+        return n.startsWith("appartement") || n.startsWith("appart");
+    }
+
+    private String extraireEtageParent(String vueInterne) {
+        String etage = vueInterne.substring(0, vueInterne.indexOf("_"));
+
+        if (etage.equalsIgnoreCase("RDC")) {
+            return "RDC";
+        }
+
+        if (etage.toLowerCase().startsWith("etage")) {
+            return etage.replace("Etage", "Etage ");
+        }
+
+        return etage;
+    }
+
+    private String extraireNomAppartement(String vueInterne) {
+        return vueInterne.substring(vueInterne.indexOf("_") + 1);
+    }
+
+    private DimensionsAppartement chargerDimensionsAppartement() {
+        String etageParent = extraireEtageParent(nomEtage);
+        String nomAppartement = extraireNomAppartement(nomEtage);
+
+        String[] bloc = SauvegardeProjet.chargerElementPlan(
+                batiment.getId(),
+                etageParent,
+                nomAppartement
+        );
+
+        if (bloc != null && bloc.length >= 7) {
+            try {
+                double largeur = Double.parseDouble(bloc[5].trim().replace(",", "."));
+                double longueur = Double.parseDouble(bloc[6].trim().replace(",", "."));
+
+                if (largeur > 0 && longueur > 0) {
+                    return new DimensionsAppartement(largeur, longueur);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return new DimensionsAppartement(batiment.getLargeur(), batiment.getLongueur());
+    }
+
+    private HashMap<String, Integer> chargerNbAppartsParEtage() {
+        HashMap<String, Integer> nbAppartsParEtage = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("Etage.txt"))) {
+            reader.readLine();
+
+            String ligne;
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) continue;
+
+                String[] p = ligne.split(";");
+
+                if (p.length >= 4 && p[1].trim().equalsIgnoreCase(batiment.getId())) {
+                    nbAppartsParEtage.put(
+                            p[2].trim(),
+                            Integer.parseInt(p[3].trim())
+                    );
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return nbAppartsParEtage;
+    }
+
+    private String normaliser(String texte) {
+        if (texte == null) {
+            return "";
+        }
+
+        return texte.trim().toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("ê", "e")
+                .replace("ë", "e")
+                .replace("à", "a")
+                .replace("â", "a")
+                .replace("ù", "u")
+                .replace("û", "u")
+                .replace("î", "i")
+                .replace("ï", "i")
+                .replace("ô", "o")
+                .replace("ç", "c");
+    }
+
+    private static class DimensionsAppartement {
+        double largeur;
+        double longueur;
+
+        DimensionsAppartement(double largeur, double longueur) {
+            this.largeur = largeur;
+            this.longueur = longueur;
         }
     }
 
