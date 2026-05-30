@@ -181,12 +181,15 @@ public class FenetrePiece {
         Button btnRetour = new Button("RETOUR");
         Button btnCalculer = new Button("CALCULER");
         Button btnEnregistrer = new Button("ENREGISTRER");
+        Button btnMenu = new Button("MENU PRINCIPALE");
+        
 
         btnRetour.setStyle(styleBouton);
         btnCalculer.setStyle(styleBouton);
         btnEnregistrer.setStyle(styleBouton);
+        btnMenu.setStyle(styleBouton);
 
-        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer);
+        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer,btnMenu);
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setPadding(new Insets(10, 30, 10, 30));
         bottom.setMinHeight(58);
@@ -264,6 +267,11 @@ public class FenetrePiece {
                         nbAppartsParEtage
                 ).afficher(stage);
             }
+        });
+        
+        btnMenu.setOnAction(e -> {
+            FenetreAccueil accueil = new FenetreAccueil();
+            accueil.afficher(stage);
         });
 
         Scene scene = new Scene(root, 1500, 850);

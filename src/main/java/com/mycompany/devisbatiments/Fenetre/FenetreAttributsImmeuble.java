@@ -102,7 +102,7 @@ public class FenetreAttributsImmeuble {
         btnRetour.setStyle(styleBouton);
         btnRetour.setOnAction(e -> new FenetreProjet().afficher(stage));
 
-        Button btnSuivant = new Button("ÉTAPE SUIVANTE →");
+        Button btnSuivant = new Button("ÉTAPE SUIVANTE");
         btnSuivant.setStyle(styleBouton);
 
         btnSuivant.setOnAction(e -> {
@@ -158,6 +158,7 @@ public class FenetreAttributsImmeuble {
         Scene scene = new Scene(root, 1000, 600);
         stage.setTitle("Attributs Immeuble");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 
@@ -226,7 +227,7 @@ public class FenetreAttributsImmeuble {
                 nbAppartsPourRetour
         ));
 
-        Button btnValider = new Button("VALIDER L'IMMEUBLE →");
+        Button btnValider = new Button("VALIDER L'IMMEUBLE");
         btnValider.setStyle(styleBouton);
 
         btnValider.setOnAction(e -> {

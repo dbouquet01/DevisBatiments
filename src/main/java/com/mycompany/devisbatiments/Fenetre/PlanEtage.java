@@ -276,6 +276,7 @@ public class PlanEtage {
         Scene scene = new Scene(root, 1250, 720);
         stage.setTitle("Plan étage");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 

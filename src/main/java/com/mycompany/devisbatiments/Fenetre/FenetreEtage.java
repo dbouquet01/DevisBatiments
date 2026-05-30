@@ -70,7 +70,7 @@ public class FenetreEtage {
                 lblInfo.setText(getNbApparts(nomEtage) + " appartement(s)");
             }
 
-            Button btnEntrer = bouton("Entrer →", styleBouton);
+            Button btnEntrer = bouton("ENTRER", styleBouton);
             btnEntrer.setOnAction(e -> {
                 if (estMaison) {
                     new FenetreListePieces(batiment, nomEtageCapture, nbAppartsParEtage).afficher(stage);
@@ -115,7 +115,7 @@ public class FenetreEtage {
         btnRetour.setOnAction(e -> retourAttributs(stage, estMaison));
 
         Button btnMenuPrincipal = bouton("MENU PRINCIPAL", styleBouton);
-        btnMenuPrincipal.setOnAction(e -> new FenetreProjet().afficher(stage));
+        btnMenuPrincipal.setOnAction(e -> new FenetreAccueil().afficher(stage));
 
         HBox bottomBox = new HBox(20, btnRetour, btnMenuPrincipal);
         bottomBox.setPadding(new Insets(20));

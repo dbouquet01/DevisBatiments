@@ -96,8 +96,15 @@ public class FenetreListePieces {
         btnDevis.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
         btnDevis.setOnAction(e -> new FenetreRecapitulatif(batiment, vuePlan).afficher(stage));
+        
+        Button btnMenu = new Button("MENU PRINCIPALE");
+        btnMenu.setStyle(styleBouton);
+        btnMenu.setOnAction(e -> {
+            FenetreAccueil accueil = new FenetreAccueil();
+            accueil.afficher(stage);
+        });
 
-        HBox bottomBox = new HBox(20, btnRetour, btnDevis);
+        HBox bottomBox = new HBox(20, btnRetour, btnDevis, btnMenu);
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.BOTTOM_LEFT);
 

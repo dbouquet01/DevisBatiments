@@ -182,10 +182,12 @@ public class FenetreProjet {
             }
         });
         
-        Button btnRecap = new Button("Récapitulatif");
-        btnRecap.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
-
-        btnRecap.setOnAction(e -> {
+        Button btnDevis = new Button("VOIR LE DEVIS");
+        btnDevis.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; "
+                + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
+        
+        
+        btnDevis.setOnAction(e -> {
             if (idTrouve[0] == null) {
                 detailsText.setText("Veuillez d'abord rechercher un projet.");
                 zoneResultats.setVisible(true);
@@ -226,7 +228,7 @@ public class FenetreProjet {
                 retour,
                 espace,
                 btnPlans,
-                btnRecap,
+                btnDevis,
                 btnModification
         );
 

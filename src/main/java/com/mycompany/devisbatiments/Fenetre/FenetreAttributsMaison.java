@@ -73,7 +73,7 @@ public class FenetreAttributsMaison {
         btnRetour.setStyle(styleBouton);
         btnRetour.setOnAction(e -> new FenetreProjet().afficher(stage));
 
-        Button btnSuivant = new Button("ÉTAPE SUIVANTE →");
+        Button btnSuivant = new Button("ÉTAPE SUIVANTE");
         btnSuivant.setStyle(styleBouton);
 
         btnSuivant.setOnAction(e -> {
