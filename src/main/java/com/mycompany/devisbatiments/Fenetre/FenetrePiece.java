@@ -9,6 +9,8 @@ import com.mycompany.devisbatiments.elements.Batiments;
 import com.mycompany.devisbatiments.elements.Maison;
 import com.mycompany.devisbatiments.elements.Piece;
 import com.mycompany.devisbatiments.elements.Revetement;
+import com.mycompany.devisbatiments.elements.Tremie;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -65,19 +67,28 @@ public class FenetrePiece {
 
         TextField fieldNbFenetre = new TextField("0");
         TextField fieldNbPorte = new TextField("0");
+
         TextField fieldNbTremie = new TextField("0");
+        TextField fieldLargeurTremie = new TextField("1.0");
+        TextField fieldLongueurTremie = new TextField("2.5");
 
         ComboBox<Revetement> comboMur = new ComboBox<>();
         ComboBox<Revetement> comboSol = new ComboBox<>();
         ComboBox<Revetement> comboPlafond = new ComboBox<>();
+        ComboBox<Revetement> comboTremie = new ComboBox<>();
 
         comboMur.getItems().addAll(Revetement.getRevetementsMur());
         comboSol.getItems().addAll(Revetement.getRevetementsSol());
         comboPlafond.getItems().addAll(Revetement.getRevetementsPlafond());
 
+        // L'escalier/trémie a son propre revêtement.
+        // Ici on prend les revêtements de sol, car un escalier se revêt comme un sol.
+        comboTremie.getItems().addAll(Revetement.getRevetementsSol());
+
         if (!comboMur.getItems().isEmpty()) comboMur.setValue(comboMur.getItems().get(0));
         if (!comboSol.getItems().isEmpty()) comboSol.setValue(comboSol.getItems().get(0));
         if (!comboPlafond.getItems().isEmpty()) comboPlafond.setValue(comboPlafond.getItems().get(0));
+        if (!comboTremie.getItems().isEmpty()) comboTremie.setValue(comboTremie.getItems().get(0));
 
         chargerDonnees(fieldX, fieldY, fieldLargeur, fieldLongueur, fieldHauteur,
                 comboMur, comboSol, comboPlafond);
@@ -90,33 +101,41 @@ public class FenetrePiece {
                 ligne("Hauteur (m) :", fieldHauteur, 140, 220)
         );
 
-        VBox boxOuv = creerBox("2. Ouvertures",
-                ligne("Fenêtres :", fieldNbFenetre, 110, 180),
-                ligne("Portes :", fieldNbPorte, 110, 180),
-                ligne("Trémies :", fieldNbTremie, 110, 180)
+        VBox boxOuv = creerBox("2. Ouvertures / escalier",
+                ligne("Fenêtres :", fieldNbFenetre, 160, 180),
+                ligne("Portes :", fieldNbPorte, 160, 180),
+                ligne("Nombre escaliers :", fieldNbTremie, 160, 180),
+                ligne("Largeur escalier :", fieldLargeurTremie, 160, 180),
+                ligne("Longueur escalier :", fieldLongueurTremie, 160, 180)
         );
 
         VBox boxRev = creerBox("3. Revêtements",
-                ligne("Murs :", comboMur, 90, 320),
-                ligne("Sol :", comboSol, 90, 320),
-                ligne("Plafond :", comboPlafond, 90, 320)
+                ligne("Murs :", comboMur, 140, 320),
+                ligne("Sol :", comboSol, 140, 320),
+                ligne("Plafond :", comboPlafond, 140, 320),
+                ligne("Escalier :", comboTremie, 140, 320)
         );
 
         Label lblSurfaceMur = new Label("Surface murs : -");
         Label lblSurfaceSol = new Label("Surface sol : -");
         Label lblSurfacePlafond = new Label("Surface plafond : -");
+        Label lblSurfaceTremie = new Label("Surface escalier : -");
+
         Label lblPrixMur = new Label("Prix murs : -");
         Label lblPrixSol = new Label("Prix sol : -");
         Label lblPrixPlafond = new Label("Prix plafond : -");
+        Label lblPrixTremie = new Label("Prix escalier : -");
         Label lblPrixTotal = new Label("TOTAL : -");
 
         VBox resultatsCalcul = new VBox(8,
                 lblSurfaceMur,
                 lblSurfaceSol,
                 lblSurfacePlafond,
+                lblSurfaceTremie,
                 lblPrixMur,
                 lblPrixSol,
                 lblPrixPlafond,
+                lblPrixTremie,
                 lblPrixTotal
         );
 
@@ -177,18 +196,20 @@ public class FenetrePiece {
 
         btnCalculer.setOnAction(e -> calculer(
                 fieldX, fieldY, fieldLargeur, fieldLongueur, fieldHauteur,
-                fieldNbFenetre, fieldNbPorte, fieldNbTremie,
-                comboMur, comboSol, comboPlafond,
-                lblSurfaceMur, lblSurfaceSol, lblSurfacePlafond,
-                lblPrixMur, lblPrixSol, lblPrixPlafond, lblPrixTotal,
+                fieldNbFenetre, fieldNbPorte,
+                fieldNbTremie, fieldLargeurTremie, fieldLongueurTremie,
+                comboMur, comboSol, comboPlafond, comboTremie,
+                lblSurfaceMur, lblSurfaceSol, lblSurfacePlafond, lblSurfaceTremie,
+                lblPrixMur, lblPrixSol, lblPrixPlafond, lblPrixTremie, lblPrixTotal,
                 lblMessage
         ));
 
         btnEnregistrer.setOnAction(e -> {
             enregistrer(
                     fieldX, fieldY, fieldLargeur, fieldLongueur, fieldHauteur,
-                    fieldNbFenetre, fieldNbPorte, fieldNbTremie,
-                    comboMur, comboSol, comboPlafond,
+                    fieldNbFenetre, fieldNbPorte,
+                    fieldNbTremie, fieldLargeurTremie, fieldLongueurTremie,
+                    comboMur, comboSol, comboPlafond, comboTremie,
                     lblMessage
             );
             actualiserPlan(plan);
@@ -199,9 +220,9 @@ public class FenetrePiece {
             if (batiment instanceof Maison) {
 
                 new FenetreListePieces(
-                    batiment,
-                    nomEtage,
-                    nomsPieces
+                        batiment,
+                        nomEtage,
+                        nomsPieces
                 ).afficher(stage);
 
             } else {
@@ -209,7 +230,7 @@ public class FenetrePiece {
                 HashMap<String, Integer> nbAppartsParEtage = new HashMap<>();
 
                 try (BufferedReader reader =
-                    new BufferedReader(new FileReader("Etage.txt"))) {
+                             new BufferedReader(new FileReader("Etage.txt"))) {
 
                     reader.readLine();
 
@@ -219,32 +240,31 @@ public class FenetrePiece {
 
                         if (ligne.trim().isEmpty()) continue;
 
-                    String[] p = ligne.split(";");
+                        String[] p = ligne.split(";");
 
-                if (p.length >= 4
-                        && p[1].trim().equalsIgnoreCase(batiment.getId())) {
+                        if (p.length >= 4
+                                && p[1].trim().equalsIgnoreCase(batiment.getId())) {
 
-                    nbAppartsParEtage.put(
-                            p[2].trim(),
-                            Integer.parseInt(p[3].trim())
-                    );
+                            nbAppartsParEtage.put(
+                                    p[2].trim(),
+                                    Integer.parseInt(p[3].trim())
+                            );
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            }
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-            new FenetreAppartement(
-                batiment,
-                nomEtage,
-                batiment.getLargeur() * batiment.getLongueur(),
-                nbAppartsParEtage.getOrDefault(nomEtage, 0),
-                nbAppartsParEtage
-            ).afficher(stage);
+                new FenetreAppartement(
+                        batiment,
+                        nomEtage,
+                        batiment.getLargeur() * batiment.getLongueur(),
+                        nbAppartsParEtage.getOrDefault(nomEtage, 0),
+                        nbAppartsParEtage
+                ).afficher(stage);
             }
         });
-        
 
         Scene scene = new Scene(root, 1500, 850);
         stage.setTitle("Configuration pièce");
@@ -344,24 +364,40 @@ public class FenetrePiece {
 
     private void calculer(TextField x, TextField y,
                           TextField largeur, TextField longueur, TextField hauteur,
-                          TextField nbFenetre, TextField nbPorte, TextField nbTremie,
+                          TextField nbFenetre, TextField nbPorte,
+                          TextField nbTremie,
+                          TextField largeurTremie,
+                          TextField longueurTremie,
                           ComboBox<Revetement> mur,
                           ComboBox<Revetement> sol,
                           ComboBox<Revetement> plafond,
-                          Label lblSurfaceMur, Label lblSurfaceSol, Label lblSurfacePlafond,
-                          Label lblPrixMur, Label lblPrixSol, Label lblPrixPlafond,
-                          Label lblPrixTotal, Label lblMessage) {
+                          ComboBox<Revetement> tremie,
+                          Label lblSurfaceMur,
+                          Label lblSurfaceSol,
+                          Label lblSurfacePlafond,
+                          Label lblSurfaceTremie,
+                          Label lblPrixMur,
+                          Label lblPrixSol,
+                          Label lblPrixPlafond,
+                          Label lblPrixTremie,
+                          Label lblPrixTotal,
+                          Label lblMessage) {
 
         try {
             Resultat r = faireCalcul(x, y, largeur, longueur, hauteur,
-                    nbFenetre, nbPorte, nbTremie, mur, sol, plafond);
+                    nbFenetre, nbPorte,
+                    nbTremie, largeurTremie, longueurTremie,
+                    mur, sol, plafond, tremie);
 
             lblSurfaceMur.setText(String.format("Surface murs : %.2f m²", r.surfaceMurs));
             lblSurfaceSol.setText(String.format("Surface sol : %.2f m²", r.surfaceSol));
             lblSurfacePlafond.setText(String.format("Surface plafond : %.2f m²", r.surfacePlafond));
+            lblSurfaceTremie.setText(String.format("Surface escalier : %.2f m²", r.surfaceTremie));
+
             lblPrixMur.setText(String.format("Prix murs : %.2f €", r.coutMurs));
             lblPrixSol.setText(String.format("Prix sol : %.2f €", r.coutSol));
             lblPrixPlafond.setText(String.format("Prix plafond : %.2f €", r.coutPlafond));
+            lblPrixTremie.setText(String.format("Prix escalier : %.2f €", r.coutTremie));
             lblPrixTotal.setText(String.format("TOTAL : %.2f €", r.total));
 
             lblMessage.setText("");
@@ -373,15 +409,21 @@ public class FenetrePiece {
 
     private void enregistrer(TextField x, TextField y,
                              TextField largeur, TextField longueur, TextField hauteur,
-                             TextField nbFenetre, TextField nbPorte, TextField nbTremie,
+                             TextField nbFenetre, TextField nbPorte,
+                             TextField nbTremie,
+                             TextField largeurTremie,
+                             TextField longueurTremie,
                              ComboBox<Revetement> mur,
                              ComboBox<Revetement> sol,
                              ComboBox<Revetement> plafond,
+                             ComboBox<Revetement> tremie,
                              Label lblMessage) {
 
         try {
             Resultat r = faireCalcul(x, y, largeur, longueur, hauteur,
-                    nbFenetre, nbPorte, nbTremie, mur, sol, plafond);
+                    nbFenetre, nbPorte,
+                    nbTremie, largeurTremie, longueurTremie,
+                    mur, sol, plafond, tremie);
 
             SauvegardeProjet.sauvegarderElementPlan(
                     batiment.getId(), nomEtage, nomPiece,
@@ -417,11 +459,17 @@ public class FenetrePiece {
                                  TextField fieldNbFenetre,
                                  TextField fieldNbPorte,
                                  TextField fieldNbTremie,
+                                 TextField fieldLargeurTremie,
+                                 TextField fieldLongueurTremie,
                                  ComboBox<Revetement> comboMur,
                                  ComboBox<Revetement> comboSol,
-                                 ComboBox<Revetement> comboPlafond) {
+                                 ComboBox<Revetement> comboPlafond,
+                                 ComboBox<Revetement> comboTremie) {
 
-        if (comboMur.getValue() == null || comboSol.getValue() == null || comboPlafond.getValue() == null) {
+        if (comboMur.getValue() == null
+                || comboSol.getValue() == null
+                || comboPlafond.getValue() == null
+                || comboTremie.getValue() == null) {
             throw new IllegalArgumentException();
         }
 
@@ -435,19 +483,28 @@ public class FenetrePiece {
 
         double ouverturesMurs = parseZero(fieldNbFenetre) * 1.2 * 1.2
                 + parseZero(fieldNbPorte) * 0.9 * 2.1;
-        double tremies = parseZero(fieldNbTremie) * 1.0 * 2.5;
+
+        double nbTremie = parseZero(fieldNbTremie);
+        double largeurTremie = parseZero(fieldLargeurTremie);
+        double longueurTremie = parseZero(fieldLongueurTremie);
+
+        Tremie tremie = new Tremie(0, 0, largeurTremie, longueurTremie);
+        tremie.setRevetement(comboTremie.getValue());
 
         double surfaceMurs = Math.max(0, piece.calculerSurfaceMurs() - ouverturesMurs);
-        double surfaceSol = Math.max(0, piece.calculerSurfaceSol() - tremies);
-        double surfacePlafond = Math.max(0, piece.calculerSurfacePlafond() - tremies);
+        double surfaceSol = Math.max(0, piece.calculerSurfaceSol());
+        double surfacePlafond = Math.max(0, piece.calculerSurfacePlafond());
+
+        double surfaceTremie = nbTremie * tremie.calculerSurfaceRevetement();
 
         double coutMurs = comboMur.getValue().calculerPrix(surfaceMurs);
         double coutSol = comboSol.getValue().calculerPrix(surfaceSol);
         double coutPlafond = comboPlafond.getValue().calculerPrix(surfacePlafond);
+        double coutTremie = comboTremie.getValue().calculerPrix(surfaceTremie);
 
         return new Resultat(x, y, largeur, longueur, hauteur,
-                surfaceMurs, surfaceSol, surfacePlafond,
-                coutMurs, coutSol, coutPlafond);
+                surfaceMurs, surfaceSol, surfacePlafond, surfaceTremie,
+                coutMurs, coutSol, coutPlafond, coutTremie);
     }
 
     private double parse(TextField field) {
@@ -465,12 +522,12 @@ public class FenetrePiece {
 
     private static class Resultat {
         double x, y, largeur, longueur, hauteur;
-        double surfaceMurs, surfaceSol, surfacePlafond;
-        double coutMurs, coutSol, coutPlafond, total;
+        double surfaceMurs, surfaceSol, surfacePlafond, surfaceTremie;
+        double coutMurs, coutSol, coutPlafond, coutTremie, total;
 
         Resultat(double x, double y, double largeur, double longueur, double hauteur,
-                 double surfaceMurs, double surfaceSol, double surfacePlafond,
-                 double coutMurs, double coutSol, double coutPlafond) {
+                 double surfaceMurs, double surfaceSol, double surfacePlafond, double surfaceTremie,
+                 double coutMurs, double coutSol, double coutPlafond, double coutTremie) {
             this.x = x;
             this.y = y;
             this.largeur = largeur;
@@ -479,10 +536,12 @@ public class FenetrePiece {
             this.surfaceMurs = surfaceMurs;
             this.surfaceSol = surfaceSol;
             this.surfacePlafond = surfacePlafond;
+            this.surfaceTremie = surfaceTremie;
             this.coutMurs = coutMurs;
             this.coutSol = coutSol;
             this.coutPlafond = coutPlafond;
-            this.total = coutMurs + coutSol + coutPlafond;
+            this.coutTremie = coutTremie;
+            this.total = coutMurs + coutSol + coutPlafond + coutTremie;
         }
     }
 }
