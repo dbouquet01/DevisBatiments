@@ -291,6 +291,81 @@ public class SauvegardeProjet {
         }
     }
 
+
+    public static ArrayList<String> chargerNomsElementsPlan(String idProjet, String vue) {
+        ArrayList<String> noms = new ArrayList<>();
+
+        try {
+            Path path = Paths.get(FICHIER_PLAN);
+
+            if (!Files.exists(path)) {
+                return noms;
+            }
+
+            List<String> lignes = Files.readAllLines(path);
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))) {
+
+                    String nomElement = parts[2].trim();
+
+                    if (!nomElement.isEmpty() && !contient(noms, nomElement)) {
+                        noms.add(nomElement);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return noms;
+    }
+
+    public static String[] chargerElementPlan(String idProjet, String vue, String nomElement) {
+        try {
+            Path path = Paths.get(FICHIER_PLAN);
+
+            if (!Files.exists(path)) {
+                return null;
+            }
+
+            List<String> lignes = Files.readAllLines(path);
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 9
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).equals(normaliser(nomElement))) {
+                    return parts;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     private interface ConditionLigne {
         boolean correspond(String[] parts);
     }
@@ -399,3 +474,4 @@ public class SauvegardeProjet {
                 .replace("ç", "c");
     }
 }
+

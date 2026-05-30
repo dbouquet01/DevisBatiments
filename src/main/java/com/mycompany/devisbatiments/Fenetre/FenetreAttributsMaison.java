@@ -136,6 +136,7 @@ public class FenetreAttributsMaison {
         Scene scene = new Scene(root, 1000, 600);
         stage.setTitle("Attributs Maison");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 

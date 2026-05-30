@@ -21,36 +21,35 @@ import java.util.HashMap;
 public class FenetreListePieces {
 
     private final Batiments batiment;
-    private final String nomEtage;
-    private final int numAppart;
-    private final double surfaceAppart;
-    private final int nbApparts;
+    private final String vuePlan;
+    private final String retourEtage;
+    private final double surface;
     private final HashMap<String, Integer> nbAppartsParEtage;
     private final ArrayList<String> nomsPieces = new ArrayList<>();
 
-    public FenetreListePieces(Batiments batiment, String nomEtage, int numAppart,
-                              double surfaceAppart, int nbApparts,
+    public FenetreListePieces(Batiments batiment, String vuePlan) {
+        this(batiment, vuePlan, vuePlan, new HashMap<String, Integer>());
+    }
+
+    public FenetreListePieces(Batiments batiment, String vuePlan,
+                              HashMap<String, Integer> nbAppartsParEtage) {
+        this(batiment, vuePlan, vuePlan, nbAppartsParEtage);
+    }
+
+    public FenetreListePieces(Batiments batiment, String vuePlan,
+                              ArrayList<String> nomsPieces) {
+        this(batiment, vuePlan, vuePlan, new HashMap<String, Integer>());
+        this.nomsPieces.addAll(nomsPieces);
+    }
+
+    public FenetreListePieces(Batiments batiment, String vuePlan,
+                              String retourEtage,
                               HashMap<String, Integer> nbAppartsParEtage) {
         this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.numAppart = numAppart;
-        this.surfaceAppart = surfaceAppart;
-        this.nbApparts = nbApparts;
-        this.nbAppartsParEtage = nbAppartsParEtage;
-    }
-
-    public FenetreListePieces(Batiments batiment, String nomEtage) {
-        this.batiment = batiment;
-        this.nomEtage = nomEtage;
-        this.numAppart = 0;
-        this.surfaceAppart = batiment.getLargeur() * batiment.getLongueur();
-        this.nbApparts = 0;
-        this.nbAppartsParEtage = new HashMap<>();
-    }
-
-    public FenetreListePieces(Batiments batiment, String nomEtage, ArrayList<String> nomsPieces) {
-        this(batiment, nomEtage);
-        this.nomsPieces.addAll(nomsPieces);
+        this.vuePlan = vuePlan;
+        this.retourEtage = retourEtage;
+        this.nbAppartsParEtage = nbAppartsParEtage == null ? new HashMap<>() : nbAppartsParEtage;
+        this.surface = calculerSurfaceVue();
     }
 
     public void afficher(Stage stage) {
@@ -59,16 +58,14 @@ public class FenetreListePieces {
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
 
-        Label titre = new Label(numAppart > 0
-                ? "PIÈCES — " + nomEtage + " | Appartement " + numAppart
-                : "PIÈCES — " + nomEtage + " | " + batiment.getId());
+        Label titre = new Label("PIÈCES — " + vuePlan);
         titre.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         VBox topBox = new VBox(titre);
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(30));
 
-        Label lblSurface = new Label("Surface : " + String.format("%.2f", surfaceAppart) + " m²");
+        Label lblSurface = new Label("Surface : " + String.format("%.2f", surface) + " m²");
         lblSurface.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F056B; -fx-font-weight: bold;");
 
         TextField fieldNomPiece = new TextField();
@@ -84,24 +81,7 @@ public class FenetreListePieces {
 
         Button btnAjouter = new Button("+ AJOUTER UNE PIÈCE");
         btnAjouter.setStyle(styleBouton);
-        btnAjouter.setOnAction(e -> {
-            String nomPiece = fieldNomPiece.getText().trim();
-
-            if (nomPiece.isEmpty()) {
-                lblErreur.setText("Veuillez donner un nom à la pièce.");
-                return;
-            }
-
-            if (pieceExisteDeja(nomPiece)) {
-                lblErreur.setText("Cette pièce existe déjà.");
-                return;
-            }
-
-            lblErreur.setText("");
-            nomsPieces.add(nomPiece);
-            fieldNomPiece.clear();
-            actualiserListePieces(stage, listePieces, styleBouton);
-        });
+        btnAjouter.setOnAction(e -> ajouterPiece(fieldNomPiece, lblErreur, stage, listePieces, styleBouton));
 
         HBox ligneAjout = new HBox(15, fieldNomPiece, btnAjouter);
         ligneAjout.setAlignment(Pos.CENTER);
@@ -110,24 +90,12 @@ public class FenetreListePieces {
 
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> {
-            if (batiment instanceof Maison) {
-                new FenetreEtage(batiment, nbAppartsParEtage).afficher(stage);
-            } else {
-                new FenetreAppartement(
-                        batiment,
-                        nomEtage,
-                        batiment.getLargeur() * batiment.getLongueur(),
-                        nbApparts,
-                        nbAppartsParEtage
-                ).afficher(stage);
-            }
-        });
+        btnRetour.setOnAction(e -> retour(stage));
 
         Button btnDevis = new Button("VOIR LE DEVIS");
         btnDevis.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
-        btnDevis.setOnAction(e -> new FenetreRecapitulatif(batiment, nomEtage).afficher(stage));
+        btnDevis.setOnAction(e -> new FenetreRecapitulatif(batiment, vuePlan).afficher(stage));
 
         HBox bottomBox = new HBox(20, btnRetour, btnDevis);
         bottomBox.setPadding(new Insets(20));
@@ -146,10 +114,31 @@ public class FenetreListePieces {
         root.setCenter(scrollPane);
         root.setBottom(bottomBox);
 
-        Scene scene = new Scene(root, 1000, 600);
-        stage.setTitle("Liste Pièces - " + nomEtage);
+        Scene scene = new Scene(root);
+        stage.setTitle("Liste Pièces - " + vuePlan);
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
+    }
+
+    private void ajouterPiece(TextField fieldNomPiece, Label lblErreur,
+                              Stage stage, VBox listePieces, String styleBouton) {
+        String nomPiece = fieldNomPiece.getText().trim();
+
+        if (nomPiece.isEmpty()) {
+            lblErreur.setText("Veuillez donner un nom à la pièce.");
+            return;
+        }
+
+        if (pieceExisteDeja(nomPiece)) {
+            lblErreur.setText("Cette pièce existe déjà.");
+            return;
+        }
+
+        lblErreur.setText("");
+        nomsPieces.add(nomPiece);
+        fieldNomPiece.clear();
+        actualiserListePieces(stage, listePieces, styleBouton);
     }
 
     private void actualiserListePieces(Stage stage, VBox listePieces, String styleBouton) {
@@ -181,9 +170,9 @@ public class FenetreListePieces {
         btnEntrer.setStyle(styleBouton);
         btnEntrer.setOnAction(e -> new FenetrePiece(
                 batiment,
-                getVuePlan(),
+                vuePlan,
                 nomPiece,
-                surfaceAppart,
+                surface,
                 nomsPieces
         ).afficher(stage));
 
@@ -209,17 +198,45 @@ public class FenetreListePieces {
 
         confirmation.showAndWait().ifPresent(reponse -> {
             if (reponse == ButtonType.OK) {
-                SauvegardeProjet.supprimerPiece(batiment.getId(), getVuePlan(), nomPiece);
+                SauvegardeProjet.supprimerPiece(batiment.getId(), vuePlan, nomPiece);
                 nomsPieces.remove(nomPiece);
                 actualiserListePieces(stage, listePieces, styleBouton);
             }
         });
     }
 
+    private void retour(Stage stage) {
+        if (batiment instanceof Maison) {
+            new FenetreEtage(batiment, nbAppartsParEtage).afficher(stage);
+            return;
+        }
+
+        if (vuePlan.contains("_")) {
+            String etageParent = extraireEtageParent(vuePlan);
+
+            new FenetreAppartement(
+                    batiment,
+                    etageParent,
+                    batiment.getLargeur() * batiment.getLongueur(),
+                    nbAppartsParEtage.getOrDefault(etageParent, 0),
+                    nbAppartsParEtage
+            ).afficher(stage);
+            return;
+        }
+
+        new FenetreAppartement(
+                batiment,
+                retourEtage,
+                batiment.getLargeur() * batiment.getLongueur(),
+                nbAppartsParEtage.getOrDefault(retourEtage, 0),
+                nbAppartsParEtage
+        ).afficher(stage);
+    }
+
     private void chargerPiecesExistantes() {
         ArrayList<String> piecesSauvegardees = SauvegardeProjet.chargerNomsPieces(
                 batiment.getId(),
-                getVuePlan()
+                vuePlan
         );
 
         for (String piece : piecesSauvegardees) {
@@ -227,6 +244,44 @@ public class FenetreListePieces {
                 nomsPieces.add(piece);
             }
         }
+    }
+
+    private double calculerSurfaceVue() {
+        if (batiment instanceof Maison || !vuePlan.contains("_")) {
+            return batiment.getLargeur() * batiment.getLongueur();
+        }
+
+        String etageParent = extraireEtageParent(vuePlan);
+        String nomBloc = vuePlan.substring(vuePlan.indexOf("_") + 1);
+
+        String[] bloc = SauvegardeProjet.chargerElementPlan(
+                batiment.getId(),
+                etageParent,
+                nomBloc
+        );
+
+        if (bloc != null && bloc.length >= 7) {
+            try {
+                return Double.parseDouble(bloc[5]) * Double.parseDouble(bloc[6]);
+            } catch (Exception ignored) {
+            }
+        }
+
+        return batiment.getLargeur() * batiment.getLongueur();
+    }
+
+    private String extraireEtageParent(String vueInterne) {
+        String etage = vueInterne.substring(0, vueInterne.indexOf("_"));
+
+        if (etage.equalsIgnoreCase("RDC")) {
+            return "RDC";
+        }
+
+        if (etage.toLowerCase().startsWith("etage")) {
+            return etage.replace("Etage", "Etage ");
+        }
+
+        return etage;
     }
 
     private boolean pieceExisteDeja(String nomPiece) {
@@ -238,18 +293,8 @@ public class FenetreListePieces {
         return false;
     }
 
-    private String getVuePlan() {
-        return (batiment instanceof Maison) ? nomEtage : getVuePlanAppartement();
-    }
-
-    private String getVuePlanAppartement() {
-        return nomEtage.replace(" ", "") + "_APPART" + numAppart;
-    }
-
     private String normaliser(String texte) {
-        if (texte == null) {
-            return "";
-        }
+        if (texte == null) return "";
 
         return texte.trim().toLowerCase()
                 .replace("é", "e")

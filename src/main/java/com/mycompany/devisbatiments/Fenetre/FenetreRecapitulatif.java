@@ -23,7 +23,7 @@ public class FenetreRecapitulatif {
     private final Batiments batiment;
     private final String nomEtage;
  
-    // Classe interne pour stocker une ligne de devis
+  
     private static class LigneDevis {
         String piece;
         double coutMurs;
@@ -54,7 +54,7 @@ public class FenetreRecapitulatif {
         String styleCellule = "-fx-font-size: 13px; -fx-padding: 6 8; "
                 + "-fx-border-color: #CCCCCC; -fx-border-width: 0 0 1 0;";
  
-        // --- TITRE ---
+     
         Label titre = new Label("RÉCAPITULATIF DU DEVIS — " + batiment.getId());
         titre.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
         Label sousTitre = new Label("Projet : " + batiment.getId()
@@ -65,17 +65,17 @@ public class FenetreRecapitulatif {
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(25));
  
-        // --- LECTURE Devis.txt ---
+     
         List<LigneDevis> lignesDevis = lireDevis();
  
-        // --- TABLEAU ---
+        
         GridPane tableau = new GridPane();
         tableau.setHgap(0);
         tableau.setVgap(0);
         tableau.setPadding(new Insets(10));
         tableau.setStyle("-fx-background-color: white;");
  
-        // En-têtes colonnes
+        
         String[] entetes = {"Pièce", "Murs (€)", "Sol (€)", "Plafond (€)", "Total (€)"};
         for (int col = 0; col < entetes.length; col++) {
             Label lbl = new Label(entetes[col]);
@@ -85,7 +85,7 @@ public class FenetreRecapitulatif {
             tableau.add(lbl, col, 0);
         }
  
-        // Lignes de données
+      
         double totalMurs = 0, totalSol = 0, totalPlafond = 0, grandTotal = 0;
  
         for (int row = 0; row < lignesDevis.size(); row++) {
@@ -114,7 +114,7 @@ public class FenetreRecapitulatif {
             grandTotal   += ld.total;
         }
  
-        // Ligne TOTAL
+       
         int rowTotal = lignesDevis.size() + 1;
         String styleTotalCell = "-fx-font-weight: bold; -fx-font-size: 14px; "
                 + "-fx-background-color: #E8E8FF; -fx-padding: 8; "
@@ -139,14 +139,14 @@ public class FenetreRecapitulatif {
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background-color: white;");
  
-        // --- MESSAGE si aucune pièce ---
+        
         if (lignesDevis.isEmpty()) {
             Label lblVide = new Label("Aucune pièce enregistrée pour ce projet dans Devis.txt.");
             lblVide.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
             scrollPane.setContent(lblVide);
         }
  
-        // --- BOUTONS ---
+     
         Label lblMessage = new Label("");
         lblMessage.setStyle("-fx-font-size: 13px;");
  
@@ -181,20 +181,21 @@ public class FenetreRecapitulatif {
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.CENTER_LEFT);
  
-        // --- LAYOUT ---
+  
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #F5F5F5;");
         root.setTop(topBox);
         root.setCenter(scrollPane);
         root.setBottom(bottomBox);
  
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root);
         stage.setTitle("Récapitulatif Devis — " + batiment.getId());
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
  
-    // --- LECTURE Devis.txt filtrée par idProjet ---
+    
     private List<LigneDevis> lireDevis() {
         List<LigneDevis> liste = new ArrayList<>();
         String idDevis = "D_" + batiment.getId();
@@ -213,7 +214,7 @@ public class FenetreRecapitulatif {
                 String idP   = parts[1].trim();
                 String piece = parts[2].trim();
  
-                // Filtrer par idDevis ET idProjet
+                
                 if (!idD.equalsIgnoreCase(idDevis)
                         || !idP.equalsIgnoreCase(batiment.getId())) {
                     continue;

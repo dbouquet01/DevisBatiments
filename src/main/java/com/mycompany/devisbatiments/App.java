@@ -39,11 +39,12 @@ public class App extends Application {
     accueil.afficher(primaryStage);
     });
     
-        // Bouton historique
+        
     loginLayout.getChildren().addAll(titre, btnCo );
     Scene loginScene = new Scene(loginLayout, 900, 550);
     loginStage.setScene(loginScene);
     loginStage.setTitle("Connexion");
+    loginStage.setFullScreen(true); 
     loginStage.show();
     }
 }

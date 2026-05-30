@@ -75,7 +75,7 @@ public class FenetreNouveauProjet {
 
         stage.setTitle("Nouveau projet");
         stage.setScene(scene);
-        
+        stage.setFullScreen(true);
         stage.show();
     }
 }

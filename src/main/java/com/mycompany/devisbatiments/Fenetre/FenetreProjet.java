@@ -1,5 +1,9 @@
 package com.mycompany.devisbatiments.Fenetre;
 
+import com.mycompany.devisbatiments.elements.Batiments;
+import com.mycompany.devisbatiments.elements.Maison;
+import com.mycompany.devisbatiments.elements.Immeuble;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -147,7 +151,7 @@ public class FenetreProjet {
             fenetrePlans.afficher();
         });
 
-        Button btnModification = new Button("MODIFIER");
+        Button btnModification = new Button("Modifier");
         btnModification.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
 
         btnModification.setOnAction(e -> {
@@ -177,7 +181,39 @@ public class FenetreProjet {
                 );
             }
         });
+        
+        Button btnRecap = new Button("Récapitulatif");
+        btnRecap.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
 
+        btnRecap.setOnAction(e -> {
+            if (idTrouve[0] == null) {
+                detailsText.setText("Veuillez d'abord rechercher un projet.");
+                zoneResultats.setVisible(true);
+                return;
+            }
+
+            Batiments batiment;
+
+            if (typeTrouve[0].equalsIgnoreCase("MAISON")) {
+                batiment = new Maison(
+                        idTrouve[0],
+                        designationTrouvee[0],
+                        largeurTrouvee[0],
+                        longueurTrouvee[0],
+                        nbEtagesTrouve[0]
+                );
+            } else {
+                batiment = new Immeuble(
+                        idTrouve[0],
+                        designationTrouvee[0],
+                        largeurTrouvee[0],
+                        longueurTrouvee[0],
+                        nbEtagesTrouve[0]
+                );
+            }
+
+            new FenetreRecapitulatif(batiment, "Tous les étages").afficher(stage);
+        });
         HBox bottomContainer = new HBox();
         bottomContainer.setPadding(new Insets(15));
         bottomContainer.setSpacing(20);
@@ -190,6 +226,7 @@ public class FenetreProjet {
                 retour,
                 espace,
                 btnPlans,
+                btnRecap,
                 btnModification
         );
 
@@ -201,9 +238,10 @@ public class FenetreProjet {
         root.setCenter(layoutCentre);
         root.setBottom(bottomContainer);
 
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root);
         stage.setTitle("Recherche de Projet");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 }

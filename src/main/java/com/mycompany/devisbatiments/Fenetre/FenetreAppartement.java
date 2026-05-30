@@ -4,16 +4,17 @@
  */
 package com.mycompany.devisbatiments.Fenetre;
 
+import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Batiments;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FenetreAppartement {
@@ -40,114 +41,121 @@ public class FenetreAppartement {
         String styleBouton = "-fx-background-color: #0F056B; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;";
 
-        Label titre = new Label("APPARTEMENTS — " + nomEtage);
-        titre.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Label titre = new Label("BLOCS / SALLES — " + nomEtage);
+        titre.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
 
         VBox topBox = new VBox(titre);
         topBox.setAlignment(Pos.CENTER);
         topBox.setPadding(new Insets(25));
 
-        if (nbApparts <= 0) {
-            afficherErreur(stage, topBox, styleBouton);
-            return;
-        }
-
         double surfaceCouloir = calculerSurfaceCouloir();
         double surfaceHabitable = calculerSurfaceHabitable();
-        double surfaceParAppart = surfaceHabitable / nbApparts;
-       
+        double surfaceParAppart = nbApparts > 0 ? surfaceHabitable / nbApparts : 0;
 
         Label lblSurfaceInfo = new Label(
                 "Surface étage : " + String.format("%.2f", surfaceEtage)
-                        + " m² — Couloir : " + String.format("%.2f", surfaceCouloir)
-                        + " m² — Surface restante : " + String.format("%.2f", surfaceHabitable)
-                        + " m² — Surface par appartement : "
-                        + String.format("%.2f", surfaceParAppart) + " m²"
+                        + " m² — Couloir théorique : " + String.format("%.2f", surfaceCouloir)
+                        + " m² — Surface restante théorique : " + String.format("%.2f", surfaceHabitable)
+                        + " m² — Surface/appartement théorique : " + String.format("%.2f", surfaceParAppart) + " m²"
         );
         lblSurfaceInfo.setStyle("-fx-font-size: 14px; -fx-text-fill: #0F056B; -fx-font-weight: bold;");
 
-        VBox listeApparts = new VBox(10);
-        listeApparts.setAlignment(Pos.CENTER);
-        listeApparts.setPadding(new Insets(20));
+        VBox listeBlocs = new VBox(10);
+        listeBlocs.setAlignment(Pos.TOP_CENTER);
+        listeBlocs.setPadding(new Insets(20));
 
-        for (int i = 1; i <= nbApparts; i++) {
+        ArrayList<String> blocsEtage = SauvegardeProjet.chargerNomsElementsPlan(batiment.getId(), nomEtage);
 
-            Label lblAppart = new Label("Appartement " + i
-                    + " — " + String.format("%.2f", surfaceParAppart) + " m²");
-            lblAppart.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
-            lblAppart.setMinWidth(250);
-
-            Button btnEntrer = new Button("Entrer →");
-            btnEntrer.setStyle(styleBouton);
-
-            final int numAppart = i;
-
-            btnEntrer.setOnAction(e -> {
-                new FenetreListePieces(
-                        batiment,
-                        nomEtage,
-                        numAppart,
-                        surfaceParAppart,
-                        nbApparts,
-                        nbAppartsParEtage
-                ).afficher(stage);
-            });
-
-            HBox ligne = new HBox(20, lblAppart, btnEntrer);
-            ligne.setAlignment(Pos.CENTER_LEFT);
-            ligne.setStyle("-fx-background-color: #F4F4F4; -fx-border-color: #0F056B; "
-                    + "-fx-border-width: 1; -fx-padding: 10 20;");
-
-            listeApparts.getChildren().add(ligne);
+        if (blocsEtage.isEmpty()) {
+            Label vide = new Label("Aucun bloc enregistré sur cet étage.");
+            vide.setStyle("-fx-font-size: 15px; -fx-text-fill: grey;");
+            listeBlocs.getChildren().add(vide);
+        } else {
+            for (String nomBloc : blocsEtage) {
+                ajouterLigneBloc(stage, listeBlocs, blocsEtage, nomBloc, styleBouton);
+            }
         }
 
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(styleBouton);
         btnRetour.setOnAction(e -> new FenetreEtage(batiment, nbAppartsParEtage).afficher(stage));
 
-        HBox bottomBox = new HBox(btnRetour);
+        Button btnMenu = new Button("MENU PRINCIPAL");
+        btnMenu.setStyle(styleBouton);
+        btnMenu.setOnAction(e -> new FenetreProjet().afficher(stage));
+
+        HBox bottomBox = new HBox(20, btnRetour, btnMenu);
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+        bottomBox.setStyle("-fx-background-color: #F5F5F5;");
 
-        VBox centre = new VBox(20, lblSurfaceInfo, listeApparts);
+        VBox centre = new VBox(20, lblSurfaceInfo, listeBlocs);
         centre.setAlignment(Pos.TOP_CENTER);
         centre.setPadding(new Insets(20));
 
+        ScrollPane scrollPane = new ScrollPane(centre);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
         BorderPane root = new BorderPane();
         root.setTop(topBox);
-        root.setCenter(centre);
+        root.setCenter(scrollPane);
         root.setBottom(bottomBox);
 
-        Scene scene = new Scene(root, 1000, 600);
-        stage.setTitle("Appartement — " + nomEtage);
+        Scene scene = new Scene(root);
+        stage.setTitle("Blocs / Salles — " + nomEtage);
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 
-    private void afficherErreur(Stage stage, VBox topBox, String styleBouton) {
-        Label erreur = new Label("Aucun appartement n'est enregistré pour cet étage.");
-        erreur.setStyle("-fx-font-size: 16px; -fx-text-fill: red; -fx-font-weight: bold;");
+    private void ajouterLigneBloc(Stage stage, VBox listeBlocs, ArrayList<String> blocsEtage,
+                                  String nomBloc, String styleBouton) {
+        Label lblBloc = new Label(nomBloc + calculerSurfaceBlocTexte(nomBloc));
+        lblBloc.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+        lblBloc.setMinWidth(330);
 
-        Button btnRetour = new Button("RETOUR");
-        btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> new FenetreEtage(batiment, nbAppartsParEtage).afficher(stage));
+        Button btnModifier = new Button("Modifier →");
+        btnModifier.setStyle(styleBouton);
+        btnModifier.setOnAction(e -> new FenetrePiece(
+                batiment,
+                nomEtage,
+                nomBloc,
+                surfaceEtage,
+                blocsEtage
+        ).afficher(stage));
 
-        VBox centre = new VBox(20, erreur);
-        centre.setAlignment(Pos.CENTER);
+        Button btnSupprimer = new Button("Supprimer");
+        btnSupprimer.setStyle("-fx-background-color: #B00020; -fx-text-fill: white; "
+                + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
+        btnSupprimer.setOnAction(e -> {
+            SauvegardeProjet.supprimerPiece(batiment.getId(), nomEtage, nomBloc);
+            afficher(stage);
+        });
 
-        HBox bottomBox = new HBox(btnRetour);
-        bottomBox.setPadding(new Insets(20));
-        bottomBox.setAlignment(Pos.BOTTOM_LEFT);
+        HBox ligne = new HBox(20, lblBloc, btnModifier, btnSupprimer);
+        ligne.setAlignment(Pos.CENTER_LEFT);
+        ligne.setMaxWidth(950);
+        ligne.setStyle("-fx-background-color: #F4F4F4; -fx-border-color: #0F056B; "
+                + "-fx-border-width: 1; -fx-padding: 10 20;");
 
-        BorderPane root = new BorderPane();
-        root.setTop(topBox);
-        root.setCenter(centre);
-        root.setBottom(bottomBox);
+        listeBlocs.getChildren().add(ligne);
+    }
 
-        Scene scene = new Scene(root, 1000, 600);
-        stage.setTitle("Appartement — " + nomEtage);
-        stage.setScene(scene);
-        stage.show();
+    private String calculerSurfaceBlocTexte(String nomBloc) {
+        String[] element = SauvegardeProjet.chargerElementPlan(batiment.getId(), nomEtage, nomBloc);
+
+        if (element == null || element.length < 7) {
+            return "";
+        }
+
+        try {
+            double largeur = Double.parseDouble(element[5].trim().replace(",", "."));
+            double longueur = Double.parseDouble(element[6].trim().replace(",", "."));
+            return " — " + String.format("%.2f", largeur * longueur) + " m²";
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private double calculerSurfaceCouloir() {
@@ -165,5 +173,4 @@ public class FenetreAppartement {
     private double calculerSurfaceHabitable() {
         return Math.max(0, surfaceEtage - calculerSurfaceCouloir());
     }
-    
 }

@@ -50,7 +50,7 @@ public class PlanVisualisation {
         );
 
         zoneDessin = new Pane();
-        zoneDessin.setPrefSize(850, 600);
+        zoneDessin.setPrefSize(1000, 500);
         zoneDessin.setStyle(
                 "-fx-background-color: white;" +
                 "-fx-border-color: #0F056B;" +
@@ -69,7 +69,7 @@ public class PlanVisualisation {
         root.setTop(topBar);
         root.setCenter(zoneDessin);
 
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1100, 600);
         stage.setScene(scene);
         stage.setTitle("Visualisation des Plans");
         stage.show();

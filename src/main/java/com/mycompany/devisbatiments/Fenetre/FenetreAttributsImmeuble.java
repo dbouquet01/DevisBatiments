@@ -245,7 +245,7 @@ public class FenetreAttributsImmeuble {
 
                     int nbApparts = Integer.parseInt(txt);
 
-                    if (nbApparts <= 0) {
+                    if (nbApparts < 0) {
                         lblErreur.setText("Le nombre d'appartements doit être positif pour " + nomEtage + ".");
                         return;
                     }
@@ -311,6 +311,7 @@ public class FenetreAttributsImmeuble {
         Scene scene = new Scene(root, 1000, 600);
         stage.setTitle("Appartements par étage");
         stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.show();
     }
 
