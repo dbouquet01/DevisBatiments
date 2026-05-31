@@ -94,8 +94,7 @@ public class FenetrePiece {
                 ligne("Y origine :", fieldY, 140, 220),
                 ligne("Largeur (m) :", fieldLargeur, 140, 220),
                 ligne("Longueur (m) :", fieldLongueur, 140, 220),
-                ligne("Hauteur (m) :", fieldHauteur, 140, 220)
-        );
+            );
 
         VBox boxOuv = creerBox("2. Ouvertures / escalier",
                 ligne("Fenêtres :", fieldNbFenetre, 160, 180),
@@ -181,13 +180,15 @@ public class FenetrePiece {
         Button btnCalculer = new Button("CALCULER");
         Button btnEnregistrer = new Button("ENREGISTRER");
         Button btnMenu = new Button("MENU PRINCIPAL");
+        Button btnPlacerOuverture = new Button("PLACER LES OUVERTURES");
 
         btnRetour.setStyle(styleBouton);
         btnCalculer.setStyle(styleBouton);
         btnEnregistrer.setStyle(styleBouton);
         btnMenu.setStyle(styleBouton);
+        btnPlacerOuverture.setStyle(styleBouton);
 
-        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer, btnMenu);
+        HBox bottom = new HBox(20, btnRetour, btnCalculer, btnEnregistrer, btnMenu, btnPlacerOuverture);
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setPadding(new Insets(10, 30, 10, 30));
         bottom.setMinHeight(58);
@@ -226,6 +227,7 @@ public class FenetrePiece {
         stage.setFullScreen(true);
         stage.show();
     }
+        
 
     private void retour(Stage stage) {
         if (batiment instanceof Maison) {
