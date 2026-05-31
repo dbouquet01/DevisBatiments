@@ -12,21 +12,34 @@ M01;Etage 1;SalleDeBain;0.0;5.0;4.0;5.0;2.5;4
 M01;Etage 1;Bureau;4.0;5.0;4.0;5.0;2.5;13
 M01;Etage 1;Couloir;8.0;5.0;4.0;5.0;2.5;2
 
-M01;FACE;Mur;0.0;0.0;12.0;2.5;2.5;5
-M01;FACE;Porte;5.5;1.0;1.0;1.5;2.5;13
-M01;FACE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
-M01;FACE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
+M01;FACE;Mur;0.0;0.0;12.0;5.0;5.0;5
+M01;FACE;PorteEntree;5.5;3.0;1.0;2.0;5.0;13
+M01;FACE;FenetreSalon;1.5;3.2;1.2;1.0;5.0;10
+M01;FACE;FenetreCuisine;9.0;3.2;1.2;1.0;5.0;10
+M01;FACE;FenetreChambre2;1.5;0.8;1.2;1.0;5.0;10
+M01;FACE;FenetreChambre3;9.0;0.8;1.2;1.0;5.0;10
+M01;FACE;LigneEtage;0.0;2.5;12.0;0.05;5.0;14
 
-M01;GAUCHE;Mur;0.0;0.0;10.0;2.5;2.5;5
-M01;GAUCHE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
+M01;GAUCHE;Mur;0.0;0.0;10.0;5.0;5.0;5
+M01;GAUCHE;FenetreSalon;2.0;3.2;1.2;1.0;5.0;10
+M01;GAUCHE;FenetreChambre1;7.0;3.2;1.2;1.0;5.0;10
+M01;GAUCHE;FenetreChambre2;2.0;0.8;1.2;1.0;5.0;10
+M01;GAUCHE;FenetreSalleDeBain;7.0;0.8;1.0;1.0;5.0;10
+M01;GAUCHE;LigneEtage;0.0;2.5;10.0;0.05;5.0;14
 
-M01;DROITE;Mur;0.0;0.0;10.0;2.5;2.5;5
-M01;DROITE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
+M01;DROITE;Mur;0.0;0.0;10.0;5.0;5.0;5
+M01;DROITE;FenetreCuisine;2.0;3.2;1.2;1.0;5.0;10
+M01;DROITE;FenetreGarage;7.0;3.2;1.2;1.0;5.0;10
+M01;DROITE;FenetreChambre3;2.0;0.8;1.2;1.0;5.0;10
+M01;DROITE;FenetreBureau;7.0;0.8;1.2;1.0;5.0;10
+M01;DROITE;LigneEtage;0.0;2.5;10.0;0.05;5.0;14
 
-M01;ARRIERE;Mur;0.0;0.0;12.0;2.5;2.5;5
-M01;ARRIERE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
-M01;ARRIERE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
-
+M01;ARRIERE;Mur;0.0;0.0;12.0;5.0;5.0;5
+M01;ARRIERE;FenetreChambre1;1.5;3.2;1.2;1.0;5.0;10
+M01;ARRIERE;FenetreSalleDeBain;5.5;3.2;1.0;1.0;5.0;10
+M01;ARRIERE;FenetreGarage;9.0;3.2;1.2;1.0;5.0;10
+M01;ARRIERE;FenetreBureau;5.5;0.8;1.2;1.0;5.0;10
+M01;ARRIERE;LigneEtage;0.0;2.5;12.0;0.05;5.0;14
 
 IMB01;ETAGE1;Appartement11;0.0;0.0;8.0;5.0;3.0;13
 IMB01;ETAGE1;Appartement12;12.0;0.0;8.0;5.0;3.0;13

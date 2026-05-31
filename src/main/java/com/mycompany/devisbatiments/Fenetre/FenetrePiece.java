@@ -7,6 +7,7 @@ package com.mycompany.devisbatiments.Fenetre;
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Batiments;
 import com.mycompany.devisbatiments.elements.Maison;
+import com.mycompany.devisbatiments.elements.Ouverture;
 import com.mycompany.devisbatiments.elements.Piece;
 import com.mycompany.devisbatiments.elements.Revetement;
 import com.mycompany.devisbatiments.elements.Tremie;
@@ -514,12 +515,24 @@ public class FenetrePiece {
 
         Piece piece = new Piece(nomPiece, x, y, largeur, longueur, hauteur);
 
-        double ouverturesMurs = parseZero(fieldNbFenetre) * 1.2 * 1.2
-                + parseZero(fieldNbPorte) * 0.9 * 2.1;
+        Ouverture fenetres =
+        new Ouverture(
+                "Fenetre",
+                (int) parseZero(fieldNbFenetre)
+        );
 
-        double nbTremie = parseZero(fieldNbTremie);
-        double largeurTremie = parseZero(fieldLargeurTremie);
-        double longueurTremie = parseZero(fieldLongueurTremie);
+        Ouverture portes =
+        new Ouverture(
+                "Porte",
+                (int) parseZero(fieldNbPorte)
+        );
+
+        double ouverturesMurs =
+                fenetres.calculerSurfaceTotale()
+                + portes.calculerSurfaceTotale();
+                double nbTremie = parseZero(fieldNbTremie);
+                double largeurTremie = parseZero(fieldLargeurTremie);
+                double longueurTremie = parseZero(fieldLongueurTremie);
 
         Tremie tremie = new Tremie(0, 0, largeurTremie, longueurTremie);
         tremie.setRevetement(comboTremie.getValue());

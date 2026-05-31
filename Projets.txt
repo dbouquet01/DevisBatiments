@@ -1,6 +1,6 @@
-idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur;idRevetementFacade;idRevetementIsolation
+idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur;idFacade;idIsolation
 
-M1;MaisonR;MAISON;1;2.5;240.0;0;D_P1;12.0;10.0
+M01;MaisonR;MAISON;1;4.0;240.0;0;D_M01;12.0;10.0;20;19
 P2;ImmeubleB;IMMEUBLE;5;15.0;1800.0;26;D_P2;20.0;15.0
 P10;A;MAISON;2;5.0;144.0;0;D_P10;8.0;6.0
 P16;Immeuble A;IMMEUBLE;4;12.0;450.0;20;D_P16;10.0;9.0

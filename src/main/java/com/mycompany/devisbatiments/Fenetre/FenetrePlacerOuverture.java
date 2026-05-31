@@ -6,6 +6,7 @@ package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Batiments;
+import com.mycompany.devisbatiments.elements.Ouverture;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -640,8 +641,8 @@ public class FenetrePlacerOuverture {
                 nomPiece + "_Fenetre" + fenetres.size(),
                 pieceX + calculerXPlan(mur, offset),
                 pieceY + calculerYPlan(mur, offset),
-                isMurHorizontal(mur) ? 1.2 : 0.10,
-                isMurHorizontal(mur) ? 0.10 : 1.2,
+                isMurHorizontal(mur) ? Ouverture.LARGEUR_FENETRE_STANDARD : 0.10,
+                isMurHorizontal(mur) ? Ouverture.LARGEUR_PORTE_STANDARD : 1.2,
                 hauteurDepuisSol,
                 10
         );
@@ -654,9 +655,9 @@ public class FenetrePlacerOuverture {
                 nomPiece + "_Porte" + portes.size(),
                 pieceX + calculerXPlan(mur, offset),
                 pieceY + calculerYPlan(mur, offset),
-                isMurHorizontal(mur) ? 0.9 : 0.10,
+                isMurHorizontal(mur) ? Ouverture.LARGEUR_PORTE_STANDARD : 0.10,
                 isMurHorizontal(mur) ? 0.10 : 0.9,
-                2.1,
+                Ouverture.HAUTEUR_PORTE_STANDARD,
                 13
         );
     }
