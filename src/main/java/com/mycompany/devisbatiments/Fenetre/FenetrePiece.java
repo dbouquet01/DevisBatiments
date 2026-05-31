@@ -96,7 +96,8 @@ public class FenetrePiece {
                 ligne("X origine :", fieldX, 140, 220),
                 ligne("Y origine :", fieldY, 140, 220),
                 ligne("Largeur (m) :", fieldLargeur, 140, 220),
-                ligne("Longueur (m) :", fieldLongueur, 140, 220)
+                ligne("Longueur (m) :", fieldLongueur, 140, 220),
+                ligne("Hauteur (m) :", fieldHauteur, 140, 220)
         );
 
         VBox boxOuv = creerBox("2. Ouvertures / escalier",
