@@ -2,6 +2,7 @@ package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Immeuble;
+import com.mycompany.devisbatiments.elements.Revetement;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FenetreAttributsImmeuble {
 
@@ -64,6 +66,17 @@ public class FenetreAttributsImmeuble {
         TextField fieldLargeur = new TextField();
         TextField fieldLongueur = new TextField();
         TextField fieldEtage = new TextField();
+        TextField fieldHauteur = new TextField();
+        fieldHauteur.setPromptText("Ex : 3.0");
+
+        // 1. Initialisation des ComboBox
+        ComboBox<Revetement> comboFacade = new ComboBox<>();
+        comboFacade.setPromptText("Choisir une façade");
+        comboFacade.setMinWidth(180);
+
+        ComboBox<Revetement> comboIsolation = new ComboBox<>();
+        comboIsolation.setPromptText("Choisir une isolation");
+        comboIsolation.setMinWidth(180);
 
         fieldId.setPromptText("Ex : IMB001");
         fieldDesignation.setPromptText("Ex : Résidence Les Lilas");
@@ -77,11 +90,9 @@ public class FenetreAttributsImmeuble {
         if (largeurExistante > 0) {
             fieldLargeur.setText(String.valueOf(largeurExistante));
         }
-
         if (longueurExistante > 0) {
             fieldLongueur.setText(String.valueOf(longueurExistante));
         }
-
         if (nbEtagesExistant > 0) {
             fieldEtage.setText(String.valueOf(nbEtagesExistant));
         }
@@ -91,7 +102,10 @@ public class FenetreAttributsImmeuble {
         ajouterLigne(grid, "Largeur (m) :", fieldLargeur, 2, styleLabel);
         ajouterLigne(grid, "Longueur (m) :", fieldLongueur, 3, styleLabel);
         ajouterLigne(grid, "Nombre d'étages :", fieldEtage, 4, styleLabel);
-
+        ajouterLigne(grid, "Hauteur par étage (m) :", fieldHauteur, 5, styleLabel);
+        ajouterLigneCombo(grid, "Façade extérieure :", comboFacade, 6, styleLabel);
+        ajouterLigneCombo(grid, "Isolation extérieure :", comboIsolation, 7, styleLabel);
+        
         Label lblErreur = new Label("");
         lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
 
@@ -102,46 +116,58 @@ public class FenetreAttributsImmeuble {
         btnRetour.setStyle(styleBouton);
         btnRetour.setOnAction(e -> new FenetreProjet().afficher(stage));
 
-        Button btnSuivant = new Button("ÉTAPE SUIVANTE");
+        Button btnSuivant = new Button("ÉTAPE SUIVANTE →");
         btnSuivant.setStyle(styleBouton);
 
         btnSuivant.setOnAction(e -> {
-            String id = fieldId.getText().trim();
-            String designation = fieldDesignation.getText().trim();
-            String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
-            String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
-            String txtEtage = fieldEtage.getText().trim();
+    String id = fieldId.getText().trim();
+    String designation = fieldDesignation.getText().trim();
+    String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
+    String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
+    String txtEtage = fieldEtage.getText().trim();
+    String txtHauteur = fieldHauteur.getText().trim().replace(",", ".");
 
-            if (id.isEmpty() || designation.isEmpty() || txtLargeur.isEmpty()
-                    || txtLongueur.isEmpty() || txtEtage.isEmpty()) {
-                lblErreur.setText("Veuillez remplir tous les champs.");
-                return;
-            }
+    Revetement facade = comboFacade.getValue();
+    Revetement isolation = comboIsolation.getValue();
 
-            try {
-                double largeur = Double.parseDouble(txtLargeur);
-                double longueur = Double.parseDouble(txtLongueur);
-                int nbEtages = Integer.parseInt(txtEtage);
+    if (id.isEmpty() || designation.isEmpty() || txtLargeur.isEmpty()
+            || txtLongueur.isEmpty() || txtEtage.isEmpty() || txtHauteur.isEmpty()
+            || facade == null || isolation == null) {
+        lblErreur.setText("Veuillez remplir tous les champs et faire vos sélections de revêtements.");
+        return;
+    }
 
-                if (largeur <= 0 || longueur <= 0 || nbEtages < 0) {
-                    lblErreur.setText("Les dimensions doivent être positives et le nombre d'étages ne peut pas être négatif.");
-                    return;
-                }
+    try {
+        double largeur = Double.parseDouble(txtLargeur);
+        double longueur = Double.parseDouble(txtLongueur);
+        int nbEtages = Integer.parseInt(txtEtage);
+        double hauteurEtage = Double.parseDouble(txtHauteur);
 
-                afficherSaisieAppartements(
-                        stage,
-                        id,
-                        designation,
-                        largeur,
-                        longueur,
-                        nbEtages,
-                        nbAppartsPreRemplis
-                );
+        if (largeur <= 0 || longueur <= 0 || nbEtages < 0) {
+            lblErreur.setText("Les dimensions doivent être positives.");
+            return;
+        }
 
-            } catch (NumberFormatException ex) {
-                lblErreur.setText("Les valeurs numériques sont invalides.");
-            }
-        });
+        double hauteurTotale = hauteurEtage * (nbEtages + 1);
+        double perimetre = 2 * (largeur + longueur);
+        double coutFacade = facade.getPrixUnitaire() * perimetre * hauteurTotale;
+        double coutIsolation = isolation.getPrixUnitaire() * perimetre * hauteurTotale;
+
+        SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Facade", 0, 0, 0, coutFacade);
+        SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Isolation", 0, 0, 0, coutIsolation);
+
+        afficherSaisieAppartements(
+        stage, id, designation, largeur, longueur, nbEtages,
+        nbAppartsPreRemplis,
+        facade.getIdRevetement(),
+        isolation.getIdRevetement()
+);
+
+    } catch (NumberFormatException ex) {
+        lblErreur.setText("Les valeurs numériques sont invalides.");
+    }
+});
+        
 
         HBox bottomBox = new HBox(30, btnRetour, btnSuivant);
         bottomBox.setPadding(new Insets(30));
@@ -158,14 +184,14 @@ public class FenetreAttributsImmeuble {
         Scene scene = new Scene(root, 1000, 600);
         stage.setTitle("Attributs Immeuble");
         stage.setScene(scene);
-        stage.setFullScreen(true);
         stage.show();
     }
 
+    
     private void afficherSaisieAppartements(Stage stage, String id, String designation,
                                             double largeur, double longueur, int nbEtages,
-                                            HashMap<String, Integer> nbAppartsExistants) {
-
+                                            HashMap<String, Integer> nbAppartsExistants, int idFacade, int idIsolation) {
+      
         if (nbAppartsExistants == null || nbAppartsExistants.isEmpty()) {
             nbAppartsExistants = chargerNbAppartementsDepuisEtage(id);
         }
@@ -227,7 +253,7 @@ public class FenetreAttributsImmeuble {
                 nbAppartsPourRetour
         ));
 
-        Button btnValider = new Button("VALIDER L'IMMEUBLE");
+        Button btnValider = new Button("VALIDER L'IMMEUBLE →");
         btnValider.setStyle(styleBouton);
 
         btnValider.setOnAction(e -> {
@@ -262,18 +288,12 @@ public class FenetreAttributsImmeuble {
                 double surfaceEtage = largeur * longueur;
                 double surfaceTotale = surfaceEtage * (nbEtages + 1);
 
-                SauvegardeProjet.sauvegarderProjet(
-                        id,
-                        designation,
-                        "IMMEUBLE",
-                        nbEtages,
-                        hauteurTotale,
-                        surfaceTotale,
-                        totalAppartements,
-                        idDevis,
-                        largeur,
-                        longueur
-                );
+            SauvegardeProjet.sauvegarderProjet(
+        id, designation, "IMMEUBLE",
+        nbEtages, hauteurTotale, surfaceTotale,
+        totalAppartements, idDevis, largeur, longueur,
+        idFacade, idIsolation
+);
 
                 for (int i = 0; i <= nbEtages; i++) {
                     String nomEtage = (i == 0) ? "RDC" : "Etage " + i;
@@ -318,25 +338,15 @@ public class FenetreAttributsImmeuble {
 
     private HashMap<String, Integer> chargerNbAppartementsDepuisEtage(String idProjet) {
         HashMap<String, Integer> nbApparts = new HashMap<>();
-
-        if (idProjet == null || idProjet.trim().isEmpty()) {
-            return nbApparts;
-        }
+        if (idProjet == null || idProjet.trim().isEmpty()) return nbApparts;
 
         try (BufferedReader reader = new BufferedReader(new FileReader("Etage.txt"))) {
             String ligne;
             reader.readLine();
-
             while ((ligne = reader.readLine()) != null) {
-                if (ligne.trim().isEmpty()) {
-                    continue;
-                }
-
+                if (ligne.trim().isEmpty()) continue;
                 String[] p = ligne.split(";");
-
-                if (p.length < 4) {
-                    continue;
-                }
+                if (p.length < 4) continue;
 
                 String idProjetLigne = p[1].trim();
                 String nomEtage = p[2].trim();
@@ -346,11 +356,7 @@ public class FenetreAttributsImmeuble {
                     nbApparts.put(nomEtage, nbAppartements);
                 }
             }
-
-        } catch (Exception e) {
-            // Si Etage.txt n'existe pas encore ou est vide, on garde les champs vides.
-        }
-
+        } catch (Exception e) {}
         return nbApparts;
     }
 
@@ -360,4 +366,13 @@ public class FenetreAttributsImmeuble {
         grid.add(lbl, 0, ligne);
         grid.add(field, 1, ligne);
     }
+
+    // Méthode utilitaire ajoutée pour lier la combo box
+    private void ajouterLigneCombo(GridPane grid, String texte, ComboBox<?> combo, int ligne, String style) {
+        Label lbl = new Label(texte);
+        lbl.setStyle(style);
+        grid.add(lbl, 0, ligne);
+        grid.add(combo, 1, ligne);
+    }
+
 }

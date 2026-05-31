@@ -1,112 +1,97 @@
 idProjet;vue;piece;x;y;largeur;longueur;hauteur;idRevetement
 
-P1;RDC;Salon;0.0;0.0;6.0;5.0;2.5;13
-P1;RDC;Cuisine;6.0;0.0;6.0;5.0;2.5;2
-P1;RDC;Chambre1;0.0;5.0;6.0;5.0;2.5;15
-P1;RDC;SalleDeBain;6.0;5.0;3.0;5.0;2.5;4
-P1;RDC;Garage;9.0;5.0;3.0;5.0;2.5;14
+M01;RDC;Salon;0.0;0.0;6.0;5.0;2.5;13
+M01;RDC;Cuisine;6.0;0.0;6.0;5.0;2.5;2
+M01;RDC;Chambre1;0.0;5.0;6.0;5.0;2.5;15
+M01;RDC;SalleDeBain;6.0;5.0;3.0;5.0;2.5;4
+M01;RDC;Garage;9.0;5.0;3.0;5.0;2.5;14
 
-P1;Etage 1;Chambre2;0.0;0.0;6.0;5.0;2.5;15
-P1;Etage 1;Chambre3;6.0;0.0;6.0;5.0;2.5;15
-P1;Etage 1;SalleDeBain;0.0;5.0;4.0;5.0;2.5;4
-P1;Etage 1;Bureau;4.0;5.0;4.0;5.0;2.5;13
-P1;Etage 1;Couloir;8.0;5.0;4.0;5.0;2.5;2
+M01;Etage 1;Chambre2;0.0;0.0;6.0;5.0;2.5;15
+M01;Etage 1;Chambre3;6.0;0.0;6.0;5.0;2.5;15
+M01;Etage 1;SalleDeBain;0.0;5.0;4.0;5.0;2.5;4
+M01;Etage 1;Bureau;4.0;5.0;4.0;5.0;2.5;13
+M01;Etage 1;Couloir;8.0;5.0;4.0;5.0;2.5;2
 
-P1;FACE;Mur;0.0;0.0;12.0;2.5;2.5;5
-P1;FACE;Porte;5.5;1.0;1.0;1.5;2.5;13
-P1;FACE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
-P1;FACE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
+M01;FACE;Mur;0.0;0.0;12.0;2.5;2.5;5
+M01;FACE;Porte;5.5;1.0;1.0;1.5;2.5;13
+M01;FACE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
+M01;FACE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
 
-P1;GAUCHE;Mur;0.0;0.0;10.0;2.5;2.5;5
-P1;GAUCHE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
+M01;GAUCHE;Mur;0.0;0.0;10.0;2.5;2.5;5
+M01;GAUCHE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
 
-P1;DROITE;Mur;0.0;0.0;10.0;2.5;2.5;5
-P1;DROITE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
+M01;DROITE;Mur;0.0;0.0;10.0;2.5;2.5;5
+M01;DROITE;Fenetre;4.0;0.8;1.2;0.8;2.5;10
 
-P1;ARRIERE;Mur;0.0;0.0;12.0;2.5;2.5;5
-P1;ARRIERE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
-P1;ARRIERE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
+M01;ARRIERE;Mur;0.0;0.0;12.0;2.5;2.5;5
+M01;ARRIERE;Fenetre1;2.0;0.8;1.2;0.8;2.5;10
+M01;ARRIERE;Fenetre2;8.8;0.8;1.2;0.8;2.5;10
 
 
-P2;ETAGE1;Appartement11;0.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE1;Appartement12;12.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE1;Couloir;8.0;0.0;4.0;12.0;3.0;2
-P2;ETAGE1;Appartement13;0.0;5.0;8.0;7.0;3.0;15
-P2;ETAGE1;Appartement14;12.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE1;Appartement11;0.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE1;Appartement12;12.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE1;Couloir;8.0;0.0;4.0;12.0;3.0;2
+IMB01;ETAGE1;Appartement13;0.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE1;Appartement14;12.0;5.0;8.0;7.0;3.0;15
 
-P2;ETAGE2;Appartement21;0.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE2;Appartement22;12.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE2;Couloir;8.0;0.0;4.0;12.0;3.0;2
-P2;ETAGE2;Appartement23;0.0;5.0;8.0;7.0;3.0;15
-P2;ETAGE2;Appartement24;12.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE2;Appartement21;0.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE2;Appartement22;12.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE2;Couloir;8.0;0.0;4.0;12.0;3.0;2
+IMB01;ETAGE2;Appartement23;0.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE2;Appartement24;12.0;5.0;8.0;7.0;3.0;15
 
-P2;ETAGE3;Appartement31;0.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE3;Appartement32;12.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE3;Couloir;8.0;0.0;4.0;12.0;3.0;2
-P2;ETAGE3;Appartement33;0.0;5.0;8.0;7.0;3.0;15
-P2;ETAGE3;Appartement34;12.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE3;Appartement31;0.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE3;Appartement32;12.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE3;Couloir;8.0;0.0;4.0;12.0;3.0;2
+IMB01;ETAGE3;Appartement33;0.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE3;Appartement34;12.0;5.0;8.0;7.0;3.0;15
 
-P2;ETAGE4;Appartement41;0.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE4;Appartement42;12.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE4;Couloir;8.0;0.0;4.0;12.0;3.0;2
-P2;ETAGE4;Appartement43;0.0;5.0;8.0;7.0;3.0;15
-P2;ETAGE4;Appartement44;12.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE4;Appartement41;0.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE4;Appartement42;12.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE4;Couloir;8.0;0.0;4.0;12.0;3.0;2
+IMB01;ETAGE4;Appartement43;0.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE4;Appartement44;12.0;5.0;8.0;7.0;3.0;15
 
-P2;ETAGE5;Appartement51;0.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE5;Appartement52;12.0;0.0;8.0;5.0;3.0;13
-P2;ETAGE5;Couloir;8.0;0.0;4.0;12.0;3.0;2
-P2;ETAGE5;Appartement53;0.0;5.0;8.0;7.0;3.0;15
-P2;ETAGE5;Appartement54;12.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE5;Appartement51;0.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE5;Appartement52;12.0;0.0;8.0;5.0;3.0;13
+IMB01;ETAGE5;Couloir;8.0;0.0;4.0;12.0;3.0;2
+IMB01;ETAGE5;Appartement53;0.0;5.0;8.0;7.0;3.0;15
+IMB01;ETAGE5;Appartement54;12.0;5.0;8.0;7.0;3.0;15
 
-P2;FACE;Mur;0.0;0.0;20.0;15.0;15.0;5
-P2;FACE;Porte;9.5;13.0;1.0;2.0;3.0;13
-P2;FACE;Fenetre1;3.0;2.0;1.2;1.0;3.0;10
-P2;FACE;Fenetre2;8.0;2.0;1.2;1.0;3.0;10
-P2;FACE;Fenetre3;13.0;2.0;1.2;1.0;3.0;10
-P2;FACE;Fenetre4;17.0;2.0;1.2;1.0;3.0;10
-P2;FACE;LigneEtage1;0.0;3.0;20.0;0.05;3.0;14
-P2;FACE;LigneEtage2;0.0;6.0;20.0;0.05;3.0;14
-P2;FACE;LigneEtage3;0.0;9.0;20.0;0.05;3.0;14
-P2;FACE;LigneEtage4;0.0;12.0;20.0;0.05;3.0;14
+IMB01;FACE;Mur;0.0;0.0;20.0;15.0;15.0;5
+IMB01;FACE;Porte;9.5;13.0;1.0;2.0;3.0;13
+IMB01;FACE;Fenetre1;3.0;2.0;1.2;1.0;3.0;10
+IMB01;FACE;Fenetre2;8.0;2.0;1.2;1.0;3.0;10
+IMB01;FACE;Fenetre3;13.0;2.0;1.2;1.0;3.0;10
+IMB01;FACE;Fenetre4;17.0;2.0;1.2;1.0;3.0;10
+IMB01;FACE;LigneEtage1;0.0;3.0;20.0;0.05;3.0;14
+IMB01;FACE;LigneEtage2;0.0;6.0;20.0;0.05;3.0;14
+IMB01;FACE;LigneEtage3;0.0;9.0;20.0;0.05;3.0;14
+IMB01;FACE;LigneEtage4;0.0;12.0;20.0;0.05;3.0;14
 
-P10;RDC;Salon;0.0;0.0;4.0;3.0;2.5;13
-P10;RDC;Cuisine;4.0;0.0;4.0;3.0;2.5;2
-P10;RDC;Chambre;0.0;3.0;4.0;3.0;2.5;15
-P10;RDC;SalleDeBain;4.0;3.0;2.0;3.0;2.5;4
-P10;RDC;WC;6.0;3.0;2.0;3.0;2.5;14
+M02;RDC;Salon;0.0;0.0;4.0;3.0;2.5;13
+M02;RDC;Cuisine;4.0;0.0;4.0;3.0;2.5;2
+M02;RDC;Chambre;0.0;3.0;4.0;3.0;2.5;15
+M02;RDC;SalleDeBain;4.0;3.0;2.0;3.0;2.5;4
+M02;RDC;WC;6.0;3.0;2.0;3.0;2.5;14
 
-P10;Etage 1;Chambre1;0.0;0.0;4.0;3.0;2.5;15
-P10;Etage 1;Chambre2;4.0;0.0;4.0;3.0;2.5;15
-P10;Etage 1;Bureau;0.0;3.0;4.0;3.0;2.5;13
-P10;Etage 1;SalleDeBain;4.0;3.0;4.0;3.0;2.5;4
+M02;Etage 1;Chambre1;0.0;0.0;4.0;3.0;2.5;15
+M02;Etage 1;Chambre2;4.0;0.0;4.0;3.0;2.5;15
+M02;Etage 1;Bureau;0.0;3.0;4.0;3.0;2.5;13
+M02;Etage 1;SalleDeBain;4.0;3.0;4.0;3.0;2.5;4
 
-P16;RDC;Appartement1;0.0;0.0;4.0;4.5;3.0;13
-P16;RDC;Appartement2;6.0;0.0;4.0;4.5;3.0;13
-P16;RDC;Couloir;4.0;0.0;2.0;9.0;3.0;2
-P16;RDC;Appartement3;0.0;4.5;4.0;4.5;3.0;15
-P16;RDC;Appartement4;6.0;4.5;4.0;4.5;3.0;15
+IMB02;RDC;Appartement1;0.0;0.0;4.0;4.5;3.0;13
+IMB02;RDC;Appartement2;6.0;0.0;4.0;4.5;3.0;13
+IMB02;RDC;Couloir;4.0;0.0;2.0;9.0;3.0;2
+IMB02;RDC;Appartement3;0.0;4.5;4.0;4.5;3.0;15
+IMB02;RDC;Appartement4;6.0;4.5;4.0;4.5;3.0;15
 
-P3;RDC;Appartement1;0.0;0.0;4.0;6.0;3.0;13
-P3;RDC;Appartement2;6.0;0.0;4.0;6.0;3.0;13
-P3;RDC;Couloir;4.0;0.0;2.0;12.0;3.0;2
+IMB03;RDC;Appartement1;0.0;0.0;3.5;5.0;3.0;13
+IMB03;RDC;Appartement2;5.5;0.0;3.5;5.0;3.0;13
+IMB03;RDC;Couloir;3.5;0.0;2.0;10.0;3.0;2
+IMB03;RDC;Appartement3;0.0;5.0;3.5;5.0;3.0;15
+IMB03;RDC;Appartement4;5.5;5.0;3.5;5.0;3.0;15
 
-IMB001;RDC;Appartement1;0.0;0.0;3.5;5.0;3.0;13
-IMB001;RDC;Appartement2;5.5;0.0;3.5;5.0;3.0;13
-IMB001;RDC;Couloir;3.5;0.0;2.0;10.0;3.0;2
-IMB001;RDC;Appartement3;0.0;5.0;3.5;5.0;3.0;15
-IMB001;RDC;Appartement4;5.5;5.0;3.5;5.0;3.0;15
-P18;RDC;ReperePlan;0.0;0.0;12.0;7.0;2.5;2
-P18;Etage 1;ReperePlan;0.0;0.0;12.0;7.0;2.5;2
-P19;RDC;ReperePlan;0.0;0.0;12.0;9.0;3.0;2
-P21;RDC;Salle de sport;0.0;0.0;6.0;2.3;3.0;2
-P21;RDC;Couloir;0.0;5.910919433744083;20.0;1.5;3.0;2
-P21;Etage 1;Couloir;0.0;4.822249483005166;20.0;1.5;3.0;11
-P21;Etage 1;Salle de sport;0.0;0.0;7.0;4.2;3.0;2
-P21;Etage 2;Couloir;0.0;6.14819402647723;20.0;1.5;3.0;2
-P21;Etage 3;Couloir;0.0;4.25;20.0;1.5;3.0;2
-P21;Etage 1;Appart1;10.0;0.0;10.0;4.822249483005166;3.0;11
-P21;Etage 1;Appart2;0.0;6.322249483005166;20.0;3.677750516994834;3.0;11
-P21;Etage3_APPART4;Salon;0.0;0.0;3.0;5.0;2.0;2
 IMB003;RDC;Couloir;0.0;7.232142857142858;12.0;1.5;3.0;2
 IMB003;RDC;Appart1;0.0;0.0;6.0;7.232142857142858;3.0;2
 IMB003;RDC;Appart2;6.0;0.0;6.0;7.232142857142858;3.0;2
@@ -114,20 +99,4 @@ IMB003;RDC;Appart3;0.0;8.732142857142858;6.0;7.267857142857142;3.0;2
 IMB003;RDC;Appart4;6.0;8.732142857142858;6.0;7.267857142857142;3.0;2
 IMB004;Etage1_APPART1;Salon;0.0;0.0;8.0;10.0;2.5;3
 
-P2;RDC;Hall;0.0;0.0;6.666666666666667;5.25;3.0;2
-P2;RDC;Ascenseur;6.666666666666667;0.0;6.666666666666667;5.25;3.0;14
-P2;RDC;Escalier;13.333333333333334;0.0;6.666666666666667;5.25;3.0;11
-P2;RDC;Couloir;0.0;5.25;20.0;1.5;3.0;2
-P2;RDC;LocalTechnique;0.0;6.75;5.0;8.25;3.0;4
-P2;RDC;Accueil;5.0;6.75;5.0;8.25;3.0;13
-P2;RDC;Local Poubelle;10.0;6.75;5.0;8.25;3.0;2
-P2;Etage 5;Couloir;0.0;6.75;20.0;1.5;3.0;2
-P2;Etage 5;Appart1;0.0;0.0;5.0;6.75;3.0;2
-P2;Etage 5;Appart2;5.0;0.0;5.0;6.75;3.0;2
-P2;Etage 5;Appart3;10.0;0.0;5.0;6.75;3.0;2
-P2;Etage 5;Appart4;15.0;0.0;5.0;6.75;3.0;2
-P2;Etage 5;Appart5;0.0;8.25;6.666666666666667;6.75;3.0;2
-P2;Etage 5;Appart6;6.666666666666667;8.25;6.666666666666667;6.75;3.0;2
-P2;Etage 5;Appart7;13.333333333333334;8.25;6.666666666666667;6.75;3.0;2
-P2;RDC;Appart1;15.0;6.75;5.0;8.25;3.0;2
-P2;RDC_Appart1;Salon;0.0;0.0;2.0;3.0;2.0;2
+

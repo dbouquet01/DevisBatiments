@@ -12,6 +12,8 @@ public class SauvegardeProjet {
     private static final String FICHIER_DEVIS = "Devis.txt";
     private static final String FICHIER_ETAGE = "Etage.txt";
     private static final String FICHIER_PIECE = "Piece.txt";
+    private static final String FICHIER_OUVERTURES = "Ouvertures.txt";
+    private static final String HEADER_OUVERTURES = "idProjet;nomEtage;nomPiece;type;mur;position;largeur;hauteur";
 
     private static final String HEADER_PROJETS =
             "idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur";
@@ -40,13 +42,16 @@ public class SauvegardeProjet {
         }
     }
 
-    public static void sauvegarderProjet(String idProjet, String designation, String type,
-                                         int nombreEtages, double hauteurTotale,
-                                         double surfaceTotale, int nombreAppartements,
-                                         String idDevis, double largeur, double longueur) {
-        String ligne = idProjet + ";" + designation + ";" + type + ";" + nombreEtages + ";"
-                + hauteurTotale + ";" + surfaceTotale + ";" + nombreAppartements + ";"
-                + idDevis + ";" + largeur + ";" + longueur;
+public static void sauvegarderProjet(String idProjet, String designation, String type,
+                                     int nombreEtages, double hauteurTotale,
+                                     double surfaceTotale, int nombreAppartements,
+                                     String idDevis, double largeur, double longueur,
+                                     int idRevetementFacade, int idRevetementIsolation) {
+
+    String ligne = idProjet + ";" + designation + ";" + type + ";" + nombreEtages + ";"
+            + hauteurTotale + ";" + surfaceTotale + ";" + nombreAppartements + ";"
+            + idDevis + ";" + largeur + ";" + longueur + ";"
+            + idRevetementFacade + ";" + idRevetementIsolation;
 
         upsert(FICHIER_PROJETS, HEADER_PROJETS, ligne, parts ->
                 parts.length > 0 && normaliser(parts[0]).equals(normaliser(idProjet))
@@ -407,6 +412,57 @@ public class SauvegardeProjet {
             e.printStackTrace();
         }
     }
+    
+    public static void sauvegarderOuverture(String idProjet, String nomEtage, String nomPiece, 
+                                        String type, String mur, double position, double largeur, double hauteur) {
+    Path path = Paths.get(FICHIER_OUVERTURES);
+    try {
+        List<String> lignes = new ArrayList<>();
+        if (!Files.exists(path)) {
+            lignes.add(HEADER_OUVERTURES);
+        } else {
+            lignes = Files.readAllLines(path);
+        }
+
+        // On crée la nouvelle ligne de données
+        String nouvelleLigne = String.format("%s;%s;%s;%s;%s;%.2f;%.2f;%.2f", 
+                idProjet, nomEtage, nomPiece, type, mur, position, largeur, hauteur);
+        lignes.add(nouvelleLigne);
+
+        Files.write(path, lignes);
+    } catch (IOException e) {
+        System.out.println("Erreur lors de la sauvegarde de l'ouverture : " + e.getMessage());
+    }
+}
+
+
+public static List<String[]> chargerOuverturesPiece(String idProjet, String nomEtage, String nomPiece) {
+    List<String[]> ouvertures = new ArrayList<>();
+    Path path = Paths.get(FICHIER_OUVERTURES);
+    
+    if (!Files.exists(path)) return ouvertures;
+
+    try {
+        List<String> lignes = Files.readAllLines(path);
+        for (int i = 1; i < lignes.size(); i++) { // On saute l'en-tête
+            String ligne = lignes.get(i).trim();
+            if (ligne.isEmpty()) continue;
+
+            String[] parts = ligne.split(";");
+            if (parts.length >= 8) {
+                // On vérifie si l'ouverture appartient bien à ce projet, cet étage et cette pièce
+                if (parts[0].trim().equalsIgnoreCase(idProjet.trim()) &&
+                    parts[1].trim().equalsIgnoreCase(nomEtage.trim()) &&
+                    parts[2].trim().equalsIgnoreCase(nomPiece.trim())) {
+                    ouvertures.add(parts);
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Erreur lors du chargement des ouvertures : " + e.getMessage());
+    }
+    return ouvertures;
+}
 
     private static void supprimerDansFichier(String fichier, String header, ConditionLigne condition) {
         try {

@@ -1,20 +1,27 @@
-idRevetement;designation;pourMur(0/1);pourSol(0/1);pourPlafond(0/1) ;prixUnitaire;couleur
+idRevetement;designation;pourMur(0/1);pourSol(0/1);pourPlafond(0/1);prixUnitaire;couleur; Façade(0/1);Isolation(0/1)
 
-1;Peinture Beige;1;0;1;10.95;BEIGE
-2;Carrelage Beige;1;1;0;49.75;BEIGE
-3;Lambris Bois Massif;1;1;1;50.60;BURLYWOOD
-4;Marbre;1;1;0;97.85;WHITE
-5;Crepi;1;0;0;67.80;BISQUE
-6;Papier peint;1;0;0;32.90;LIGHTPINK
-7;Plaquettes de parement;1;0;0;15.20;SANDYBROWN
-8;Peinture Bleu;1;0;1;77.30;LIGHTBLUE
-9;Peinture Blanc;1;0;1;29.90;FLORALWHITE
-10;Carrelage Gris;1;1;0;89.45;LIGHTGRAY
-11;Lambris Bois;1;1;0;42.50;PERU
-12;Liège Marron;1;0;0;25.40;TAN
-13;Parquet;0;1;0;46.36;SADDLEBROWN
-14;Vinyle Lino;0;1;0;23.55;DARKGRAY
-15;Moquette;0;1;0;48.10;DIMGRAY
-16;Stratifie;0;1;0;31.99;LIGHTSLATEGRAY
-17;Gazon;0;1;0;17.95;GREEN
-18;Liège Bois;0;1;0;33.90;PERU
+1;Peinture Beige;1;0;1;10.95;BEIGE;0;0
+2;Carrelage Beige;1;1;0;49.75;BEIGE;0;0
+3;Lambris Bois Massif;1;1;1;50.60;BURLYWOOD;0;0
+4;Marbre;1;1;0;97.85;WHITE;0;0
+5;Crepi;1;0;0;67.80;BISQUE;0;0
+6;Papier peint;1;0;0;32.90;LIGHTPINK;0;0
+7;Plaquettes de parement;1;0;0;15.20;SANDYBROWN;0;0
+8;Peinture Bleu;1;0;1;77.30;LIGHTBLUE;0;0
+9;Peinture Blanc;1;0;1;29.90;FLORALWHITE;0;0
+10;Carrelage Gris;1;1;0;89.45;LIGHTGRAY;0;0
+11;Lambris Bois;1;1;0;42.50;PERU;0;0
+12;Liège Marron;1;0;0;25.40;TAN;0;0
+13;Parquet;0;1;0;46.36;SADDLEBROWN;0;0
+14;Vinyle Lino;0;1;0;23.55;DARKGRAY;0;0
+15;Moquette;0;1;0;48.10;DIMGRAY;0;0
+16;Stratifie;0;1;0;31.99;LIGHTSLATEGRAY;0;0
+17;Gazon;0;1;0;17.95;GREEN;0;0
+18;Liège Bois;0;1;0;33.90;PERU;0;0
+19; Bardage; 0;0;0;60.00;LIGHTSLATEGREY;0;1
+20; Bardage Bois; 0;0;0; 90.00; BURLYWOOD;1;0
+21; Enduit; 0;0;0;66.00;MISTYROSE;1;0
+22; Béton; 0;0;0; 180.00; WHITESMOKE;1;0
+23; Isolation rapportée; 0;0;0;40.00;WHITE;0;1
+24; Isolation projeté;0;0;0;25.00;WHITE;0;1
+25; Brique;0;0;0;40.00; CORAL;1;0
