@@ -12,11 +12,10 @@ public class SauvegardeProjet {
     private static final String FICHIER_DEVIS = "Devis.txt";
     private static final String FICHIER_ETAGE = "Etage.txt";
     private static final String FICHIER_PIECE = "Piece.txt";
-    private static final String FICHIER_OUVERTURES = "Ouvertures.txt";
     private static final String HEADER_OUVERTURES = "idProjet;nomEtage;nomPiece;type;mur;position;largeur;hauteur";
 
     private static final String HEADER_PROJETS =
-            "idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur";
+            "idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur;idFacade;idIsolation";
 
     private static final String HEADER_PLAN =
             "idProjet;vue;piece;x;y;largeur;longueur;hauteur;idRevetement";
@@ -30,7 +29,8 @@ public class SauvegardeProjet {
     private static final String HEADER_PIECE =
             "idPiece;idProjet;idEtage;nomPiece;vue;xPlan;yPlan;largeurPlan;hauteurPlan;"
                     + "largeurMetres;longueurMetres;hauteurMetres;surfaceSol;surfaceMurs;surfacePlafond;"
-                    + "idRevetementMur;idRevetementSol;idRevetementPlafond;devisMurs;devisSol;devisPlafond;devisTotal";
+                    + "idRevetementMur;idRevetementSol;idRevetementPlafond;devisMurs;devisSol;devisPlafond;devisTotal;"
+                    + "nbFenetre;nbPorte;nbTremie;largeurTremie;longueurTremie";
 
     private static void verifierFichier(String nomFichier, String header) throws IOException {
         Path path = Paths.get(nomFichier);
@@ -56,6 +56,40 @@ public static void sauvegarderProjet(String idProjet, String designation, String
         upsert(FICHIER_PROJETS, HEADER_PROJETS, ligne, parts ->
                 parts.length > 0 && normaliser(parts[0]).equals(normaliser(idProjet))
         );
+    }
+
+
+
+    public static String[] chargerProjet(String idProjet) {
+        try {
+            Path path = Paths.get(FICHIER_PROJETS);
+
+            if (!Files.exists(path)) {
+                return null;
+            }
+
+            List<String> lignes = Files.readAllLines(path);
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 10
+                        && normaliser(parts[0]).equals(normaliser(idProjet))) {
+                    return parts;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static void sauvegarderEtage(String idProjet, String nomEtage,
@@ -105,7 +139,9 @@ public static void sauvegarderProjet(String idProjet, String designation, String
                                         double largeur, double longueur, double hauteur,
                                         int idRevetementMur, int idRevetementSol, int idRevetementPlaf,
                                         double coutMurs, double coutSol,
-                                        double coutPlafond, double total) {
+                                        double coutPlafond, double total,
+                                        int nbFenetre, int nbPorte, int nbTremie,
+                                        double largeurTremie, double longueurTremie) {
         String idEtage = idProjet + "_" + nomEtage.replace(" ", "").toUpperCase();
         String idPiece = idEtage + "_" + nomPiece.replace(" ", "");
 
@@ -118,7 +154,9 @@ public static void sauvegarderProjet(String idProjet, String designation, String
                 + largeur + ";" + longueur + ";" + hauteur + ";"
                 + surfaceSol + ";" + surfaceMurs + ";" + surfacePlafond + ";"
                 + idRevetementMur + ";" + idRevetementSol + ";" + idRevetementPlaf + ";"
-                + coutMurs + ";" + coutSol + ";" + coutPlafond + ";" + total;
+                + coutMurs + ";" + coutSol + ";" + coutPlafond + ";" + total + ";"
+                + nbFenetre + ";" + nbPorte + ";" + nbTremie + ";"
+                + largeurTremie + ";" + longueurTremie;
 
         upsert(FICHIER_PIECE, HEADER_PIECE, ligne, parts ->
                 parts.length >= 5
@@ -371,6 +409,153 @@ public static void sauvegarderProjet(String idProjet, String designation, String
         return null;
     }
 
+
+    public static int[] compterElementsPlanPiece(String idProjet, String vue, String nomPiece) {
+        int nbFenetre = 0;
+        int nbPorte = 0;
+        int nbTremie = 0;
+
+        try {
+            Path path = Paths.get(FICHIER_PLAN);
+
+            if (!Files.exists(path)) {
+                return new int[]{0, 0, 0};
+            }
+
+            List<String> lignes = Files.readAllLines(path);
+            String prefixe = normaliser(nomPiece + "_");
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length < 3
+                        || !normaliser(parts[0]).equals(normaliser(idProjet))
+                        || !normaliser(parts[1]).equals(normaliser(vue))) {
+                    continue;
+                }
+
+                String nomElement = normaliser(parts[2]);
+
+                if (!nomElement.startsWith(prefixe)) {
+                    continue;
+                }
+
+                if (nomElement.contains("fenetre")) {
+                    nbFenetre++;
+                } else if (nomElement.contains("porte")) {
+                    nbPorte++;
+                } else if (nomElement.contains("tremie")) {
+                    nbTremie++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new int[]{nbFenetre, nbPorte, nbTremie};
+    }
+
+    public static double[] chargerDerniereTremiePiece(String idProjet, String vue, String nomPiece) {
+        double largeurTremie = 0;
+        double longueurTremie = 0;
+
+        try {
+            Path path = Paths.get(FICHIER_PLAN);
+
+            if (!Files.exists(path)) {
+                return new double[]{0, 0};
+            }
+
+            List<String> lignes = Files.readAllLines(path);
+            String prefixe = normaliser(nomPiece + "_Tremie");
+
+            for (int i = 1; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (ligne.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 7
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).startsWith(prefixe)) {
+                    largeurTremie = Double.parseDouble(parts[5].trim().replace(",", "."));
+                    longueurTremie = Double.parseDouble(parts[6].trim().replace(",", "."));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new double[]{largeurTremie, longueurTremie};
+    }
+
+    public static void mettreAJourInfosOuverturesPiece(String idProjet, String vue, String nomPiece,
+                                                       int nbFenetre, int nbPorte, int nbTremie,
+                                                       double largeurTremie, double longueurTremie) {
+        try {
+            verifierFichier(FICHIER_PIECE, HEADER_PIECE);
+
+            Path path = Paths.get(FICHIER_PIECE);
+            List<String> lignes = Files.readAllLines(path);
+            List<String> nouvellesLignes = new ArrayList<>();
+
+            for (int i = 0; i < lignes.size(); i++) {
+                String ligne = lignes.get(i);
+
+                if (i == 0) {
+                    nouvellesLignes.add(HEADER_PIECE);
+                    continue;
+                }
+
+                if (ligne.trim().isEmpty()) {
+                    nouvellesLignes.add(ligne);
+                    continue;
+                }
+
+                String[] parts = ligne.split(";");
+
+                if (parts.length >= 5
+                        && normaliser(parts[1]).equals(normaliser(idProjet))
+                        && normaliser(parts[4]).equals(normaliser(vue))
+                        && normaliser(parts[3]).equals(normaliser(nomPiece))) {
+
+                    ArrayList<String> colonnes = new ArrayList<>();
+                    for (String part : parts) {
+                        colonnes.add(part);
+                    }
+
+                    while (colonnes.size() < 27) {
+                        colonnes.add("0");
+                    }
+
+                    colonnes.set(22, String.valueOf(nbFenetre));
+                    colonnes.set(23, String.valueOf(nbPorte));
+                    colonnes.set(24, String.valueOf(nbTremie));
+                    colonnes.set(25, String.valueOf(largeurTremie));
+                    colonnes.set(26, String.valueOf(longueurTremie));
+
+                    nouvellesLignes.add(String.join(";", colonnes));
+                } else {
+                    nouvellesLignes.add(ligne);
+                }
+            }
+
+            Files.write(path, nouvellesLignes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private interface ConditionLigne {
         boolean correspond(String[] parts);
     }
@@ -412,57 +597,6 @@ public static void sauvegarderProjet(String idProjet, String designation, String
             e.printStackTrace();
         }
     }
-    
-    public static void sauvegarderOuverture(String idProjet, String nomEtage, String nomPiece, 
-                                        String type, String mur, double position, double largeur, double hauteur) {
-    Path path = Paths.get(FICHIER_OUVERTURES);
-    try {
-        List<String> lignes = new ArrayList<>();
-        if (!Files.exists(path)) {
-            lignes.add(HEADER_OUVERTURES);
-        } else {
-            lignes = Files.readAllLines(path);
-        }
-
-        // On crée la nouvelle ligne de données
-        String nouvelleLigne = String.format("%s;%s;%s;%s;%s;%.2f;%.2f;%.2f", 
-                idProjet, nomEtage, nomPiece, type, mur, position, largeur, hauteur);
-        lignes.add(nouvelleLigne);
-
-        Files.write(path, lignes);
-    } catch (IOException e) {
-        System.out.println("Erreur lors de la sauvegarde de l'ouverture : " + e.getMessage());
-    }
-}
-
-
-public static List<String[]> chargerOuverturesPiece(String idProjet, String nomEtage, String nomPiece) {
-    List<String[]> ouvertures = new ArrayList<>();
-    Path path = Paths.get(FICHIER_OUVERTURES);
-    
-    if (!Files.exists(path)) return ouvertures;
-
-    try {
-        List<String> lignes = Files.readAllLines(path);
-        for (int i = 1; i < lignes.size(); i++) { // On saute l'en-tête
-            String ligne = lignes.get(i).trim();
-            if (ligne.isEmpty()) continue;
-
-            String[] parts = ligne.split(";");
-            if (parts.length >= 8) {
-                // On vérifie si l'ouverture appartient bien à ce projet, cet étage et cette pièce
-                if (parts[0].trim().equalsIgnoreCase(idProjet.trim()) &&
-                    parts[1].trim().equalsIgnoreCase(nomEtage.trim()) &&
-                    parts[2].trim().equalsIgnoreCase(nomPiece.trim())) {
-                    ouvertures.add(parts);
-                }
-            }
-        }
-    } catch (IOException e) {
-        System.out.println("Erreur lors du chargement des ouvertures : " + e.getMessage());
-    }
-    return ouvertures;
-}
 
     private static void supprimerDansFichier(String fichier, String header, ConditionLigne condition) {
         try {
@@ -530,4 +664,3 @@ public static List<String[]> chargerOuverturesPiece(String idProjet, String nomE
                 .replace("ç", "c");
     }
 }
-

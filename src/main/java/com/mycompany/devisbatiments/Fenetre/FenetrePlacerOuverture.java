@@ -25,34 +25,23 @@ import java.util.List;
 
 public class FenetrePlacerOuverture {
 
-    // ── Données du contexte ──────────────────────────────────────────────────
     private final Batiments batiment;
     private final String nomEtage;
     private final String nomPiece;
-
-    // Dimensions réelles de la pièce (en mètres), lues depuis PlanProjets.txt
     private double pieceX        = 0;
     private double pieceY        = 0;
     private double pieceLargeur  = 4;
     private double pieceLongueur = 3;
     private double pieceHauteur  = 2.5;
-
-    // ── Listes d'ouvertures en mémoire ──────────────────────────────────────
     private final List<Fenetre> fenetres = new ArrayList<>();
     private final List<Porte>   portes   = new ArrayList<>();
     private final List<Tremie>  tremies  = new ArrayList<>();
-
-    // ── Zone de dessin ───────────────────────────────────────────────────────
     private Pane zoneDessin;
-
     private static final double PANE_W = 700;
     private static final double PANE_H = 520;
     private static final double MARGE  = 40;
 
-    // ── Enum Mur ─────────────────────────────────────────────────────────────
     public enum Mur { HAUT, DROITE, BAS, GAUCHE }
-
-    // ── Classes internes ─────────────────────────────────────────────────────
 
     private static class Fenetre {
         Mur mur;
@@ -88,17 +77,13 @@ public class FenetrePlacerOuverture {
         }
     }
 
-    // ── Constructeur ─────────────────────────────────────────────────────────
-
     public FenetrePlacerOuverture(Batiments batiment, String nomEtage, String nomPiece) {
         this.batiment  = batiment;
         this.nomEtage  = nomEtage;
         this.nomPiece  = nomPiece;
         chargerDimensionsPiece();
-        chargerOuverturesExistantes(); // Charge les ouvertures sauvegardées au démarrage
+        chargerOuverturesDepuisPlan(); 
     }
-
-    // ── Affichage principal ──────────────────────────────────────────────────
 
     public void afficher(Stage stage) {
 
@@ -135,7 +120,6 @@ public class FenetrePlacerOuverture {
         panneauGauche.setPadding(new Insets(10, 15, 10, 10));
         panneauGauche.setPrefWidth(420);
 
-        // ─── Section Fenetre ──────────────────────────────────────────────────
         ComboBox<String> comboMurFen = murCombo();
         TextField tfFenX = tf("distance x sur le mur (m)");
         TextField tfFenY = tf("hauteur depuis le sol (m)");
@@ -152,8 +136,9 @@ public class FenetrePlacerOuverture {
                 validerOffsetFenetre(mur, x, y);
                 
                 fenetres.add(new Fenetre(mur, x, y));
-                
-              
+                sauvegarderFenetrePlan(mur, x, y);
+                mettreAJourInfosPieceDepuisListes();
+
                 actualiserListe(listeFenetres, fenetres);
                 dessinerPlan();
             } catch (Exception ex) {
@@ -165,7 +150,7 @@ public class FenetrePlacerOuverture {
         btnSupprimerFen.setStyle(STYLE_DEL);
         btnSupprimerFen.setOnAction(e -> {
             int idx = listeFenetres.getSelectionModel().getSelectedIndex();
-            if (idx >= 0) { fenetres.remove(idx); actualiserListe(listeFenetres, fenetres); dessinerPlan(); }
+            if (idx >= 0) { fenetres.remove(idx); mettreAJourInfosPieceDepuisListes(); actualiserListe(listeFenetres, fenetres); dessinerPlan(); }
         });
 
         VBox sectionFen = section("Fenetres",
@@ -176,11 +161,10 @@ public class FenetrePlacerOuverture {
                 listeFenetres
         );
 
-        // ─── Section Porte ────────────────────────────────────────────────────
         ComboBox<String> comboMurPor = murCombo();
         TextField tfPorX = tf("Distance x sur le mur (m)");
         ListView<String> listePortes = listeView();
-        actualiserListe(listePortes, portes); // Affiche les portes chargées
+        actualiserListe(listePortes, portes);
 
         Button btnAjouterPor = new Button("+ Ajouter porte");
         btnAjouterPor.setStyle(STYLE_ADD);
@@ -191,8 +175,9 @@ public class FenetrePlacerOuverture {
                 validerOffsetPorte(mur, x);
                 
                 portes.add(new Porte(mur, x));
-                
-               
+                sauvegarderPortePlan(mur, x);
+                mettreAJourInfosPieceDepuisListes();
+
                 actualiserListe(listePortes, portes);
                 dessinerPlan();
             } catch (Exception ex) {
@@ -204,7 +189,7 @@ public class FenetrePlacerOuverture {
         btnSupprimerPor.setStyle(STYLE_DEL);
         btnSupprimerPor.setOnAction(e -> {
             int idx = listePortes.getSelectionModel().getSelectedIndex();
-            if (idx >= 0) { portes.remove(idx); actualiserListe(listePortes, portes); dessinerPlan(); }
+            if (idx >= 0) { portes.remove(idx); mettreAJourInfosPieceDepuisListes(); actualiserListe(listePortes, portes); dessinerPlan(); }
         });
 
         VBox sectionPor = section("Portes (touchent le sol)",
@@ -214,13 +199,12 @@ public class FenetrePlacerOuverture {
                 listePortes
         );
 
-        // ─── Section Tremie ───────────────────────────────────────────────────
         TextField tfTrX  = tf("x depuis coin haut-gauche (m)");
         TextField tfTrY  = tf("y depuis coin haut-gauche (m)");
         TextField tfTrL  = tf("largeur (m)");
         TextField tfTrLo = tf("longueur (m)");
         ListView<String> listeTremies = listeView();
-        actualiserListe(listeTremies, tremies); // Affiche les trémies chargées
+        actualiserListe(listeTremies, tremies);
 
         Button btnAjouterTr = new Button("+ Ajouter tremie");
         btnAjouterTr.setStyle(STYLE_ADD);
@@ -233,8 +217,9 @@ public class FenetrePlacerOuverture {
                 validerTremie(x, y, l, lo);
                 
                 tremies.add(new Tremie(x, y, l, lo));
-                
-              
+                sauvegarderTremiePlan(x, y, l, lo);
+                mettreAJourInfosPieceDepuisListes();
+
                 actualiserListe(listeTremies, tremies);
                 dessinerPlan();
             } catch (Exception ex) {
@@ -246,7 +231,7 @@ public class FenetrePlacerOuverture {
         btnSupprimerTr.setStyle(STYLE_DEL);
         btnSupprimerTr.setOnAction(e -> {
             int idx = listeTremies.getSelectionModel().getSelectedIndex();
-            if (idx >= 0) { tremies.remove(idx); actualiserListe(listeTremies, tremies); dessinerPlan(); }
+            if (idx >= 0) { tremies.remove(idx); mettreAJourInfosPieceDepuisListes(); actualiserListe(listeTremies, tremies); dessinerPlan(); }
         });
 
         VBox sectionTr = section("Tremies / Escaliers",
@@ -266,8 +251,24 @@ public class FenetrePlacerOuverture {
 
         Button btnRetour = new Button("RETOUR");
         btnRetour.setStyle(STYLE_BTN);
-        btnRetour.setOnAction(e -> stage.close());
+        btnRetour.setOnAction(e -> {
+            new FenetrePiece(
+                batiment,
+                nomEtage,
+                nomPiece,
+                pieceLargeur * pieceLongueur,
+                new ArrayList<>()
+            ).afficher(stage);
+        });
+        
+        Button btnVoirPlan = new Button("VOIR LE PLAN");
+        btnVoirPlan.setStyle(STYLE_BTN);
 
+        btnVoirPlan.setOnAction(e -> {
+            PlanVisualisation pv = new PlanVisualisation();
+            pv.afficher();
+        });
+        
         Label aide = new Label(
                 "Repere : (0, 0) = coin haut-gauche de la piece. "
                 + "Murs HAUT/BAS : x = offset horizontal. "
@@ -276,7 +277,7 @@ public class FenetrePlacerOuverture {
         aide.setStyle("-fx-font-size: 11px; -fx-text-fill: grey;");
         aide.setWrapText(true);
 
-        VBox bottomBox = new VBox(8, aide, btnRetour);
+        VBox bottomBox = new VBox(8, aide, btnRetour,btnVoirPlan);
         bottomBox.setPadding(new Insets(12, 20, 12, 20));
 
         HBox centre = new HBox(15, scrollGauche, zoneDessin);
@@ -295,8 +296,6 @@ public class FenetrePlacerOuverture {
         stage.setFullScreen(true);
         stage.show();
     }
-
-    // ── Dessin ───────────────────────────────────────────────────────────────
 
     private void dessinerPlan() {
         zoneDessin.getChildren().clear();
@@ -351,7 +350,6 @@ public class FenetrePlacerOuverture {
                 double ly = Double.parseDouble(p[6].trim());
                 int idRev = Integer.parseInt(p[8].trim());
                 String nom = p[2].trim();
-
                 Rectangle rect = new Rectangle(
                         origX + x * echelle, origY + y * echelle,
                         lx * echelle, ly * echelle);
@@ -360,7 +358,6 @@ public class FenetrePlacerOuverture {
                 rect.setStroke(Color.DARKGRAY);
                 rect.setStrokeWidth(1);
                 zoneDessin.getChildren().add(rect);
-
                 Text t = new Text(origX + x * echelle + 4, origY + y * echelle + 16, nom);
                 t.setStyle("-fx-font-size: 11px;");
                 zoneDessin.getChildren().add(t);
@@ -378,7 +375,6 @@ public class FenetrePlacerOuverture {
         surligné.setStroke(Color.web("#0F056B"));
         surligné.setStrokeWidth(3.5);
         zoneDessin.getChildren().add(surligné);
-
         double cx = origX + (pieceX + pieceLargeur / 2) * echelle;
         addLabel(cx - 8,  origY + pieceY * echelle - 6, "H");
         addLabel(cx - 8,  origY + (pieceY + pieceLongueur) * echelle + 12, "B");
@@ -397,7 +393,6 @@ public class FenetrePlacerOuverture {
 
     private void dessinerOuvertures(double origX, double origY, double echelle) {
         double ep = 6;
-
         for (Fenetre f : fenetres) {
             double[] seg = segmentMur(f.mur, f.x, 1.2);
             boolean horiz = isMurHorizontal(f.mur);
@@ -481,11 +476,9 @@ public class FenetrePlacerOuverture {
         double px = origX + seg[0] * echelle;
         double py = origY + seg[1] * echelle;
         double taille = 0.9 * echelle;
-
         Line arc = new Line();
         arc.setStroke(Color.SADDLEBROWN);
         arc.setStrokeWidth(1);
-
         switch (p.mur) {
             case HAUT:
                 arc.setStartX(px); arc.setStartY(py);
@@ -508,8 +501,6 @@ public class FenetrePlacerOuverture {
         }
         zoneDessin.getChildren().add(arc);
     }
-
-    // ── Validation ───────────────────────────────────────────────────────────
 
     private void validerOffsetFenetre(Mur mur, double x, double y) {
         double longueurMur = isMurHorizontal(mur) ? pieceLargeur : pieceLongueur;
@@ -539,8 +530,6 @@ public class FenetrePlacerOuverture {
         if (l <= 0 || lo <= 0)
             throw new IllegalArgumentException("Les dimensions de la tremie doivent etre positives.");
     }
-
-    // ── Lecture fichiers ─────────────────────────────────────────────────────
 
     private void chargerDimensionsPiece() {
         try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
@@ -588,32 +577,151 @@ public class FenetrePlacerOuverture {
         return new double[]{0, 0};
     }
     
-    // NOUVELLE METHODE POUR CHARGER LES OUVERTURES AU DEMARRAGE
-    private void chargerOuverturesExistantes() {
-        List<String[]> ouverturesSave = SauvegardeProjet.chargerOuverturesPiece(batiment.getId(), nomEtage, nomPiece);
-        for (String[] p : ouverturesSave) {
-            try {
-                String type = p[3].trim();
-                String murStr = p[4].trim();
-                double x = Double.parseDouble(p[5].trim().replace(",", "."));
-                double y = Double.parseDouble(p[6].trim().replace(",", "."));
-                double l = Double.parseDouble(p[7].trim().replace(",", "."));
-                double lo = Double.parseDouble(p[8].trim().replace(",", "."));
+    private void chargerOuverturesDepuisPlan() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
+            String ligne;
+            reader.readLine();
 
-                if (type.equalsIgnoreCase("Fenetre")) {
-                    fenetres.add(new Fenetre(murDepuis(murStr), x, y));
-                } else if (type.equalsIgnoreCase("Porte")) {
-                    portes.add(new Porte(murDepuis(murStr), x));
-                } else if (type.equalsIgnoreCase("Tremie")) {
-                    tremies.add(new Tremie(x, y, l, lo));
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) continue;
+                String[] p = ligne.split(";");
+                if (p.length < 9) continue;
+                if (!p[0].trim().equalsIgnoreCase(batiment.getId())) continue;
+                if (!normaliser(p[1].trim()).equals(normaliser(nomEtage))) continue;
+                String nomElement = p[2].trim();
+                String n = normaliser(nomElement);
+                String prefixe = normaliser(nomPiece + "_");
+                if (!n.startsWith(prefixe)) continue;
+                double x = Double.parseDouble(p[3].trim().replace(",", "."));
+                double y = Double.parseDouble(p[4].trim().replace(",", "."));
+                double largeur = Double.parseDouble(p[5].trim().replace(",", "."));
+                double longueur = Double.parseDouble(p[6].trim().replace(",", "."));
+                if (n.contains("fenetre")) {
+                    Mur mur = retrouverMurDepuisPlan(x, y, largeur, longueur);
+                    fenetres.add(new Fenetre(mur, retrouverOffsetDepuisPlan(mur, x, y), 0));
+                } else if (n.contains("porte")) {
+                    Mur mur = retrouverMurDepuisPlan(x, y, largeur, longueur);
+                    portes.add(new Porte(mur, retrouverOffsetDepuisPlan(mur, x, y)));
+                } else if (n.contains("tremie")) {
+                    tremies.add(new Tremie(x - pieceX, y - pieceY, largeur, longueur));
                 }
-            } catch (Exception e) {
-                System.out.println("Erreur de format lors du chargement d'une ouverture.");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    // ── Utilitaires IHM ──────────────────────────────────────────────────────
+    private Mur retrouverMurDepuisPlan(double x, double y, double largeur, double longueur) {
+        double eps = 0.20;
+        if (Math.abs(y - pieceY) < eps) return Mur.HAUT;
+        if (Math.abs(y - (pieceY + pieceLongueur)) < eps) return Mur.BAS;
+        if (Math.abs(x - pieceX) < eps) return Mur.GAUCHE;
+        if (Math.abs(x - (pieceX + pieceLargeur)) < eps) return Mur.DROITE;
+        return largeur >= longueur ? Mur.HAUT : Mur.GAUCHE;
+    }
+
+    private double retrouverOffsetDepuisPlan(Mur mur, double x, double y) {
+        switch (mur) {
+            case HAUT:
+            case BAS:
+                return x - pieceX;
+            case GAUCHE:
+            case DROITE:
+                return y - pieceY;
+            default:
+                return 0;
+        }
+    }
+
+    private void sauvegarderFenetrePlan(Mur mur, double offset, double hauteurDepuisSol) {
+        SauvegardeProjet.sauvegarderElementPlan(
+                batiment.getId(),
+                nomEtage,
+                nomPiece + "_Fenetre" + fenetres.size(),
+                pieceX + calculerXPlan(mur, offset),
+                pieceY + calculerYPlan(mur, offset),
+                isMurHorizontal(mur) ? 1.2 : 0.10,
+                isMurHorizontal(mur) ? 0.10 : 1.2,
+                hauteurDepuisSol,
+                10
+        );
+    }
+
+    private void sauvegarderPortePlan(Mur mur, double offset) {
+        SauvegardeProjet.sauvegarderElementPlan(
+                batiment.getId(),
+                nomEtage,
+                nomPiece + "_Porte" + portes.size(),
+                pieceX + calculerXPlan(mur, offset),
+                pieceY + calculerYPlan(mur, offset),
+                isMurHorizontal(mur) ? 0.9 : 0.10,
+                isMurHorizontal(mur) ? 0.10 : 0.9,
+                2.1,
+                13
+        );
+    }
+
+    private void sauvegarderTremiePlan(double x, double y, double largeur, double longueur) {
+        SauvegardeProjet.sauvegarderElementPlan(
+                batiment.getId(),
+                nomEtage,
+                nomPiece + "_Tremie" + tremies.size(),
+                pieceX + x,
+                pieceY + y,
+                largeur,
+                longueur,
+                0,
+                14
+        );
+    }
+
+    private void mettreAJourInfosPieceDepuisListes() {
+        double largeurTremie = 0;
+        double longueurTremie = 0;
+        if (!tremies.isEmpty()) {
+            Tremie derniere = tremies.get(tremies.size() - 1);
+            largeurTremie = derniere.largeur;
+            longueurTremie = derniere.longueur;
+        }
+        SauvegardeProjet.mettreAJourInfosOuverturesPiece(
+                batiment.getId(),
+                nomEtage,
+                nomPiece,
+                fenetres.size(),
+                portes.size(),
+                tremies.size(),
+                largeurTremie,
+                longueurTremie
+        );
+    }
+
+    private double calculerXPlan(Mur mur, double offset) {
+        switch (mur) {
+            case HAUT:
+            case BAS:
+                return offset;
+            case GAUCHE:
+                return 0;
+            case DROITE:
+                return pieceLargeur;
+            default:
+                return 0;
+        }
+    }
+
+    private double calculerYPlan(Mur mur, double offset) {
+        switch (mur) {
+            case HAUT:
+                return 0;
+            case BAS:
+                return pieceLongueur;
+            case GAUCHE:
+            case DROITE:
+                return offset;
+            default:
+                return 0;
+        }
+    }
 
     private ComboBox<String> murCombo() {
         ComboBox<String> cb = new ComboBox<>();

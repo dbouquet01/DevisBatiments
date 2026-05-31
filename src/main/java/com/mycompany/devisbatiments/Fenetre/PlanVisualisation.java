@@ -80,9 +80,8 @@ public class PlanVisualisation {
 
         double[] dimensionsPlan = calculerDimensionsDepuisPlan(projetRecherche, vueRecherche);
 
-        double largeurProjet = chercherLargeurProjet(projetRecherche);
-        double longueurProjet = chercherLongueurProjet(projetRecherche);
-
+        double largeurProjet = dimensionsPlan[0];
+        double longueurProjet = dimensionsPlan[1];
         if (dimensionsPlan[0] > largeurProjet) {
             largeurProjet = dimensionsPlan[0];
         }
@@ -125,13 +124,42 @@ public class PlanVisualisation {
 
         zoneDessin.getChildren().add(surfaceTotale);
 
+        String vueNorm = normaliserVue(vueRecherche);
+
+        String texteTitre;
+
+        if (vueNorm.equals("FACE") || vueNorm.equals("ARRIERE")) {
+
+            texteTitre =
+                "Dimensions : "
+                + String.format("%.2f", largeurProjet)
+                + " m × "
+                + String.format("%.2f", longueurProjet)
+                + " m";
+
+        } else if (vueNorm.equals("GAUCHE") || vueNorm.equals("DROITE")) {
+
+            texteTitre =
+                "Dimensions : "
+                + String.format("%.2f", longueurProjet)
+                + " m × "
+                + String.format("%.2f", largeurProjet)
+                + " m";
+
+        } else {
+
+            texteTitre =
+                "Surface : "
+                + String.format("%.2f", largeurProjet)
+                + " m × "
+                + String.format("%.2f", longueurProjet)
+                + " m";
+        }
+
         Text titre = new Text(
-                origineX,
-                Math.max(25, origineY - 12),
-                "Surface totale de l'appartement : "
-                        + String.format("%.2f", largeurProjet)
-                        + " x "
-                        + String.format("%.2f", longueurProjet)
+            origineX,
+            Math.max(25, origineY - 12),
+            texteTitre
         );
 
         titre.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");

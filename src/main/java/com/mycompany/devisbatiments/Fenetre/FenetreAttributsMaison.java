@@ -3,11 +3,8 @@ package com.mycompany.devisbatiments.Fenetre;
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Maison;
 import com.mycompany.devisbatiments.elements.Revetement;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,26 +39,24 @@ public class FenetreAttributsMaison {
         TextField fieldLongueur = new TextField();
         TextField fieldEtage = new TextField();
         TextField fieldHauteur = new TextField();
-        fieldHauteur.setPromptText("Ex : 2.5");
-
-    
-        ComboBox<Revetement> comboFacade = new ComboBox<>();
-        comboFacade.setPromptText("Choisir une façade");
-        comboFacade.setMinWidth(180);
-
-        ComboBox<Revetement> comboIsolation = new ComboBox<>();
-        comboIsolation.setPromptText("Choisir une isolation");
-        comboIsolation.setMinWidth(180);
-
-
-        comboFacade.getItems().addAll(Revetement.getRevetementsFacade());
-        comboIsolation.getItems().addAll(Revetement.getRevetementsIsolation());
 
         fieldId.setPromptText("Ex : M001");
         fieldDesignation.setPromptText("Ex : Maison familiale");
         fieldLargeur.setPromptText("Ex : 12.5");
         fieldLongueur.setPromptText("Ex : 18");
         fieldEtage.setPromptText("Ex : 1");
+        fieldHauteur.setPromptText("Ex : 2.5");
+
+        ComboBox<Revetement> comboFacade = new ComboBox<>();
+        comboFacade.setPromptText("Choisir une façade");
+        comboFacade.setMinWidth(180);
+        comboFacade.getItems().addAll(Revetement.getRevetementsFacade());
+
+        ComboBox<Revetement> comboIsolation = new ComboBox<>();
+        comboIsolation.setPromptText("Choisir une isolation");
+        comboIsolation.setMinWidth(180);
+        comboIsolation.getItems().addAll(Revetement.getRevetementsIsolation());
+
         fieldId.setText(idExistant);
         fieldDesignation.setText(designationExistante);
 
@@ -71,11 +66,15 @@ public class FenetreAttributsMaison {
         if (longueurExistante > 0) {
             fieldLongueur.setText(String.valueOf(longueurExistante));
         }
-        if (nbEtagesExistant > 0) {
+        if (nbEtagesExistant >= 0) {
             fieldEtage.setText(String.valueOf(nbEtagesExistant));
         }
 
-        // Ajout des lignes classiques
+        // Complète les infos déjà sauvegardées dans Projets.txt.
+        // La méthode centralisée est dans SauvegardeProjet, donc on évite de relire le fichier ici.
+        String[] projet = SauvegardeProjet.chargerProjet(idExistant);
+        preRemplirInfosProjet(projet, nbEtagesExistant, fieldHauteur, comboFacade, comboIsolation);
+
         ajouterLigne(grid, "ID :", fieldId, 0, styleLabel);
         ajouterLigne(grid, "Désignation :", fieldDesignation, 1, styleLabel);
         ajouterLigne(grid, "Largeur (m) :", fieldLargeur, 2, styleLabel);
@@ -84,7 +83,7 @@ public class FenetreAttributsMaison {
         ajouterLigne(grid, "Hauteur par étage (m) :", fieldHauteur, 5, styleLabel);
         ajouterLigneCombo(grid, "Façade extérieure :", comboFacade, 6, styleLabel);
         ajouterLigneCombo(grid, "Isolation extérieure :", comboIsolation, 7, styleLabel);
-        
+
         Label lblErreur = new Label("");
         lblErreur.setStyle("-fx-text-fill: red; -fx-font-size: 13px;");
 
@@ -98,68 +97,67 @@ public class FenetreAttributsMaison {
         Button btnSuivant = new Button("ÉTAPE SUIVANTE →");
         btnSuivant.setStyle(styleBouton);
 
- btnSuivant.setOnAction(e -> {
-    String id = fieldId.getText().trim();
-    String designation = fieldDesignation.getText().trim();
-    String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
-    String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
-    String txtEtage = fieldEtage.getText().trim();
-    String txtHauteur = fieldHauteur.getText().trim().replace(",", ".");
+        btnSuivant.setOnAction(e -> {
+            String id = fieldId.getText().trim();
+            String designation = fieldDesignation.getText().trim();
+            String txtLargeur = fieldLargeur.getText().trim().replace(",", ".");
+            String txtLongueur = fieldLongueur.getText().trim().replace(",", ".");
+            String txtEtage = fieldEtage.getText().trim();
+            String txtHauteur = fieldHauteur.getText().trim().replace(",", ".");
 
-    Revetement facadeSelectionnee = comboFacade.getValue();
-    Revetement isolationSelectionnee = comboIsolation.getValue();
+            Revetement facadeSelectionnee = comboFacade.getValue();
+            Revetement isolationSelectionnee = comboIsolation.getValue();
 
-    // Validation des champs AVANT tout calcul
-    if (id.isEmpty() || designation.isEmpty() || txtLargeur.isEmpty()
-            || txtLongueur.isEmpty() || txtEtage.isEmpty() || txtHauteur.isEmpty()
-            || facadeSelectionnee == null || isolationSelectionnee == null) {
-        lblErreur.setText("Veuillez remplir tous les champs et sélectionner la façade et l'isolation.");
-        return;
-    }
+            if (id.isEmpty() || designation.isEmpty() || txtLargeur.isEmpty()
+                    || txtLongueur.isEmpty() || txtEtage.isEmpty() || txtHauteur.isEmpty()
+                    || facadeSelectionnee == null || isolationSelectionnee == null) {
+                lblErreur.setText("Veuillez remplir tous les champs et sélectionner la façade et l'isolation.");
+                return;
+            }
 
-    try {
-        double largeur = Double.parseDouble(txtLargeur);
-        double longueur = Double.parseDouble(txtLongueur);
-        int nbEtages = Integer.parseInt(txtEtage);
-        double hauteurEtage = Double.parseDouble(txtHauteur);
+            try {
+                double largeur = Double.parseDouble(txtLargeur);
+                double longueur = Double.parseDouble(txtLongueur);
+                int nbEtages = Integer.parseInt(txtEtage);
+                double hauteurEtage = Double.parseDouble(txtHauteur);
 
-        // Calculs façade et isolation
-        double hauteurTotale = hauteurEtage * (nbEtages + 1);
-        double perimetre = 2 * (largeur + longueur);
-        double surfaceFacade = perimetre * hauteurTotale;
-        double surfaceIsolation = perimetre * hauteurTotale;
+                if (largeur <= 0 || longueur <= 0 || nbEtages < 0 || hauteurEtage <= 0) {
+                    lblErreur.setText("Les dimensions doivent être positives.");
+                    return;
+                }
 
-        double coutFacade = facadeSelectionnee.getPrixUnitaire() * surfaceFacade;
-        double coutIsolation = isolationSelectionnee.getPrixUnitaire() * surfaceIsolation;
+                double hauteurTotale = hauteurEtage * (nbEtages + 1);
+                double perimetre = 2 * (largeur + longueur);
+                double surfaceFacade = perimetre * hauteurTotale;
+                double surfaceIsolation = perimetre * hauteurTotale;
 
-        // Sauvegarde du projet
-        Maison maison = new Maison(id, designation, largeur, longueur, nbEtages);
-        String idDevis = "D_" + id;
-        double surfaceTotale = largeur * longueur * (nbEtages + 1);
+                double coutFacade = facadeSelectionnee.getPrixUnitaire() * surfaceFacade;
+                double coutIsolation = isolationSelectionnee.getPrixUnitaire() * surfaceIsolation;
 
-SauvegardeProjet.sauvegarderProjet(
-        id, designation, "MAISON",
-        nbEtages, hauteurTotale, surfaceTotale,
-        0, idDevis, largeur, longueur,
-        facadeSelectionnee.getIdRevetement(),
-        isolationSelectionnee.getIdRevetement()
-);
+                Maison maison = new Maison(id, designation, largeur, longueur, nbEtages);
+                String idDevis = "D_" + id;
+                double surfaceTotale = largeur * longueur * (nbEtages + 1);
 
-        // Sauvegarde façade et isolation dans le devis
-        SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Facade", surfaceFacade, 0, 0, coutFacade);
-        SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Isolation", surfaceIsolation, 0, 0, coutIsolation);
+                SauvegardeProjet.sauvegarderProjet(
+                        id, designation, "MAISON",
+                        nbEtages, hauteurTotale, surfaceTotale,
+                        0, idDevis, largeur, longueur,
+                        facadeSelectionnee.getIdRevetement(),
+                        isolationSelectionnee.getIdRevetement()
+                );
 
-        new FenetreEtage(maison, new HashMap<>()).afficher(stage);
+                SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Facade", surfaceFacade, 0, 0, coutFacade);
+                SauvegardeProjet.sauvegarderDevis("D_" + id, id, "Isolation", surfaceIsolation, 0, 0, coutIsolation);
 
-    } catch (NumberFormatException ex) {
-        lblErreur.setText("Largeur, longueur et étages doivent être des nombres.");
-    }
-});
+                new FenetreEtage(maison, new HashMap<>()).afficher(stage);
 
-        HBox bottomBox = new HBox();
+            } catch (NumberFormatException ex) {
+                lblErreur.setText("Largeur, longueur, étages et hauteur doivent être des nombres.");
+            }
+        });
+
+        HBox bottomBox = new HBox(30, btnRetour, btnSuivant);
         bottomBox.setPadding(new Insets(30));
-        bottomBox.setSpacing(400);
-        bottomBox.getChildren().addAll(btnRetour, btnSuivant);
         bottomBox.setAlignment(Pos.CENTER);
 
         VBox centre = new VBox(10, grid, lblErreur);
@@ -177,6 +175,43 @@ SauvegardeProjet.sauvegarderProjet(
         stage.show();
     }
 
+    private void preRemplirInfosProjet(String[] projet, int nbEtagesExistant,
+                                       TextField fieldHauteur,
+                                       ComboBox<Revetement> comboFacade,
+                                       ComboBox<Revetement> comboIsolation) {
+        if (projet == null) return;
+
+        try {
+            if (projet.length >= 5 && nbEtagesExistant >= 0) {
+                double hauteurTotale = Double.parseDouble(projet[4].trim().replace(",", "."));
+                double hauteurParEtage = hauteurTotale / (nbEtagesExistant + 1);
+
+                if (hauteurParEtage > 0) {
+                    fieldHauteur.setText(String.valueOf(hauteurParEtage));
+                }
+            }
+
+            if (projet.length >= 12) {
+                int idFacade = Integer.parseInt(projet[10].trim());
+                int idIsolation = Integer.parseInt(projet[11].trim());
+
+                selectionnerRevetement(comboFacade, idFacade);
+                selectionnerRevetement(comboIsolation, idIsolation);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void selectionnerRevetement(ComboBox<Revetement> combo, int idRevetement) {
+        for (Revetement r : combo.getItems()) {
+            if (r.getIdRevetement() == idRevetement) {
+                combo.setValue(r);
+                return;
+            }
+        }
+    }
+
     private void ajouterLigne(GridPane grid, String texte, TextField field, int ligne, String style) {
         Label lbl = new Label(texte);
         lbl.setStyle(style);
@@ -190,5 +225,4 @@ SauvegardeProjet.sauvegarderProjet(
         grid.add(lbl, 0, ligne);
         grid.add(combo, 1, ligne);
     }
-
 }

@@ -162,11 +162,18 @@ public class FenetrePieceCommuneEtage {
             );
 
             SauvegardeProjet.sauvegarderPiece(
-                    batiment.getId(), nomEtage, nom,
-                    p.x, p.y, p.largeur, p.longueur, p.hauteur,
-                    revMur.getIdRevetement(), revSol.getIdRevetement(), revPlafond.getIdRevetement(),
-                    coutMurs, coutSol, coutPlafond, total
-            );
+                batiment.getId(), nomEtage, nom,
+                p.x, p.y, p.largeur, p.longueur, p.hauteur,
+                revMur.getIdRevetement(),
+                revSol.getIdRevetement(),
+                revPlafond.getIdRevetement(),
+                coutMurs, coutSol, coutPlafond, total,
+                0,      
+                0,      
+                0,      
+                0.0,    
+                0.0     
+);
 
             SauvegardeProjet.sauvegarderDevis(
                     "D_" + batiment.getId(), batiment.getId(), nom,

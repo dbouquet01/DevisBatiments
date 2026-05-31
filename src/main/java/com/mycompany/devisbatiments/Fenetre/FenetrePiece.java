@@ -87,14 +87,16 @@ public class FenetrePiece {
         if (!comboTremie.getItems().isEmpty()) comboTremie.setValue(comboTremie.getItems().get(0));
 
         chargerDonnees(fieldX, fieldY, fieldLargeur, fieldLongueur, fieldHauteur,
+                fieldNbFenetre, fieldNbPorte,
+                fieldNbTremie, fieldLargeurTremie, fieldLongueurTremie,
                 comboMur, comboSol, comboPlafond);
 
         VBox boxDim = creerBox("1. Dimensions / position",
                 ligne("X origine :", fieldX, 140, 220),
                 ligne("Y origine :", fieldY, 140, 220),
                 ligne("Largeur (m) :", fieldLargeur, 140, 220),
-                ligne("Longueur (m) :", fieldLongueur, 140, 220),
-            );
+                ligne("Longueur (m) :", fieldLongueur, 140, 220)
+        );
 
         VBox boxOuv = creerBox("2. Ouvertures / escalier",
                 ligne("Fenêtres :", fieldNbFenetre, 160, 180),
@@ -220,6 +222,14 @@ public class FenetrePiece {
         btnRetour.setOnAction(e -> retour(stage));
 
         btnMenu.setOnAction(e -> new FenetreAccueil().afficher(stage));
+        
+        btnPlacerOuverture.setOnAction(e -> {
+            new FenetrePlacerOuverture(
+                batiment,
+                nomEtage,
+                nomPiece
+            ).afficher(stage);
+        });
 
         Scene scene = new Scene(root, 1500, 850);
         stage.setTitle("Configuration pièce");
@@ -312,6 +322,9 @@ public class FenetrePiece {
 
     private void chargerDonnees(TextField x, TextField y, TextField largeur,
                                 TextField longueur, TextField hauteur,
+                                TextField nbFenetre, TextField nbPorte,
+                                TextField nbTremie, TextField largeurTremie,
+                                TextField longueurTremie,
                                 ComboBox<Revetement> mur,
                                 ComboBox<Revetement> sol,
                                 ComboBox<Revetement> plafond) {
@@ -332,6 +345,32 @@ public class FenetrePiece {
             selectionner(mur, piece[15]);
             selectionner(sol, piece[16]);
             selectionner(plafond, piece[17]);
+        }
+
+        if (piece != null && piece.length >= 27) {
+            nbFenetre.setText(piece[22]);
+            nbPorte.setText(piece[23]);
+            nbTremie.setText(piece[24]);
+            largeurTremie.setText(piece[25]);
+            longueurTremie.setText(piece[26]);
+        } else {
+            int[] compteurs = SauvegardeProjet.compterElementsPlanPiece(
+                    batiment.getId(), nomEtage, nomPiece
+            );
+            double[] dimTremie = SauvegardeProjet.chargerDerniereTremiePiece(
+                    batiment.getId(), nomEtage, nomPiece
+            );
+
+            nbFenetre.setText(String.valueOf(compteurs[0]));
+            nbPorte.setText(String.valueOf(compteurs[1]));
+            nbTremie.setText(String.valueOf(compteurs[2]));
+
+            if (dimTremie[0] > 0) {
+                largeurTremie.setText(String.valueOf(dimTremie[0]));
+            }
+            if (dimTremie[1] > 0) {
+                longueurTremie.setText(String.valueOf(dimTremie[1]));
+            }
         }
     }
 
@@ -424,7 +463,12 @@ public class FenetrePiece {
                     mur.getValue().getIdRevetement(),
                     sol.getValue().getIdRevetement(),
                     plafond.getValue().getIdRevetement(),
-                    r.coutMurs, r.coutSol, r.coutPlafond, r.total
+                    r.coutMurs, r.coutSol, r.coutPlafond, r.total,
+                    (int) parseZero(nbFenetre),
+                    (int) parseZero(nbPorte),
+                    (int) parseZero(nbTremie),
+                    parseZero(largeurTremie),
+                    parseZero(longueurTremie)
             );
 
             SauvegardeProjet.sauvegarderDevis(
