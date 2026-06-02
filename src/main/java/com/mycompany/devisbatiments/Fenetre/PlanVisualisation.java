@@ -8,7 +8,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -16,6 +15,7 @@ public class PlanVisualisation {
 
     private Pane zoneDessin;
     private String projetInitial;
+    private Stage fenetrePrecedente;
 
     public PlanVisualisation() {
         this.projetInitial = "";
@@ -25,8 +25,19 @@ public class PlanVisualisation {
         this.projetInitial = projetInitial;
     }
 
+    public PlanVisualisation(String projetInitial, Stage fenetrePrecedente) {
+        this.projetInitial = projetInitial;
+        this.fenetrePrecedente = fenetrePrecedente;
+    }
+
     public void afficher() {
         Stage stage = new Stage();
+        
+        stage.setOnHidden(e -> {
+            if (fenetrePrecedente != null) {
+                fenetrePrecedente.show();
+            }
+        });
 
         Label lblProjet = new Label("PROJET :");
         lblProjet.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -72,27 +83,53 @@ public class PlanVisualisation {
         Scene scene = new Scene(root, 1100, 600);
         stage.setScene(scene);
         stage.setTitle("Visualisation des Plans");
+        stage.setMaximized(true);
+        stage.setOnCloseRequest(e -> {
+            e.consume();
+                new FenetreProjet().afficher(stage);
+        });
         stage.show();
+    }
+    
+    private void dessinerGraduations(double origineX, double origineY, double echelle,
+                                 double largeurProjet, double longueurProjet) {
+
+    for (int i = 0; i <= largeurProjet; i++) {
+        double x = origineX + i * echelle;
+
+        zoneDessin.getChildren().add(new javafx.scene.shape.Line(
+                x, origineY - 6,
+                x, origineY
+        ));
+
+        Text t = new Text(x - 4, origineY - 10, i + "m");
+        t.setStyle("-fx-font-size: 10px;");
+        zoneDessin.getChildren().add(t);
+    }
+
+    for (int i = 0; i <= longueurProjet; i++) {
+        double y = origineY + i * echelle;
+
+        zoneDessin.getChildren().add(new javafx.scene.shape.Line(
+                origineX - 6, y,
+                origineX, y
+        ));
+
+        Text t = new Text(origineX - 30, y + 4, i + "m");
+        t.setStyle("-fx-font-size: 10px;");
+        zoneDessin.getChildren().add(t);
+    }
     }
 
     public void afficherPlan(String projetRecherche, String vueRecherche) {
         zoneDessin.getChildren().clear();
 
-        double[] dimensionsPlan = calculerDimensionsDepuisPlan(projetRecherche, vueRecherche);
-
-        double largeurProjet = dimensionsPlan[0];
-        double longueurProjet = dimensionsPlan[1];
-        if (dimensionsPlan[0] > largeurProjet) {
-            largeurProjet = dimensionsPlan[0];
-        }
-
-        if (dimensionsPlan[1] > longueurProjet) {
-            longueurProjet = dimensionsPlan[1];
-        }
+        double largeurProjet = chercherLargeurProjet(projetRecherche);
+        double longueurProjet = chercherLongueurProjet(projetRecherche);
 
         if (largeurProjet <= 0 || longueurProjet <= 0) {
             zoneDessin.getChildren().add(
-                    new Text(40, 40, "Impossible de retrouver les dimensions du projet.")
+                new Text(40, 40, "Impossible de retrouver les dimensions du projet.")
             );
             return;
         }
@@ -123,7 +160,8 @@ public class PlanVisualisation {
         surfaceTotale.setStrokeWidth(4);
 
         zoneDessin.getChildren().add(surfaceTotale);
-
+        
+        dessinerGraduations(origineX, origineY, echelle, largeurProjet, longueurProjet);
         String vueNorm = normaliserVue(vueRecherche);
 
         String texteTitre;
@@ -158,7 +196,7 @@ public class PlanVisualisation {
 
         Text titre = new Text(
             origineX,
-            Math.max(25, origineY - 12),
+            Math.max(25, origineY - 37),
             texteTitre
         );
 
@@ -201,13 +239,35 @@ public class PlanVisualisation {
                 double largeur = Double.parseDouble(infos[5].trim());
                 double longueur = Double.parseDouble(infos[6].trim());
                 int idRevetement = Integer.parseInt(infos[8].trim());
+                    
+                
+                String nom = nomPiece.toLowerCase()
+                    .replace("é", "e")
+                    .replace("è", "e")
+                    .replace("ê", "e");
 
-                Rectangle rectPiece = new Rectangle(
-                        origineX + x * echelle,
-                        origineY + y * echelle,
-                        largeur * echelle,
-                        longueur * echelle
-                );
+                double posX = origineX + x * echelle;
+                double posY = origineY + y * echelle;
+
+                double largeurAffichage = largeur * echelle;
+                double longueurAffichage = longueur * echelle;
+
+                if (nom.contains("fenetre")) {
+                    double epaisseur = 4;
+
+                if (largeur >= longueur) {
+                    longueurAffichage = epaisseur;
+                } else {
+                    largeurAffichage = epaisseur;
+                }
+            }
+
+            Rectangle rectPiece = new Rectangle(
+                posX,
+                posY,
+                largeurAffichage,
+                longueurAffichage
+            );
 
                 rectPiece.setFill(getCouleurDepuisCatalogue(idRevetement));
                 rectPiece.setStroke(Color.BLACK);
@@ -216,11 +276,17 @@ public class PlanVisualisation {
                 Text textePiece = new Text(nomPiece);
                 textePiece.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
 
-                textePiece.setX(origineX + x * echelle + 8);
-                textePiece.setY(origineY + y * echelle + 22);
+                double centreX = origineX + x * echelle + (largeur * echelle) / 2;
+                double centreY = origineY + y * echelle + (longueur * echelle) / 2;
 
-                zoneDessin.getChildren().addAll(rectPiece, textePiece);
+                textePiece.setX(centreX - nomPiece.length() * 3);
+                textePiece.setY(centreY);
 
+                zoneDessin.getChildren().add(rectPiece);
+
+                if (!nom.contains("fenetre") && !nom.contains("porte")) {
+                    zoneDessin.getChildren().add(textePiece);
+                }
                 pieceTrouvee = true;
             }
 
@@ -240,54 +306,6 @@ public class PlanVisualisation {
                     )
             );
         }
-    }
-
-    private double[] calculerDimensionsDepuisPlan(String projetRecherche, String vueRecherche) {
-        double maxX = 0;
-        double maxY = 0;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
-
-            String ligne;
-
-            while ((ligne = reader.readLine()) != null) {
-
-                if (ligne.trim().isEmpty()) {
-                    continue;
-                }
-
-                if (ligne.toLowerCase().startsWith("idprojet")) {
-                    continue;
-                }
-
-                String[] infos = ligne.split(";");
-
-                if (infos.length < 9) {
-                    continue;
-                }
-
-                String projet = infos[0].trim();
-                String vue = infos[1].trim();
-
-                if (!projet.equalsIgnoreCase(projetRecherche.trim())
-                        || !normaliserVue(vue).equals(normaliserVue(vueRecherche))) {
-                    continue;
-                }
-
-                double x = Double.parseDouble(infos[3].trim());
-                double y = Double.parseDouble(infos[4].trim());
-                double largeur = Double.parseDouble(infos[5].trim());
-                double longueur = Double.parseDouble(infos[6].trim());
-
-                maxX = Math.max(maxX, x + largeur);
-                maxY = Math.max(maxY, y + longueur);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new double[]{maxX, maxY};
     }
 
     private double chercherLargeurProjet(String idProjet) {

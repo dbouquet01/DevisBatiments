@@ -59,7 +59,7 @@ public class PlanDessin extends Pane {
         double largeurPane = getWidth() > 0 ? getWidth() : getPrefWidth();
         double hauteurPane = getHeight() > 0 ? getHeight() : getPrefHeight();
 
-        double marge = 40;
+        double marge = 70;
 
         double largeurPlan = largeurAffichee;
         double longueurPlan = longueurAffichee;
@@ -96,12 +96,20 @@ public class PlanDessin extends Pane {
 
         Text titre = new Text(
                 origineX,
-                origineY - 10,
+                origineY - 40,
                 "Surface : " + String.format("%.2f", largeurPlan)
                         + " m x " + String.format("%.2f", longueurPlan) + " m"
         );
 
         getChildren().add(titre);
+        
+        dessinerGraduations(
+        origineX,
+        origineY,
+        echelle,
+        largeurPlan,
+        longueurPlan
+);
 
         try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
 
@@ -140,27 +148,109 @@ public class PlanDessin extends Pane {
 
                 int idRevetement = Integer.parseInt(infos[8]);
 
+                String nom = nomPiece.toLowerCase()
+                    .replace("é", "e")
+                    .replace("è", "e")
+                    .replace("ê", "e");
+
+                double posX = origineX + x * echelle;
+                double posY = origineY + y * echelle;
+
+                double largeurAffichage = largeur * echelle;
+                double longueurAffichage = longueur * echelle;
+
+                if (nom.contains("fenetre")) {
+                    double epaisseur = 4;
+
+                    if (largeur >= longueur) {
+                        longueurAffichage = epaisseur;
+                    } else {
+                        largeurAffichage = epaisseur;
+                    }
+                }
+
                 Rectangle piece = new Rectangle(
-                        origineX + x * echelle,
-                        origineY + y * echelle,
-                        largeur * echelle,
-                        longueur * echelle
+                        posX,
+                        posY,
+                        largeurAffichage,
+                        longueurAffichage
                 );
 
-                piece.setFill(getCouleurDepuisCatalogue(idRevetement));
-                piece.setStroke(Color.BLACK);
+                if (nom.contains("fenetre")) {
+                    piece.setFill(Color.LIGHTGRAY);
+                    piece.setStroke(Color.DARKGRAY);
+                    piece.setStrokeWidth(1);
+                } else {
+                    piece.setFill(getCouleurDepuisCatalogue(idRevetement));
+                    piece.setStroke(Color.BLACK);
+                }
 
-                Text texte = new Text(
-                        origineX + x * echelle + 5,
-                        origineY + y * echelle + 18,
-                        nomPiece
-                );
+                Text texte = new Text(nomPiece);
+                texte.setStyle("-fx-font-size: 11px;");
 
-                getChildren().addAll(piece, texte);
+                double centreX = origineX + x * echelle + (largeur * echelle) / 2;
+                double centreY = origineY + y * echelle + (longueur * echelle) / 2;
+
+                texte.setX(centreX - nomPiece.length() * 3);
+                texte.setY(centreY);
+
+                getChildren().add(piece);
+
+                if (!nom.contains("fenetre") && !nom.contains("porte")) {
+                    getChildren().add(texte);
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    
+    private void dessinerGraduations(double origineX, double origineY,
+                                 double echelle,
+                                 double largeurPlan,
+                                 double longueurPlan) {
+
+        for (int i = 0; i <= (int) largeurPlan; i += 2) {
+
+            double x = origineX + i * echelle;
+
+            javafx.scene.shape.Line trait =
+                    new javafx.scene.shape.Line(
+                            x, origineY - 8,
+                            x, origineY
+                    );
+
+            Text texte = new Text(
+                    x - 8,
+                    origineY - 15,
+                    i + "m"
+            );
+
+            texte.setStyle("-fx-font-size: 10px;");
+
+            getChildren().addAll(trait, texte);
+        }
+
+        for (int i = 0; i <= (int) longueurPlan; i += 2) {
+
+            double y = origineY + i * echelle;
+
+            javafx.scene.shape.Line trait =
+                    new javafx.scene.shape.Line(
+                            origineX - 8, y,
+                            origineX, y
+                    );
+
+            Text texte = new Text(
+                    origineX - 35,
+                    y + 4,
+                    i + "m"
+            );
+
+            texte.setStyle("-fx-font-size: 10px;");
+
+            getChildren().addAll(trait, texte);
         }
     }
 

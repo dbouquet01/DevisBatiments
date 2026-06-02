@@ -22,6 +22,9 @@ public class FenetreRecapitulatif {
  
     private final Batiments batiment;
     private final String nomEtage;
+    private Stage fenetrePrecedente;
+    
+    
  
   
     private static class LigneDevis {
@@ -39,10 +42,16 @@ public class FenetreRecapitulatif {
             this.total = total;
         }
     }
- 
+
     public FenetreRecapitulatif(Batiments batiment, String nomEtage) {
         this.batiment = batiment;
         this.nomEtage = nomEtage;
+    }
+   
+    public FenetreRecapitulatif(Batiments batiment, String nomEtage, Stage fenetrePrecedente) {
+        this.batiment = batiment;
+        this.nomEtage = nomEtage;
+        this.fenetrePrecedente = fenetrePrecedente;
     }
  
     public void afficher(Stage stage) {
@@ -172,12 +181,9 @@ public class FenetreRecapitulatif {
                 ex.printStackTrace();
             }
         });
+
  
-        Button btnRetour = new Button("RETOUR");
-        btnRetour.setStyle(styleBouton);
-        btnRetour.setOnAction(e -> new FenetreListePieces(batiment, nomEtage).afficher(stage));
- 
-        HBox bottomBox = new HBox(20, btnRetour, btnTelecharger, lblMessage);
+        HBox bottomBox = new HBox(20, btnTelecharger, lblMessage);
         bottomBox.setPadding(new Insets(20));
         bottomBox.setAlignment(Pos.CENTER_LEFT);
  
@@ -191,7 +197,12 @@ public class FenetreRecapitulatif {
         Scene scene = new Scene(root);
         stage.setTitle("Récapitulatif Devis — " + batiment.getId());
         stage.setScene(scene);
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
+        stage.setOnHidden(e -> {
+            if (fenetrePrecedente != null) {
+                fenetrePrecedente.show();
+            }
+        });
         stage.show();
     }
  

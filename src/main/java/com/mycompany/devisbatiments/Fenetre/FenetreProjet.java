@@ -141,15 +141,22 @@ public class FenetreProjet {
         btnPlans.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
 
         btnPlans.setOnAction(e -> {
-            if (idTrouve[0] == null) {
-                detailsText.setText("Veuillez d'abord rechercher un projet.");
-                zoneResultats.setVisible(true);
-                return;
-            }
 
-            PlanVisualisation fenetrePlans = new PlanVisualisation(idTrouve[0]);
-            fenetrePlans.afficher();
-        });
+    if (idTrouve[0] == null) {
+        detailsText.setText("Veuillez d'abord rechercher un projet.");
+        zoneResultats.setVisible(true);
+        return;
+    }
+
+    Stage fenetreActuelle = (Stage) btnPlans.getScene().getWindow();
+
+    fenetreActuelle.hide();
+
+    PlanVisualisation fenetrePlans =
+            new PlanVisualisation(idTrouve[0], fenetreActuelle);
+
+    fenetrePlans.afficher();
+    });
 
         Button btnModification = new Button("Modifier");
         btnModification.setStyle("-fx-font-size: 16px;-fx-font-weight: bold;-fx-background-color: #0F056B;-fx-text-fill: white;-fx-cursor: hand;");
@@ -214,8 +221,17 @@ public class FenetreProjet {
                 );
             }
 
-            new FenetreRecapitulatif(batiment, "Tous les étages").afficher(stage);
+            Stage fenetreActuelle = (Stage) btnDevis.getScene().getWindow();
+
+            fenetreActuelle.hide();
+
+            new FenetreRecapitulatif(
+                    batiment,
+                    "Tous les étages",
+                    fenetreActuelle
+            ).afficher(new Stage());
         });
+        
         HBox bottomContainer = new HBox();
         bottomContainer.setPadding(new Insets(15));
         bottomContainer.setSpacing(20);

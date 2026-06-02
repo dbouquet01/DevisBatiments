@@ -100,8 +100,18 @@ public class FenetreListePieces {
         Button btnDevis = new Button("VOIR LE DEVIS");
         btnDevis.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; "
                 + "-fx-font-weight: bold; -fx-padding: 8 18; -fx-cursor: hand;");
-        btnDevis.setOnAction(e -> new FenetreRecapitulatif(batiment, vuePlan).afficher(stage));
+        btnDevis.setOnAction(e -> {
+        Stage fenetreActuelle =
+                (Stage) btnDevis.getScene().getWindow();
 
+        fenetreActuelle.hide();
+
+        new FenetreRecapitulatif(
+                batiment,
+                vuePlan,
+                fenetreActuelle
+        ).afficher(new Stage());
+    });
         Button btnMenu = new Button("MENU PRINCIPAL");
         btnMenu.setStyle(styleBouton);
         btnMenu.setOnAction(e -> new FenetreAccueil().afficher(stage));
