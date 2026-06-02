@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
@@ -72,7 +68,7 @@ public class FenetreAppartement {
         boolean auMoinsUnBlocVisible = false;
 
         for (String nomBloc : blocsEtage) {
-            if (estCouloir(nomBloc)) {
+            if (estElementTechnique(nomBloc)) {
                 continue;
             }
 
@@ -237,8 +233,12 @@ public class FenetreAppartement {
         return n.startsWith("appartement") || n.startsWith("appart");
     }
 
-    private boolean estCouloir(String nomBloc) {
-        return normaliser(nomBloc).equals("couloir");
+    private boolean estElementTechnique(String nomBloc) {
+        String n = normaliser(nomBloc);
+        return n.equals("couloir")
+                || n.equals("escalier")
+                || n.equals("tremie")
+                || n.equals("trémie");
     }
 
     private String normaliser(String texte) {

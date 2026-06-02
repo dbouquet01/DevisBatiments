@@ -11,13 +11,9 @@ import javafx.stage.Stage;
 import com.mycompany.devisbatiments.Fenetre.FenetreAccueil;
 
 
-
-/**
- * JavaFX App
- */
 public class App extends Application {
 
-    public static String currentUserRole = "";  // "Administrateur" ou "Opérateur"
+    public static String currentUserRole = "";
 
     @Override
     public void start(Stage primaryStage) {
@@ -39,7 +35,6 @@ public class App extends Application {
     accueil.afficher(primaryStage);
     });
     
-        
     loginLayout.getChildren().addAll(titre, btnCo );
     Scene loginScene = new Scene(loginLayout, 900, 550);
     loginStage.setScene(loginScene);

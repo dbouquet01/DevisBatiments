@@ -1,5 +1,6 @@
 package com.mycompany.devisbatiments.Fenetre;
 
+import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
 import com.mycompany.devisbatiments.elements.Batiments;
 import com.mycompany.devisbatiments.elements.Maison;
 
@@ -169,6 +170,15 @@ public class FenetreEtage {
             alert.setTitle("Couloir obligatoire");
             alert.setHeaderText("Place d'abord le couloir.");
             alert.setContentText("Clique sur « Visualiser / placer couloir », puis valide le couloir.");
+            alert.showAndWait();
+            return;
+        }
+
+        if (!SauvegardeProjet.escalierOuTremieExiste(batiment.getId(), nomEtage)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Escalier obligatoire");
+            alert.setHeaderText("Place d'abord l'escalier.");
+            alert.setContentText("Dans « Visualiser / placer couloir », valide aussi l'escalier. Le dernier étage aura une trémie à la place.");
             alert.showAndWait();
             return;
         }

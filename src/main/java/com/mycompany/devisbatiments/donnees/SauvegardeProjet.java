@@ -120,6 +120,95 @@ public static void sauvegarderProjet(String idProjet, String designation, String
         );
     }
 
+
+
+    public static void sauvegarderCouloirTousEtages(String idProjet,
+                                                    int nbEtages,
+                                                    double largeurBatiment,
+                                                    double yCouloir,
+                                                    double largeurCouloir,
+                                                    int idRevetement) {
+        for (int i = 0; i <= nbEtages; i++) {
+            String nomEtage = i == 0 ? "RDC" : "Etage " + i;
+
+            sauvegarderElementPlan(
+                    idProjet,
+                    nomEtage,
+                    "Couloir",
+                    0,
+                    yCouloir,
+                    largeurBatiment,
+                    largeurCouloir,
+                    3.0,
+                    idRevetement
+            );
+        }
+    }
+
+    public static void sauvegarderEscalierEtTremieTousEtages(String idProjet,
+                                                             int nbEtages,
+                                                             double x,
+                                                             double y,
+                                                             double largeur,
+                                                             double longueur,
+                                                             double hauteur,
+                                                             int idRevetementEscalier,
+                                                             int idRevetementTremie) {
+        for (int i = 0; i <= nbEtages; i++) {
+            String nomEtage = i == 0 ? "RDC" : "Etage " + i;
+
+            if (i < nbEtages) {
+                sauvegarderElementPlan(
+                        idProjet,
+                        nomEtage,
+                        "Escalier",
+                        x,
+                        y,
+                        largeur,
+                        longueur,
+                        hauteur,
+                        idRevetementEscalier
+                );
+            } else {
+                supprimerElementPlan(idProjet, nomEtage, "Escalier");
+            }
+
+            sauvegarderElementPlan(
+                    idProjet,
+                    nomEtage,
+                    "Tremie",
+                    x,
+                    y,
+                    largeur,
+                    longueur,
+                    hauteur,
+                    idRevetementTremie
+            );
+        }
+    }
+
+    public static boolean escalierOuTremieExiste(String idProjet, String nomEtage) {
+        return chargerElementPlan(idProjet, nomEtage, "Escalier") != null
+                || chargerElementPlan(idProjet, nomEtage, "Tremie") != null;
+    }
+
+    public static boolean escalierExiste(String idProjet, String nomEtage) {
+        return chargerElementPlan(idProjet, nomEtage, "Escalier") != null;
+    }
+
+    public static boolean tremieExiste(String idProjet, String nomEtage) {
+        return chargerElementPlan(idProjet, nomEtage, "Tremie") != null;
+    }
+
+    public static void supprimerElementPlan(String idProjet, String vue, String nomElement) {
+        supprimerDansFichier(FICHIER_PLAN, HEADER_PLAN, parts ->
+                parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && normaliser(parts[1]).equals(normaliser(vue))
+                        && normaliser(parts[2]).equals(normaliser(nomElement))
+        );
+    }
+
     public static void sauvegarderDevis(String idDevis, String idProjet, String element,
                                         double coutMurs, double coutSol,
                                         double coutPlafond, double total) {
@@ -664,3 +753,4 @@ public static void sauvegarderProjet(String idProjet, String designation, String
                 .replace("ç", "c");
     }
 }
+

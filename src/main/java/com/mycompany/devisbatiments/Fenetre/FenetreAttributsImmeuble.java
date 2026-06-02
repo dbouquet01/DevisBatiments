@@ -97,8 +97,7 @@ public class FenetreAttributsImmeuble {
             fieldEtage.setText(String.valueOf(nbEtagesExistant));
         }
 
-        // Complète les infos déjà sauvegardées dans Projets.txt.
-        // La méthode centralisée est dans SauvegardeProjet, donc on évite de relire le fichier ici.
+       
         String[] projet = SauvegardeProjet.chargerProjet(idExistant);
         preRemplirInfosProjet(projet, nbEtagesExistant, fieldHauteur, comboFacade, comboIsolation);
 

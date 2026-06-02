@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
+
 package com.mycompany.devisbatiments.Fenetre;
 
 import com.mycompany.devisbatiments.donnees.SauvegardeProjet;
@@ -31,6 +28,8 @@ public class PlanEtage {
     private final HashMap<String, Integer> nbAppartsParEtage;
 
     private static final double LARGEUR_COULOIR_METRES = 1.50;
+    private static final double LARGEUR_ESCALIER_METRES = 2.00;
+    private static final double LONGUEUR_ESCALIER_METRES = LARGEUR_COULOIR_METRES;
 
     private static class ZoneCommune {
         String nom;
@@ -155,32 +154,74 @@ public class PlanEtage {
             }
         }
 
-        Button btnValiderCouloir = new Button("VALIDER LE COULOIR");
+        Button btnValiderCouloir = new Button("VALIDER COULOIR + ESCALIER");
         btnValiderCouloir.setStyle(styleValider);
 
-        HBox ligneChoix = new HBox(
+        String[] escalierExistant = SauvegardeProjet.chargerElementPlan(batiment.getId(), nomEtage, "Escalier");
+        String[] tremieExistante = SauvegardeProjet.chargerElementPlan(batiment.getId(), nomEtage, "Tremie");
+        String[] elementEscalierOuTremie = escalierExistant != null ? escalierExistant : tremieExistante;
+
+        double xEscalierInitial = elementEscalierOuTremie != null
+                ? Double.parseDouble(elementEscalierOuTremie[3].trim().replace(",", "."))
+                : Math.max(0, (batiment.getLargeur() - LARGEUR_ESCALIER_METRES) / 2.0);
+
+        Slider sliderEscalier = new Slider(
+                0,
+                Math.max(0, batiment.getLargeur() - LARGEUR_ESCALIER_METRES),
+                xEscalierInitial
+        );
+        sliderEscalier.setShowTickLabels(true);
+        sliderEscalier.setShowTickMarks(true);
+        sliderEscalier.setMajorTickUnit(1);
+        sliderEscalier.setBlockIncrement(0.25);
+        sliderEscalier.setPrefWidth(320);
+
+        Label lblEscalier = new Label();
+        lblEscalier.setStyle("-fx-font-weight: bold; -fx-text-fill: #0F056B;");
+
+        boolean dernierEtage = estDernierEtage(nomEtage);
+        Label lblEtatEscalier = new Label(elementEscalierOuTremie == null
+                ? (dernierEtage ? "Trémie non validée" : "Escalier non validé")
+                : (dernierEtage ? "Trémie déjà validée" : "Escalier déjà validé"));
+        lblEtatEscalier.setStyle(elementEscalierOuTremie == null
+                ? "-fx-text-fill: #B00020; -fx-font-weight: bold;"
+                : "-fx-text-fill: green; -fx-font-weight: bold;");
+
+        HBox ligneChoixCouloir = new HBox(
                 15,
                 new Label("Position Y du couloir :"),
                 sliderCouloir,
                 lblCouloir,
                 new Label("Revêtement :"),
                 choixRevetementCouloir,
-                btnValiderCouloir,
                 lblEtat
         );
-        ligneChoix.setAlignment(Pos.CENTER);
+        ligneChoixCouloir.setAlignment(Pos.CENTER);
+
+        HBox ligneChoixEscalier = new HBox(
+                15,
+                new Label("Position X escalier/trémie :"),
+                sliderEscalier,
+                lblEscalier,
+                btnValiderCouloir,
+                lblEtatEscalier
+        );
+        ligneChoixEscalier.setAlignment(Pos.CENTER);
 
         Pane dessin = creerDessinEtage(
                 nbApparts,
                 surfaceMoyenne,
                 sliderCouloir.getValue(),
                 choixRevetementCouloir.getValue(),
+                sliderEscalier.getValue(),
+                true,
                 zonesCommunes
         );
 
         lblCouloir.setText(String.format("%.2f m", sliderCouloir.getValue()));
+        lblEscalier.setText(String.format("%.2f m", sliderEscalier.getValue()));
 
-        VBox centre = new VBox(15, info, ligneChoix, dessin);
+        VBox centre = new VBox(15, info, ligneChoixCouloir, ligneChoixEscalier, dessin);
         centre.setAlignment(Pos.TOP_CENTER);
         centre.setPadding(new Insets(15));
 
@@ -193,10 +234,29 @@ public class PlanEtage {
                     surfaceMoyenne,
                     yCouloir,
                     choixRevetementCouloir.getValue(),
+                    sliderEscalier.getValue(),
+                    true,
                     zonesCommunes
             );
 
-            centre.getChildren().set(2, nouveauDessin);
+            centre.getChildren().set(3, nouveauDessin);
+        });
+
+        sliderEscalier.valueProperty().addListener((obs, oldValue, newValue) -> {
+            double xEscalier = newValue.doubleValue();
+            lblEscalier.setText(String.format("%.2f m", xEscalier));
+
+            Pane nouveauDessin = creerDessinEtage(
+                    nbApparts,
+                    surfaceMoyenne,
+                    sliderCouloir.getValue(),
+                    choixRevetementCouloir.getValue(),
+                    xEscalier,
+                    true,
+                    zonesCommunes
+            );
+
+            centre.getChildren().set(3, nouveauDessin);
         });
 
         choixRevetementCouloir.setOnAction(e -> {
@@ -205,10 +265,12 @@ public class PlanEtage {
                     surfaceMoyenne,
                     sliderCouloir.getValue(),
                     choixRevetementCouloir.getValue(),
+                    sliderEscalier.getValue(),
+                    true,
                     zonesCommunes
             );
 
-            centre.getChildren().set(2, nouveauDessin);
+            centre.getChildren().set(3, nouveauDessin);
         });
 
         btnValiderCouloir.setOnAction(e -> {
@@ -224,23 +286,34 @@ public class PlanEtage {
 
             double yCouloir = sliderCouloir.getValue();
 
-            GestionCouloirEtage.sauvegarderCouloir(
+            double xEscalier = sliderEscalier.getValue();
+
+            GestionCouloirEtage.sauvegarderCouloirTousEtages(
                     batiment.getId(),
-                    nomEtage,
+                    batiment.getNbEtage(),
                     yCouloir,
                     LARGEUR_COULOIR_METRES,
                     rev.getIdRevetement()
             );
 
-            SauvegardeProjet.sauvegarderElementPlan(
+            SauvegardeProjet.sauvegarderCouloirTousEtages(
                     batiment.getId(),
-                    nomEtage,
-                    "Couloir",
-                    0,
-                    yCouloir,
+                    batiment.getNbEtage(),
                     batiment.getLargeur(),
+                    yCouloir,
                     LARGEUR_COULOIR_METRES,
+                    rev.getIdRevetement()
+            );
+
+            SauvegardeProjet.sauvegarderEscalierEtTremieTousEtages(
+                    batiment.getId(),
+                    batiment.getNbEtage(),
+                    xEscalier,
+                    yCouloir,
+                    LARGEUR_ESCALIER_METRES,
+                    LONGUEUR_ESCALIER_METRES,
                     3.0,
+                    rev.getIdRevetement(),
                     rev.getIdRevetement()
             );
 
@@ -252,8 +325,10 @@ public class PlanEtage {
                     rev.getIdRevetement()
             );
 
-            lblEtat.setText("Couloir validé");
+            lblEtat.setText("Couloir validé sur tous les étages");
             lblEtat.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            lblEtatEscalier.setText("Escalier/trémie validé sur tous les étages");
+            lblEtatEscalier.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
         });
 
         Button btnRetour = new Button("RETOUR ÉTAGES");
@@ -284,6 +359,8 @@ public class PlanEtage {
                                   double surfaceMoyenne,
                                   double yCouloirMetres,
                                   Revetement revetementCouloir,
+                                  double xEscalierMetres,
+                                  boolean afficherEscalierTemporaire,
                                   ArrayList<ZoneCommune> zonesCommunes) {
 
         Pane dessin = new Pane();
@@ -299,6 +376,7 @@ public class PlanEtage {
         double hauteurTotale = 350;
 
         double echelleY = hauteurTotale / batiment.getLongueur();
+        double echelleX = largeurTotale / batiment.getLargeur();
 
         double xDepart = marge;
         double yDepart = marge;
@@ -357,6 +435,16 @@ public class PlanEtage {
                 largeurTotale,
                 hauteurCouloirPixels,
                 revetementCouloir
+        );
+
+        dessinerEscalierOuTremie(
+                dessin,
+                xDepart + xEscalierMetres * echelleX,
+                yCouloirPixels,
+                LARGEUR_ESCALIER_METRES * echelleX,
+                LONGUEUR_ESCALIER_METRES * echelleY,
+                afficherEscalierTemporaire,
+                estDernierEtage(nomEtage)
         );
 
         dessinerLigneBlocs(
@@ -482,6 +570,55 @@ public class PlanEtage {
         dessin.getChildren().addAll(couloir, texte);
     }
 
+
+
+    private void dessinerEscalierOuTremie(Pane dessin,
+                                          double x,
+                                          double y,
+                                          double largeur,
+                                          double hauteur,
+                                          boolean afficher,
+                                          boolean dernierEtage) {
+        if (!afficher) {
+            return;
+        }
+
+        Rectangle rect = new Rectangle(x, y, largeur, hauteur);
+        rect.setFill(dernierEtage ? Color.web("#FFF3CD") : Color.web("#D6EAF8"));
+        rect.setStroke(dernierEtage ? Color.web("#B8860B") : Color.web("#0F056B"));
+        rect.setStrokeWidth(2.5);
+
+        Text texte = new Text(
+                x + 8,
+                y + Math.max(18, hauteur / 2 + 5),
+                dernierEtage ? "Trémie" : "Escalier"
+        );
+        texte.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+
+        dessin.getChildren().addAll(rect, texte);
+    }
+
+    private boolean estDernierEtage(String nomEtageCourant) {
+        return extraireNumeroEtage(nomEtageCourant) == batiment.getNbEtage();
+    }
+
+    private int extraireNumeroEtage(String nomEtageCourant) {
+        if (nomEtageCourant == null || nomEtageCourant.equalsIgnoreCase("RDC")) {
+            return 0;
+        }
+
+        String chiffres = nomEtageCourant.replaceAll("[^0-9]", "");
+
+        if (chiffres.isEmpty()) {
+            return 0;
+        }
+
+        try {
+            return Integer.parseInt(chiffres);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
     private void sauvegarderAppartementsSelonAffichage(int nbApparts,
                                                        double surfaceMoyenne,
                                                        double yCouloirMetres,
@@ -585,6 +722,9 @@ public class PlanEtage {
                 }
 
                 if (nom.equalsIgnoreCase("Couloir")
+                        || nom.equalsIgnoreCase("Escalier")
+                        || nom.equalsIgnoreCase("Tremie")
+                        || nom.equalsIgnoreCase("Trémie")
                         || nom.toLowerCase().startsWith("appart")
                         || nom.toLowerCase().startsWith("appartement")) {
                     continue;

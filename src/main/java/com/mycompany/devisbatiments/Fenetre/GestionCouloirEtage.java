@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMain.java to edit this template
- */
 package com.mycompany.devisbatiments.Fenetre;
 
 import java.io.IOException;
@@ -80,6 +76,15 @@ public class GestionCouloirEtage {
         }
     }
 
+    public static void sauvegarderCouloirTousEtages(String idProjet, int nbEtages,
+                                                    double yCouloir, double largeurCouloir,
+                                                    int idRevetement) {
+        for (int i = 0; i <= nbEtages; i++) {
+            String nomEtage = i == 0 ? "RDC" : "Etage " + i;
+            sauvegarderCouloir(idProjet, nomEtage, yCouloir, largeurCouloir, idRevetement);
+        }
+    }
+
     public static CouloirInfo chargerCouloir(String idProjet, String nomEtage) {
         try {
             Path path = Paths.get(FICHIER_COULOIRS);
@@ -136,3 +141,5 @@ public class GestionCouloirEtage {
         }
     }
 }
+
+

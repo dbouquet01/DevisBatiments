@@ -1,49 +1,6 @@
 idEtage;idProjet;nomEtage;nbAppartements;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
-P1_RDC;P1;RDC;5;false;false;24.75;2713.97
-P2_RDC;P2;RDC;1;0;false;false;300.0;0
-P2_ETAGE1;P2;Etage 1;3;0;false;false;300.0;0
-P2_ETAGE2;P2;Etage 2;4;0;false;false;300.0;0
-P2_ETAGE3;P2;Etage 3;5;0;false;false;300.0;0
-P2_ETAGE4;P2;Etage 4;6;0;false;false;300.0;0
-P2_ETAGE5;P2;Etage 5;7;0;false;false;300.0;0
-P3_RDC;P3;RDC;2;0;false;false;120.0;0
-P3_ETAGE1;P3;Etage 1;3;0;false;false;120.0;0
-P3_ETAGE2;P3;Etage 2;3;0;false;false;120.0;0
-P3_ETAGE3;P3;Etage 3;3;0;false;false;120.0;0
-P3_ETAGE4;P3;Etage 4;3;0;false;false;120.0;0
-P16_RDC;P16;RDC;2;0;false;false;90.0;0
-P16_ETAGE1;P16;Etage 1;3;0;false;false;90.0;0
-P16_ETAGE2;P16;Etage 2;4;0;false;false;90.0;0
-P16_ETAGE3;P16;Etage 3;5;0;false;false;90.0;0
-P16_ETAGE4;P16;Etage 4;6;0;false;false;90.0;0
-IMB001_RDC;IMB001;RDC;2;0;false;false;90.0;0
-IMB001_ETAGE1;IMB001;Etage 1;4;0;false;false;90.0;0
-IMB001_ETAGE2;IMB001;Etage 2;5;0;false;false;90.0;0
-IMB001_ETAGE3;IMB001;Etage 3;6;0;false;false;90.0;0
-IMB001_ETAGE4;IMB001;Etage 4;7;0;false;false;90.0;0
-P17_RDC;P17;RDC;2;0;false;false;250.0;0
-P17_ETAGE1;P17;Etage 1;3;0;false;false;250.0;0
-P17_ETAGE2;P17;Etage 2;4;0;false;false;250.0;0
-P17_ETAGE3;P17;Etage 3;1;0;false;false;250.0;0
-P17_ETAGE4;P17;Etage 4;1;0;false;false;250.0;0
-
-P18_RDC;P18;RDC;0;4;false;false;84.0;0
-P18_ETAGE1;P18;Etage 1;0;3;false;false;84.0;0
-P19_RDC;P19;RDC;2;3;false;false;108.0;0
-P21_RDC;P21;RDC;1;0;false;false;200.0;0
-P21_ETAGE1;P21;Etage 1;2;0;false;false;200.0;0
-P21_ETAGE2;P21;Etage 2;3;0;false;false;200.0;0
-P21_ETAGE3;P21;Etage 3;4;0;false;false;200.0;0
-P21_ETAGE4;P21;Etage 4;6;0;false;false;200.0;0
-P21_ETAGE5;P21;Etage 5;7;0;false;false;200.0;0
-IMB003_RDC;IMB003;RDC;4;0;false;false;192.0;0
-IMB003_ETAGE1;IMB003;Etage 1;6;0;false;false;192.0;0
-IMB003_ETAGE2;IMB003;Etage 2;6;0;false;false;192.0;0
-IMB003_ETAGE3;IMB003;Etage 3;6;0;false;false;192.0;0
-IMB003_ETAGE4;IMB003;Etage 4;5;0;false;false;192.0;0
-IMB004_RDC;IMB004;RDC;4;0;false;false;300.0;0
-IMB004_ETAGE1;IMB004;Etage 1;6;0;false;false;300.0;0
-IMB004_ETAGE2;IMB004;Etage 2;6;0;false;false;300.0;0
-IMB004_ETAGE3;IMB004;Etage 3;6;0;false;false;300.0;0
-IMB004_ETAGE4;IMB004;Etage 4;5;0;false;false;300.0;0
-IMB004_ETAGE5;IMB004;Etage 5;5;0;false;false;300.0;0
+IM01_RDC;IM01;RDC;0;0;false;false;500.0;0
+IM01_ETAGE1;IM01;Etage 1;6;0;false;false;500.0;0
+IM01_ETAGE2;IM01;Etage 2;6;0;false;false;500.0;0
+IM01_ETAGE3;IM01;Etage 3;7;0;false;false;500.0;0
+IM01_ETAGE4;IM01;Etage 4;7;0;false;false;500.0;0
