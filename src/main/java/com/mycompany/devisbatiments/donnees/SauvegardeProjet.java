@@ -12,6 +12,7 @@ public class SauvegardeProjet {
     private static final String FICHIER_DEVIS = "Devis.txt";
     private static final String FICHIER_ETAGE = "Etage.txt";
     private static final String FICHIER_PIECE = "Piece.txt";
+    private static final String FICHIER_CATALOGUE = "CatalogueRevetements.txt";
     private static final String HEADER_OUVERTURES = "idProjet;nomEtage;nomPiece;type;mur;position;largeur;hauteur";
 
     private static final String HEADER_PROJETS =
@@ -350,6 +351,37 @@ public static void sauvegarderProjet(String idProjet, String designation, String
                         && normaliser(parts[1]).equals(normaliser(idProjet))
                         && normaliser(parts[2]).equals(normaliser(nomPiece))
         );
+    }
+
+
+    public static void supprimerPiecesAppartementsProjet(String idProjet) {
+        ArrayList<String> nomsPiecesSupprimees = new ArrayList<>();
+
+        supprimerDansFichier(FICHIER_PIECE, HEADER_PIECE, parts -> {
+            boolean aSupprimer = parts.length >= 5
+                    && normaliser(parts[1]).equals(normaliser(idProjet))
+                    && estVueAppartement(parts[4]);
+
+            if (aSupprimer && parts[3] != null && !parts[3].trim().isEmpty()) {
+                nomsPiecesSupprimees.add(parts[3].trim());
+            }
+
+            return aSupprimer;
+        });
+
+        supprimerDansFichier(FICHIER_PLAN, HEADER_PLAN, parts ->
+                parts.length >= 3
+                        && normaliser(parts[0]).equals(normaliser(idProjet))
+                        && estVueAppartement(parts[1])
+        );
+
+        if (!nomsPiecesSupprimees.isEmpty()) {
+            supprimerDansFichier(FICHIER_DEVIS, HEADER_DEVIS, parts ->
+                    parts.length >= 3
+                            && normaliser(parts[1]).equals(normaliser(idProjet))
+                            && contient(nomsPiecesSupprimees, parts[2])
+            );
+        }
     }
 
     public static void supprimerAppartementsAutoEtage(String idProjet, String nomEtage) {
@@ -726,9 +758,37 @@ public static void sauvegarderProjet(String idProjet, String designation, String
         return false;
     }
 
+
+    private static boolean estVueAppartement(String texte) {
+        String n = normaliser(texte).replace("_", "");
+        return n.contains("appart") || n.contains("appartement");
+    }
+
     private static boolean estAppartement(String texte) {
         String n = normaliser(texte);
         return n.startsWith("appartement") || n.startsWith("appart");
+    }
+
+
+    public static void sauvegarderTremieEtageDessusMaison(String idProjet,
+                                                          String nomEtage,
+                                                          String nomPieceOrigine,
+                                                          double xPlan,
+                                                          double yPlan,
+                                                          double largeur,
+                                                          double longueur,
+                                                          int idRevetementTremie) {
+        SauvegardeProjetOuvertures.sauvegarderTremieEtageDessusMaison(
+                idProjet, nomEtage, nomPieceOrigine, xPlan, yPlan, largeur, longueur, idRevetementTremie
+        );
+    }
+
+    private static String nettoyerNom(String texte) {
+        return normaliser(texte).replaceAll("[^a-z0-9]", "");
+    }
+
+    private static String coordNom(double valeur) {
+        return String.valueOf(Math.round(valeur * 100));
     }
 
     private static String normaliser(String texte) {
@@ -753,4 +813,3 @@ public static void sauvegarderProjet(String idProjet, String designation, String
                 .replace("ç", "c");
     }
 }
-

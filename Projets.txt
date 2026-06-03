@@ -1,4 +1,4 @@
 idProjet;designation;type;nombreEtages;hauteurTotale;surfaceTotale;nombreAppartements;idDevis;largeur;longueur;idFacade;idIsolation
 
 M01;Maison Bouquet;MAISON;2;6.0;330.0;0;D_M01;10.0;11.0;20;23
-IM01;Résidence Strasbourg;IMMEUBLE;4;12.0;2000.0;20;D_IM01;20.0;25.0;20;23
+IM01;Résidence Strasbourg;IMMEUBLE;4;12.0;2500.0;16;D_IM01;20.0;25.0;20;23

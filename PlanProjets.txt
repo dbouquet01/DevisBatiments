@@ -1,6 +1,6 @@
 idProjet;vue;piece;x;y;largeur;longueur;hauteur;idRevetement
 
-M01;RDC;Entrée;0;0;3;3;3;2
+M01;RDC;Entrée;0.0;0.0;3.0;3.0;3.0;2
 M01;RDC;Cuisine;3;0;3.5;3;3;13
 M01;RDC;Salon;6.5;0;3.5;6;3;10
 M01;RDC;Salle à manger;0;3;6.5;4;3;13
@@ -29,26 +29,21 @@ M01;Etage 1;Chambre 1_Porte1;4.5;5.5;0.9;0.1;2.1;13
 M01;Etage 1;Chambre 2_Porte1;5.5;5.5;0.9;0.1;2.1;13
 M01;Etage 1;Salle de bain_Porte1;3;7;0.1;0.9;2.1;13
 M01;Etage 1;Bureau_Porte1;4;5.5;0.9;0.1;2.1;13
-IM01;RDC;Couloir;0;11.75;20;1.5;3;3
-IM01;RDC;Escalier;0;11.75;2;1.5;3;3
-IM01;Etage 1;Couloir;0;11.75;20;1.5;3;3
-IM01;Etage 1;Escalier;0;11.75;2;1.5;3;3
-IM01;Etage 2;Couloir;0;11.75;20;1.5;3;3
-IM01;Etage 2;Escalier;0;11.75;2;1.5;3;3
-IM01;Etage 3;Couloir;0;11.75;20;1.5;3;3
-IM01;Etage 3;Escalier;0;11.75;2;1.5;3;3
-IM01;Etage 4;Couloir;0;11.75;20;1.5;3;3
-IM01;Etage 4;Escalier;0;11.75;2;1.5;3;3
+IM01;RDC;Couloir;0.0;8.354268999522542;20.0;1.5;3.0;3
+IM01;RDC;Escalier;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 1;Couloir;0.0;8.354268999522542;20.0;1.5;3.0;3
+IM01;Etage 1;Escalier;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 2;Couloir;0.0;8.354268999522542;20.0;1.5;3.0;3
+IM01;Etage 2;Escalier;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 3;Couloir;0.0;8.354268999522542;20.0;1.5;3.0;3
+IM01;Etage 3;Escalier;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 4;Couloir;0.0;8.354268999522542;20.0;1.5;3.0;3
 IM01;RDC;Accueil;0;0;6;11.75;3;2
 IM01;RDC;Local poubelle;6;0;4;11.75;3;14
 IM01;RDC;Salle de sport;10;0;10;11.75;3;13
 IM01;RDC;Local technique;0;13.25;5;11.75;3;14
 IM01;RDC;Bureau gardien;5;13.25;5;11.75;3;2
 IM01;RDC;Hall;10;13.25;10;11.75;3;3
-IM01;Etage 1;Appart1;0;0;10;11.75;3;3
-IM01;Etage 1;Appart2;10;0;10;11.75;3;3
-IM01;Etage 1;Appart3;0;13.25;10;11.75;3;3
-IM01;Etage 1;Appart4;10;13.25;10;11.75;3;3
 IM01;Etage 2;Appart1;0;0;10;11.75;3;3
 IM01;Etage 2;Appart2;10;0;10;11.75;3;3
 IM01;Etage 2;Appart3;0;13.25;10;11.75;3;3
@@ -61,12 +56,14 @@ IM01;Etage 4;Appart1;0;0;10;11.75;3;3
 IM01;Etage 4;Appart2;10;0;10;11.75;3;3
 IM01;Etage 4;Appart3;0;13.25;10;11.75;3;3
 IM01;Etage 4;Appart4;10;13.25;10;11.75;3;3
-IM01;Etage1_Appart1;Salon;0;0;5;5;3;10
-IM01;Etage1_Appart1;Cuisine;5;0;5;3;3;13
-IM01;Etage1_Appart1;Chambre;0;5;5;6.75;3;2
-IM01;Etage1_Appart1;Salle d'eau;5;3;2.5;4;3;14
-IM01;Etage1_Appart1;Entrée;7.5;3;2.5;8.75;3;3
-IM01;Etage1_Appart1;Salon_Fenetre1;2;0;1.2;0.1;1;10
-IM01;Etage1_Appart1;Cuisine_Fenetre1;7;0;1.2;0.1;1;10
-IM01;Etage1_Appart1;Chambre_Fenetre1;0;7;0.1;1.2;1;10
-IM01;Etage1_Appart1;Salon_Porte1;4.5;5;0.9;0.1;2.1;13
+IM01;RDC;Tremie;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 1;Tremie;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 2;Tremie;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 3;Tremie;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 4;Tremie;0.0;8.354268999522542;2.0;1.5;3.0;3
+IM01;Etage 1;Appart1;0.0;0.0;20.0;8.354268999522542;3.0;3
+IM01;Etage 1;Appart2;0.0;9.854268999522542;6.666666666666667;15.145731000477458;3.0;3
+IM01;Etage 1;Appart3;6.666666666666667;9.854268999522542;6.666666666666667;15.145731000477458;3.0;3
+IM01;Etage 1;Appart4;13.333333333333334;9.854268999522542;6.666666666666667;15.145731000477458;3.0;3
+M01;RDC;Entrée_Tremie1;0.0;1.0;1.0;2.0;0.0;14
+M01;Etage 1;Chambre 1_TremieAuto_entree_0_100;0.0;1.0;1.0;2.0;0.0;14

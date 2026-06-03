@@ -1,8 +1,8 @@
 idEtage;idProjet;nomEtage;nbAppartements;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
 M01_RDC;M01;RDC;0;6;true;false;110.0;0
 M01_ETAGE1;M01;Etage 1;0;5;true;false;110.0;0
-IM01_RDC;IM01;RDC;0;6;true;true;500.0;0
-IM01_ETAGE1;IM01;Etage 1;4;0;true;true;500.0;0
-IM01_ETAGE2;IM01;Etage 2;4;0;true;true;500.0;0
-IM01_ETAGE3;IM01;Etage 3;4;0;true;true;500.0;0
-IM01_ETAGE4;IM01;Etage 4;4;0;true;true;500.0;0
+IM01_RDC;IM01;RDC;0;0;false;false;500.0;0
+IM01_ETAGE1;IM01;Etage 1;4;0;false;false;500.0;0
+IM01_ETAGE2;IM01;Etage 2;4;0;false;false;500.0;0
+IM01_ETAGE3;IM01;Etage 3;4;0;false;false;500.0;0
+IM01_ETAGE4;IM01;Etage 4;4;0;false;false;500.0;0
