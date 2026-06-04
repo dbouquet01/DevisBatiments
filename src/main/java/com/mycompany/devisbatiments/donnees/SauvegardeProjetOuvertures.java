@@ -25,12 +25,7 @@ public class SauvegardeProjetOuvertures {
         }
     }
 
-    /**
-     * Maison uniquement : quand une trémie/escalier est placée dans une pièce,
-     * on ajoute automatiquement la trémie au même emplacement dans la pièce de
-     * l'étage du dessus, puis on recalcule les surfaces et le devis de cette
-     * pièce supérieure.
-     */
+    
     public static void sauvegarderTremieEtageDessusMaison(String idProjet,
                                                           String nomEtage,
                                                           String nomPieceOrigine,

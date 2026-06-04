@@ -639,6 +639,84 @@ public class FenetrePlacerOuvertureController {
         a.showAndWait();
     }
 
+
+
+    boolean estVueAppartement() {
+        if (nomEtage == null || !nomEtage.contains("_")) {
+            return false;
+        }
+        String nomAppartement = extraireNomAppartement(nomEtage);
+        return estNomAppartement(nomAppartement);
+    }
+
+    boolean estBlocAppartementCourant() {
+        return !(batiment instanceof Maison) && estNomAppartement(nomPiece);
+    }
+
+    double[] dimensionsZonePlan() {
+        if (estVueAppartement()) {
+            double[] dimsAppartement = dimensionsAppartementParent();
+            if (dimsAppartement[0] > 0 && dimsAppartement[1] > 0) {
+                return new double[]{dimsAppartement[0], dimsAppartement[1]};
+            }
+        }
+
+        if (estBlocAppartementCourant()) {
+            return new double[]{pieceLargeur, pieceLongueur};
+        }
+
+        return dimensionsEtage();
+    }
+
+    private double[] dimensionsAppartementParent() {
+        String etageParent = extraireEtageParent(nomEtage);
+        String nomAppartement = extraireNomAppartement(nomEtage);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("PlanProjets.txt"))) {
+            String ligne;
+            reader.readLine();
+            while ((ligne = reader.readLine()) != null) {
+                if (ligne.trim().isEmpty()) continue;
+                String[] p = ligne.split(";");
+                if (p.length < 7) continue;
+                if (!p[0].trim().equalsIgnoreCase(batiment.getId())) continue;
+                if (!normaliser(p[1].trim()).equals(normaliser(etageParent))) continue;
+                if (!normaliser(p[2].trim()).equals(normaliser(nomAppartement))) continue;
+
+                return new double[]{
+                        Double.parseDouble(p[5].trim().replace(",", ".")),
+                        Double.parseDouble(p[6].trim().replace(",", "."))
+                };
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new double[]{0, 0};
+    }
+
+    private String extraireEtageParent(String vueInterne) {
+        String etage = vueInterne.substring(0, vueInterne.indexOf("_"));
+
+        if (etage.equalsIgnoreCase("RDC")) {
+            return "RDC";
+        }
+
+        if (etage.toLowerCase().startsWith("etage")) {
+            return etage.replace("Etage", "Etage ");
+        }
+
+        return etage;
+    }
+
+    private String extraireNomAppartement(String vueInterne) {
+        return vueInterne.substring(vueInterne.indexOf("_") + 1);
+    }
+
+    private boolean estNomAppartement(String nom) {
+        String n = normaliser(nom);
+        return n.startsWith("APPARTEMENT") || n.startsWith("APPART");
+    }
+
     String normaliser(String s) {
         if (s == null) return "";
         return s.trim().toUpperCase()

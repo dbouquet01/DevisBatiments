@@ -29,12 +29,12 @@ public class PlanOuverture {
         Pane zoneDessin = vue.getZoneDessin();
         zoneDessin.getChildren().clear();
 
-        double[] dims = controller.dimensionsEtage();
+        double[] dims = controller.dimensionsZonePlan();
         double largeurEtage = dims[0];
         double longueurEtage = dims[1];
 
         if (largeurEtage <= 0 || longueurEtage <= 0) {
-            zoneDessin.getChildren().add(new Text(20, 40, "Impossible de lire les dimensions de l'etage."));
+            zoneDessin.getChildren().add(new Text(20, 40, "Impossible de lire les dimensions du plan."));
             return;
         }
 
@@ -45,20 +45,24 @@ public class PlanOuverture {
         double origX = (PANE_W - largeurEtage * echelle) / 2;
         double origY = (PANE_H - longueurEtage * echelle) / 2;
 
-        Rectangle contourEtage = new Rectangle(origX, origY,
+        Rectangle contourPlan = new Rectangle(origX, origY,
                 largeurEtage * echelle, longueurEtage * echelle);
-        contourEtage.setFill(Color.TRANSPARENT);
-        contourEtage.setStroke(Color.BLACK);
-        contourEtage.setStrokeWidth(3);
-        zoneDessin.getChildren().add(contourEtage);
+        contourPlan.setFill(Color.TRANSPARENT);
+        contourPlan.setStroke(Color.BLACK);
+        contourPlan.setStrokeWidth(3);
+        zoneDessin.getChildren().add(contourPlan);
 
         dessinerGraduations(origX, origY, echelle, largeurEtage, longueurEtage);
         dessinerPiecesEtage(origX, origY, echelle);
         dessinerPieceCourante(origX, origY, echelle);
         dessinerOuvertures(origX, origY, echelle);
 
+        String typePlan = controller.estVueAppartement() || controller.estBlocAppartementCourant()
+                ? "appartement"
+                : "etage";
         Text legende = new Text(origX, origY + longueurEtage * echelle + 20,
-                "H=Haut  B=Bas  G=Gauche  D=Droite     [piece surlignee = " + controller.getNomPiece() + "]");
+                "H=Haut  B=Bas  G=Gauche  D=Droite     [plan = " + typePlan
+                        + ", piece surlignee = " + controller.getNomPiece() + "]");
         legende.setStyle("-fx-font-size: 11px;");
         zoneDessin.getChildren().add(legende);
     }

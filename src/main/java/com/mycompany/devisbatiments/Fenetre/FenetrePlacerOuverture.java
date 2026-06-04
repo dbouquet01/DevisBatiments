@@ -18,14 +18,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * Vue de la fenêtre de placement des ouvertures.
- *
- * Cette classe garde uniquement la construction graphique JavaFX : labels,
- * champs, boutons, listes et disposition. Toute la logique d'action, de
- * sauvegarde, de chargement et de dessin du plan est dans
- * FenetrePlacerOuvertureController.
- */
 public class FenetrePlacerOuverture {
 
     static final double PANE_W = 700;
