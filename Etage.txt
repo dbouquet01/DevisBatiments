@@ -1,2 +1,6 @@
 idEtage;idProjet;nomEtage;nbAppartements;nbPieces;presenceEscalier;presenceAscenseur;surfaceTotale;devis
-
+IM01_RDC;IM01;RDC;0;0;false;false;165.0;0
+IM01_ETAGE1;IM01;Etage 1;4;0;false;false;165.0;0
+IM01_ETAGE2;IM01;Etage 2;5;0;false;false;165.0;0
+IM01_ETAGE3;IM01;Etage 3;6;0;false;false;165.0;0
+IM01_ETAGE4;IM01;Etage 4;6;0;false;false;165.0;0

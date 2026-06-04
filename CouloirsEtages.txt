@@ -1,2 +1,8 @@
 idProjet;nomEtage;yCouloir;largeurCouloir;idRevetement
 
+IM01;RDC;4.75;1.5;2
+IM01;Etage 1;4.75;1.5;2
+IM01;Etage 2;4.75;1.5;2
+IM01;Etage 3;4.75;1.5;2
+IM01;Etage 4;4.75;1.5;2
+
